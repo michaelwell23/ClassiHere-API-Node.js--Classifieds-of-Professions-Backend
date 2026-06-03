@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-const healthRoutes = require('./health.routes');
+const healthRoutes = require('../modules/health/routes');
 
 const routes = Router();
 

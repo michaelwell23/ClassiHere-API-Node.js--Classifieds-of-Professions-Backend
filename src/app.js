@@ -3,10 +3,10 @@ const swaggerUi = require('swagger-ui-express');
 
 const routes = require('./routes');
 
-const swaggerSpec = require('./docs/swagger');
+const swaggerSpec = require('./config/swagger');
 
-const notFound = require('./middlewares/notFound');
-const errorHandler = require('./middlewares/errorHandler');
+const notFound = require('./shared/middlewares/notFound');
+const errorHandler = require('./shared/middlewares/errorHandler');
 
 const app = express();
 app.use(express.json());
