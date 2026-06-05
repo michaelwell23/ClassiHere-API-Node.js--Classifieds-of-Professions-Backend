@@ -1,17 +1,20 @@
-module.exports = (error, request, response, next) => {
-  const statusCode = error.statusCode || 500;
+const AppError = require('../errors/AppError');
 
-  const responseBody = {
-    success: false,
-    error: {
-      message: error.message || 'Internal Server Error',
-      details: error.details || null,
-    },
-  };
-
-  if (process.env.NODE_ENV === 'development') {
-    responseBody.error.stack = error.stack;
+function errorHandler(error, request, response, next) {
+  if (error instanceof AppError) {
+    return response.status(error.statusCode).json({
+      success: false,
+      message: error.message,
+      details: error.details,
+    });
   }
 
-  return response.status(statusCode).json(responseBody);
-};
+  console.error(error);
+
+  return response.status(500).json({
+    success: false,
+    message: 'Internal server error',
+  });
+}
+
+module.exports = errorHandler;

@@ -1,3 +1,29 @@
-class UserRepository {}
+const User = require('../../../database/models/User');
+
+class UserRepository {
+  async create(data) {
+    return User.create(data);
+  }
+
+  async findById(id) {
+    return User.findByPk(id);
+  }
+
+  async findByEmail(email) {
+    return User.findOne({ where: { email } });
+  }
+
+  async findByCpf(cpf) {
+    return User.findOne({ where: { cpf } });
+  }
+
+  async update(user, data) {
+    return user.update(data);
+  }
+
+  async delete(user) {
+    return user.destroy();
+  }
+}
 
 module.exports = new UserRepository();
