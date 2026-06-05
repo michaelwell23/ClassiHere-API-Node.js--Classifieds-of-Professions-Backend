@@ -1,11 +1,21 @@
 const { Sequelize } = require('sequelize');
-
 const databaseConfig = require('./config');
 
-const env = process.env.NODE_ENV || 'development';
+const User = require('./models/User');
+const UserVerification = require('./models/UserVerification');
 
+const env = process.env.NODE_ENV || 'development';
 const config = databaseConfig[env];
 
 const connection = new Sequelize(config);
+
+const models = [User, UserVerification];
+
+models.forEach((model) => model.init(connection));
+models.forEach((model) => {
+  if (model.associate) {
+    model.associate(connection.models);
+  }
+});
 
 module.exports = connection;
