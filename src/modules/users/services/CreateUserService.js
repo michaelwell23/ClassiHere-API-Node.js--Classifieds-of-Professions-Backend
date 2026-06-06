@@ -1,6 +1,6 @@
 const AppError = require('../../../shared/errors/AppError');
 
-const { UserRepository } = require('../repositories');
+const { UserRepository } = require('../repositories/UserRepository');
 
 class CrreateUserService {
   async execute(data) {

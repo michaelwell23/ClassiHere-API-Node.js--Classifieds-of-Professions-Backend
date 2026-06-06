@@ -1,5 +1,7 @@
 const { GetUserService } = require('../services');
 
+const userResponseDTO = require('../dtos/user-response.dto');
+
 class GetUserController {
   async handle(request, response, next) {
     try {
@@ -7,7 +9,7 @@ class GetUserController {
 
       return response.status(200).json({
         success: true,
-        data: user,
+        data: userResponseDTO(user),
       });
     } catch (error) {
       return next(error);
