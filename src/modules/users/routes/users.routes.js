@@ -1,17 +1,15 @@
 const { Router } = require('express');
 
-const validate = require('../../../shared/validators/validate');
+const validate = require('../../../shared/middlewares/validate.middleware');
 
 const createUserDTO = require('../dtos/create-user.dto');
 const updateUserDTO = require('../dtos/update-user.dto');
-const userIdDTO = require('../dtos/user-id.dto');
+const userIdDTO = require('../dtos/get-user.dto');
 
-const {
-  CreateUserController,
-  GetUserController,
-  UpdateUserController,
-  DeleteUserController,
-} = require('../controllers');
+const CreateUserController = require('../controllers/CreateUserController');
+const GetUserController = require('../controllers/GetUserController');
+const UpdateUserController = require('../controllers/UpdateUserController');
+const DeleteUserController = require('../controllers/DeleteUserController');
 
 const usersRoutes = Router();
 

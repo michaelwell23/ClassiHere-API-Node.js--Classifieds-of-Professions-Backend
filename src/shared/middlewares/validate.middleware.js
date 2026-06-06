@@ -14,7 +14,7 @@ function validate(schema) {
         message: issue.message,
       }));
 
-      return next(new AppError('Validation failed', 400, { errors }));
+      return next(new AppError('Validation failed', 400, errors));
     }
 
     req.validated = result.data;
@@ -22,3 +22,5 @@ function validate(schema) {
     return next();
   };
 }
+
+module.exports = validate;

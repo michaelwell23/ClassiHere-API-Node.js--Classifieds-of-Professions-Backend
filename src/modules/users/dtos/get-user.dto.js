@@ -1,7 +1,9 @@
 const { z } = require('zod');
 
-module.exports = z.object({
+const getUserDTO = z.object({
   params: z.object({
     id: z.string().uuid(),
   }),
 });
+
+module.exports = getUserDTO;

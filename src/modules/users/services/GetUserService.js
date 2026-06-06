@@ -13,4 +13,4 @@ class GetUserService {
   }
 }
 
-module.exports = new GetUserService();
+module.exports = GetUserService;

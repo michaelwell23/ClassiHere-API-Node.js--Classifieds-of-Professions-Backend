@@ -32,4 +32,4 @@ class UpdateUserService {
   }
 }
 
-module.exports = new UpdateUserService();
+module.exports = UpdateUserService;

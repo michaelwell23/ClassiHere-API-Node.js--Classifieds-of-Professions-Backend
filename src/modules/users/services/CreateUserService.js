@@ -2,7 +2,7 @@ const AppError = require('../../../shared/errors/AppError');
 
 const { UserRepository } = require('../repositories/UserRepository');
 
-class CrreateUserService {
+class CreateUserService {
   async execute(data) {
     const existingEmail = await UserRepository.findByEmail(data.email);
 
@@ -28,4 +28,4 @@ class CrreateUserService {
   }
 }
 
-module.exports = new CrreateUserService();
+module.exports = CreateUserService;

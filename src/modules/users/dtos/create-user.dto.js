@@ -1,6 +1,6 @@
 const { z } = require('zod');
 
-const isValidCPF = require('../../../shared/validators/cpf.validator');
+const isValidCPF = require('../../../shared/utils/cpf.utils');
 
 const createUserDTO = z.object({
   body: z.object({

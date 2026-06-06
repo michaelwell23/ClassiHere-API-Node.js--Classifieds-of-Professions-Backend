@@ -1,4 +1,5 @@
-const { CreateUserService } = require('../services');
+const { CreateUserService } = require('../services/CreateUserService');
+
 const userResponseDTO = require;
 
 class CreateUserController {
