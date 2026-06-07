@@ -10,22 +10,6 @@ class UpdateUserService {
       throw new AppError('User not found', 404);
     }
 
-    if (data.email && data.email !== user.email) {
-      const existingEmail = await UserRepository.findByEmail(data.email);
-
-      if (existingEmail) {
-        throw new AppError('E-mail already registered', 409);
-      }
-    }
-
-    if (data.cpf && data.cpf !== user.cpf) {
-      const existingCpf = await UserRepository.findByCpf(data.cpf);
-
-      if (existingCpf) {
-        throw new AppError('CPF already registered', 409);
-      }
-    }
-
     await UserRepository.update(user, data);
 
     return user;
