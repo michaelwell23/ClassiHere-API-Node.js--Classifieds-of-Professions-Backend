@@ -7,7 +7,10 @@ const createUserDTO = z.object({
     first_name: z.string().min(2).max(100),
     last_name: z.string().min(2).max(100),
     email: z.string().email(),
-    password: z.string().min(8).max(100),
+    password: z
+      .string()
+      .min(8, 'Password must contain at least 8 characters')
+      .max(100, 'Password too long'),
     phone: z.string().optional(),
     cpf: z.string().refine(isValidCPF, {
       message: 'Invalid CPF',

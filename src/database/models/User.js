@@ -11,12 +11,29 @@ class User extends Model {
 
         first_name: DataTypes.STRING,
         last_name: DataTypes.STRING,
-        email: DataTypes.STRING,
-        password: DataTypes.STRING,
+        email: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
+        },
+        password: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
         phone: DataTypes.STRING,
-        cpf: DataTypes.STRING,
-        is_email_verified: DataTypes.BOOLEAN,
-        is_active: DataTypes.BOOLEAN,
+        cpf: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
+        },
+        is_email_verified: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false,
+        },
+        is_active: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: true,
+        },
       },
       {
         sequelize,
@@ -34,6 +51,16 @@ class User extends Model {
       foreignKey: 'user_id',
       as: 'verifications',
     });
+  }
+
+  toJSON() {
+    const values = {
+      ...this.get(),
+    };
+
+    delete values.password;
+
+    return values;
   }
 }
 
