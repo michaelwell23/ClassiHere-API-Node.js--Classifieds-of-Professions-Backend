@@ -1,8 +1,11 @@
-const AppError = require('../../../shared/errors/AppError');
-
 const { UserRepository } = require('../repositories/UserRepository');
+const UserVerificationRepository = require('../repositories/UserVerificationRepository');
 
+const emailVerificationConfig = require('../../../config/email-verification');
+
+const AppError = require('../../../shared/errors/AppError');
 const { generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
+const generateVerificationToken = require('../../../shared/utils/generate-verification-token');
 
 class CreateUserService {
   async execute(data) {
@@ -30,6 +33,18 @@ class CreateUserService {
     };
 
     const user = await UserRepository.create(userData);
+
+    const token = generateVerificationToken();
+
+    const expiresAt = new Date();
+
+    expiresAt.setHours(expiresAt.getHours() + emailVerificationConfig.expiresInHours);
+
+    await UserVerificationRepository.create({
+      user_id: user.id,
+      token,
+      expires_at: expiresAt,
+    });
 
     return user;
   }
