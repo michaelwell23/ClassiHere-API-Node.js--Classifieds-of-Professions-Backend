@@ -1,20 +1,36 @@
-const UserVerficiation = require('../../../database/models/UserVerification');
+const UserVerification = require('../../../database/models/UserVerification');
 
 class UserVerificationRepository {
   async create(data) {
-    return UserVerficiation.create(data);
+    return UserVerification.create(data);
   }
 
   async findByToken(token) {
-    return UserVerficiation.findOne({ where: { token } });
+    return UserVerification.findOne({ where: { token } });
   }
 
   async delete(id) {
-    return UserVerficiation.destroy({ where: { id } });
+    return UserVerification.destroy({ where: { id } });
   }
 
   async deleteByUser(userId) {
-    return UserVerficiation.destroy({ where: { userId: userId } });
+    return UserVerification.destroy({ where: { userId: userId } });
+  }
+
+  async findByUserId(userId) {
+    return UserVerification.findOne({
+      where: {
+        user_id: userId,
+      },
+    });
+  }
+
+  async deleteByToken(token) {
+    return UserVerification.destroy({
+      where: {
+        token,
+      },
+    });
   }
 }
 

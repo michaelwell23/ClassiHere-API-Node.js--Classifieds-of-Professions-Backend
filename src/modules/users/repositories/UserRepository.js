@@ -5,6 +5,10 @@ class UserRepository {
     return User.create(data);
   }
 
+  async save(user) {
+    return user.save();
+  }
+
   async findById(id) {
     return User.findByPk(id);
   }
