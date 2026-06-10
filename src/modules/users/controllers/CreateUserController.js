@@ -1,6 +1,6 @@
-const { CreateUserService } = require('../services/CreateUserService');
+const CreateUserService = require('../services/CreateUserService');
 
-const userResponseDTO = require;
+const userResponseDTO = require('../dtos/user-response.dto');
 
 class CreateUserController {
   async handle(request, response, next) {

@@ -1,4 +1,6 @@
-const { UserRepository } = require('../repositories/UserRepository');
+const SendVerificationEmailService = require('../../auth/services/SendVerificationEmailService');
+
+const UserRepository = require('../repositories/UserRepository');
 const UserVerificationRepository = require('../repositories/UserVerificationRepository');
 
 const emailVerificationConfig = require('../../../config/email-verification');
@@ -33,11 +35,9 @@ class CreateUserService {
     };
 
     const user = await UserRepository.create(userData);
-
     const token = generateVerificationToken();
 
     const expiresAt = new Date();
-
     expiresAt.setHours(expiresAt.getHours() + emailVerificationConfig.expiresInHours);
 
     await UserVerificationRepository.create({
@@ -46,8 +46,17 @@ class CreateUserService {
       expires_at: expiresAt,
     });
 
+    try {
+      await SendVerificationEmailService.execute({
+        user,
+        token,
+      });
+    } catch (error) {
+      console.error('Email send failed', error);
+    }
+
     return user;
   }
 }
 
-module.exports = CreateUserService;
+module.exports = new CreateUserService();
