@@ -1,5 +1,3 @@
-const SendVerificationEmailService = require('../../auth/services/SendVerificationEmailService');
-
 const UserRepository = require('../repositories/UserRepository');
 const UserVerificationRepository = require('../repositories/UserVerificationRepository');
 
@@ -8,6 +6,8 @@ const emailVerificationConfig = require('../../../config/email-verification');
 const AppError = require('../../../shared/errors/AppError');
 const { generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
 const generateVerificationToken = require('../../../shared/utils/generate-verification-token');
+
+const SendVerificationEmailJob = require('../../../shared/job/SendVerificationEmailJob');
 
 class CreateUserService {
   async execute(data) {
@@ -47,7 +47,7 @@ class CreateUserService {
     });
 
     try {
-      await SendVerificationEmailService.execute({
+      await SendVerificationEmailJob.execute({
         user,
         token,
       });
