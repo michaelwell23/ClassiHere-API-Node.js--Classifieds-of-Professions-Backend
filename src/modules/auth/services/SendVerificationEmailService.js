@@ -6,7 +6,7 @@ const verifyEmailTemplate = require('../../../shared/providers/mail/templates/ve
 
 class SendVerificationEmailService {
   async execute({ user, token }) {
-    const verificationUrl = `${mailConfig.appUrl}` + `/verify-email/${token}`;
+    const verificationUrl = `${mailConfig.appUrl}` + `/auth/verify-email/${token}`;
 
     const html = verifyEmailTemplate({
       firstName: user.first_name,

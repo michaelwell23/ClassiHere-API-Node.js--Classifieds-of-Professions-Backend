@@ -9,6 +9,7 @@ const notFound = require('./shared/middlewares/notFound');
 const errorHandler = require('./shared/middlewares/errorHandler');
 
 const app = express();
+
 app.use(express.json());
 
 app.use(routes);

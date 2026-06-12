@@ -10,17 +10,16 @@ class UserVerification extends Model {
           primaryKey: true,
         },
 
-        user_id: DataTypes.UUID,
-
+        user_id: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
         token: DataTypes.STRING,
-
         expires_at: DataTypes.DATE,
       },
       {
         sequelize,
-
         tableName: 'user_verifications',
-
         underscored: true,
       }
     );

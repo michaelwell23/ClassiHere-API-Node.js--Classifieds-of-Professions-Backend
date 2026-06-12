@@ -16,4 +16,4 @@ class DeleteUserService {
   }
 }
 
-module.exports = DeleteUserService;
+module.exports = new DeleteUserService();

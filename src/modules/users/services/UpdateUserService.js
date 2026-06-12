@@ -16,4 +16,4 @@ class UpdateUserService {
   }
 }
 
-module.exports = UpdateUserService;
+module.exports = new UpdateUserService();

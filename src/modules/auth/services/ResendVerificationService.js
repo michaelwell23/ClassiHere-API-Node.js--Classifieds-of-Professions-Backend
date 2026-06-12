@@ -1,9 +1,10 @@
 const UserRepository = require('../../users/repositories/UserRepository');
 const UserVerificationRepository = require('../../users/repositories/UserVerificationRepository');
-const generateVerificationToken = require('../../../shared/utils/generate-verification-token');
-const emailVerificationConfig = require('../../../config/email-verification');
-const SendVerificationEmailJob = require('../../../shared/jobs/SendVerificationEmailJob');
 
+const SendVerificationEmailJob = require('../../../shared/jobs/SendVerificationEmailJob');
+const generateVerificationToken = require('../../../shared/utils/generate-verification-token');
+
+const emailVerificationConfig = require('../../../config/email-verification');
 class ResendVerificationService {
   async execute(email) {
     const user = await UserRepository.findByEmail(email);

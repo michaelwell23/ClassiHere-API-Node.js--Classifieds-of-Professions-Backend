@@ -12,13 +12,13 @@ const LoginController = require('../controllers/LoginController');
 
 const authRoutes = Router();
 
+authRoutes.post('/login', validationMiddleware(loginDTO), LoginController.handle);
+
 authRoutes.get(
   '/verify-email/:token',
   validationMiddleware(verifyEmailDTO),
   VerifyEmailController.handle
 );
-
-authRoutes.post('/login', validationMiddleware(loginDTO), LoginController.handle);
 
 authRoutes.post(
   '/resend-verification',

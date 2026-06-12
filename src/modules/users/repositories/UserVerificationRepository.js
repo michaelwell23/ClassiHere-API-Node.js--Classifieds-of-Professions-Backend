@@ -6,19 +6,31 @@ class UserVerificationRepository {
   }
 
   async findByToken(token) {
-    return UserVerification.findOne({ where: { token } });
-  }
-
-  async delete(id) {
-    return UserVerification.destroy({ where: { id } });
-  }
-
-  async deleteByUser(userId) {
-    return UserVerification.destroy({ where: { userId: userId } });
+    return UserVerification.findOne({
+      where: {
+        token,
+      },
+    });
   }
 
   async findByUserId(userId) {
     return UserVerification.findOne({
+      where: {
+        user_id: userId,
+      },
+    });
+  }
+
+  async delete(id) {
+    return UserVerification.destroy({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async deleteByUser(userId) {
+    return UserVerification.destroy({
       where: {
         user_id: userId,
       },
