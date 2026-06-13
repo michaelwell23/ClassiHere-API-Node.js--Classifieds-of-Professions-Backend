@@ -1,6 +1,6 @@
-const AppError = require('../../../shared/errors/AppError');
+const UserRepository = require('../repositories/UserRepository');
 
-const { UserRepository } = require('../repositories/UserRepository');
+const AppError = require('../../../shared/errors/AppError');
 
 class DeleteUserService {
   async execute(id) {

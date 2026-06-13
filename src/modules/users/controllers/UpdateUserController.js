@@ -1,4 +1,4 @@
-const { UpdateUserService } = require('../services/UpdateUserService');
+const UpdateUserService = require('../services/UpdateUserService');
 
 const userResponseDTO = require('../dtos/user-response.dto');
 
