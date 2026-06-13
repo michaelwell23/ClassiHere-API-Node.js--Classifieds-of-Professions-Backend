@@ -15,6 +15,17 @@ const options = {
     ],
   },
   apis: ['./src/routes/*.js', './src/modules/**/docs/*.js'],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+
+        scheme: 'bearer',
+
+        bearerFormat: 'JWT',
+      },
+    },
+  },
 };
 
 module.exports = swaggerJsdoc(options);

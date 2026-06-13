@@ -1,28 +1,42 @@
-const jwt = require('jsonwebtoken');
-
 const AppError = require('../errors/AppError');
 
-const authConfig = require('../../config/auth');
+const { verifyToken } = require('../providers/auth/jwt.provider');
 
-function authMiddleware(request, response, next) {
-  const authHeader = request.headers.authorization;
+const UserRepository = require('../../modules/users/repositories/UserRepository');
 
-  if (!authHeader) {
-    return next(new AppError('Token not provided', 401));
-  }
-
-  const [, token] = authHeader.split(' ');
-
+async function authMiddleware(request, response, next) {
   try {
-    const decoded = jwt.verify(token, authConfig.jwt.secret);
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader) {
+      throw new AppError('Authentication token missing', 401);
+    }
+
+    const [scheme, token] = authHeader.split(' ');
+
+    if (scheme !== 'Bearer' || !token) {
+      throw new AppError('Invalid token format', 401);
+    }
+
+    const decoded = verifyToken(token);
+
+    const user = await UserRepository.findById(decoded.sub);
+
+    if (!user) {
+      throw new AppError('User not found', 401);
+    }
+
+    if (!user.is_active) {
+      throw new AppError('User account disabled', 403);
+    }
 
     request.user = {
-      id: decoded.sub,
+      id: user.id,
     };
 
     return next();
-  } catch {
-    return next(new AppError('Invalid token', 401));
+  } catch (error) {
+    return next(error);
   }
 }
 
