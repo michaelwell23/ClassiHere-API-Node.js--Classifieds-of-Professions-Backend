@@ -34,6 +34,14 @@ class UserRefreshTokenRepository {
       },
     });
   }
+
+  async findAllByUser(userId) {
+    return UserRefreshToken.findAll({
+      where: {
+        user_id: userId,
+      },
+    });
+  }
 }
 
 module.exports = new UserRefreshTokenRepository();

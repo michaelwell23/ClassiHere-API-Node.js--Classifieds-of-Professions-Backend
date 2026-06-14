@@ -1,11 +1,12 @@
-const { Model } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 
 class UserRefreshToken extends Model {
-  static init(sequelize, DataTypes) {
+  static init(sequelize) {
     return super.init(
       {
         id: {
           type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
         },
         user_id: DataTypes.UUID,

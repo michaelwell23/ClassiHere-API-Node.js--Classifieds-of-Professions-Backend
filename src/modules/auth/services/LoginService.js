@@ -3,7 +3,8 @@ const AppError = require('../../../shared/errors/AppError');
 const UserRepository = require('../../users/repositories/UserRepository');
 const UserRefreshTokenRepository = require('../../sessions/repositories/UserRefreshTokenRepository');
 
-const { compareHash } = require('../../../shared/providers/hash/bcrypt.provider');
+const { generateHash, compareHash } = require('../../../shared/providers/hash/bcrypt.provider');
+
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -40,9 +41,11 @@ class LoginService {
 
     expiresAt.setDate(expiresAt.getDate() + 30);
 
+    const refreshTokenHash = await generateHash(refreshToken);
+
     await UserRefreshTokenRepository.create({
       user_id: user.id,
-      token: refreshToken,
+      token: refreshTokenHash,
       expires_at: expiresAt,
     });
 

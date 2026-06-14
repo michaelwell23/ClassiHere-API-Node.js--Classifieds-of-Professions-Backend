@@ -224,4 +224,13 @@
  *                   type: boolean
  *       401:
  *         description: Unauthorized
+ *
+ */
+
+/**
+ * /auth/refresh-token:
+ * post:
+ *   tags:
+ *     - Authentication
+ *  summary: Refresh access token
  */
