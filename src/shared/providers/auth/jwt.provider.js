@@ -1,17 +1,29 @@
 const jwt = require('jsonwebtoken');
-const jwtConfig = require('../../../config/jwt.config');
+const jwtConfig = require('../../../config/jwt');
 
-function generateToken(payload) {
-  return jwt.sign(payload, jwtConfig.secret, {
-    expiresIn: jwtConfig.expiresIn,
+function generateAccessToken(payload) {
+  return jwt.sign(payload, jwtConfig.accessToken.secret, {
+    expiresIn: jwtConfig.accessToken.expiresIn,
   });
 }
 
-function verifyToken(token) {
-  return jwt.verify(token, jwtConfig.secret);
+function generateRefreshToken(payload) {
+  return jwt.sign(payload, jwtConfig.refreshToken.secret, {
+    expiresIn: jwtConfig.refreshToken.expiresIn,
+  });
+}
+
+function verifyAccessToken(token) {
+  return jwt.verify(token, jwtConfig.accessToken.secret);
+}
+
+function verifyRefreshToken(token) {
+  return jwt.verify(token, jwtConfig.refreshToken.secret);
 }
 
 module.exports = {
-  generateToken,
-  verifyToken,
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
 };

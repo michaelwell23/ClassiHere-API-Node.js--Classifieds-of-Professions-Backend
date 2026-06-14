@@ -1,8 +1,13 @@
 const AppError = require('../../../shared/errors/AppError');
+
 const UserRepository = require('../../users/repositories/UserRepository');
+const UserRefreshTokenRepository = require('../../sessions/repositories/UserRefreshTokenRepository');
 
 const { compareHash } = require('../../../shared/providers/hash/bcrypt.provider');
-const { generateToken } = require('../../../shared/providers/auth/jwt.provider');
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require('../../../shared/providers/auth/jwt.provider');
 
 const UserResponseDTO = require('../../users/dtos/user-response.dto');
 
@@ -28,11 +33,23 @@ class LoginService {
       throw new AppError('User account disabled', 403);
     }
 
-    const token = generateToken({ userId: user.id });
+    const accessToken = generateAccessToken({ userId: user.id });
+    const refreshToken = generateRefreshToken({ userId: user.id });
+
+    const expiresAt = new Date();
+
+    expiresAt.setDate(expiresAt.getDate() + 30);
+
+    await UserRefreshTokenRepository.create({
+      user_id: user.id,
+      token: refreshToken,
+      expires_at: expiresAt,
+    });
 
     return {
-      user: UserResponseDTO.toDTO(user),
-      token,
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      user: UserResponseDTO(user),
     };
   }
 }

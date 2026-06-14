@@ -9,6 +9,75 @@
 /**
  * @swagger
  *
+ * /auth/login:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: User login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: usuario@email.com
+ *               password:
+ *                 type: string
+ *                 example: senha123
+ *
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 access_token:
+ *                   type: string
+ *
+ *                 refresh_token:
+ *                   type: string
+ *
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *
+ *                     first_name:
+ *                       type: string
+ *
+ *                     last_name:
+ *                       type: string
+ *
+ *                     email:
+ *                       type: string
+ *
+ *                     is_email_verified:
+ *                       type: boolean
+ *
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *
+ *       401:
+ *         description: Invalid credentials
+ *
+ *       403:
+ *         description: Email not verified
+ */
+
+/**
+ * @swagger
+ *
  * /auth/verify-email/{token}:
  *   get:
  *     tags:
