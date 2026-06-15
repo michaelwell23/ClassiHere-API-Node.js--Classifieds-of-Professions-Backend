@@ -4,6 +4,7 @@ const UserRepository = require('../../users/repositories/UserRepository');
 const UserRefreshTokenRepository = require('../../sessions/repositories/UserRefreshTokenRepository');
 
 const { generateHash, compareHash } = require('../../../shared/providers/hash/bcrypt.provider');
+const { generateJti } = require('../../../shared/providers/auth/jwt.provider');
 
 const {
   generateAccessToken,
@@ -14,6 +15,9 @@ const UserResponseDTO = require('../../users/dtos/user-response.dto');
 
 class LoginService {
   async execute({ email, password }) {
+    const expiresAt = new Date();
+    const jti = generateJti();
+
     const user = await UserRepository.findByEmail(email);
 
     if (!user) {
@@ -35,16 +39,18 @@ class LoginService {
     }
 
     const accessToken = generateAccessToken({ userId: user.id });
-    const refreshToken = generateRefreshToken({ userId: user.id });
 
-    const expiresAt = new Date();
+    const refreshTokenHash = await generateHash(refreshToken);
+    const refreshToken = generateRefreshToken({
+      sub: user.id,
+      jti,
+    });
 
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    const refreshTokenHash = await generateHash(refreshToken);
-
     await UserRefreshTokenRepository.create({
       user_id: user.id,
+      jti,
       token: refreshTokenHash,
       expires_at: expiresAt,
     });

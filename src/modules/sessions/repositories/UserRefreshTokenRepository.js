@@ -11,16 +11,12 @@ class UserRefreshTokenRepository {
     });
   }
 
-  async findByToken(token) {
+  async findByJti(jti) {
     return UserRefreshToken.findOne({
       where: {
-        token,
+        jti,
       },
     });
-  }
-
-  async findAll() {
-    return UserRefreshToken.findAll();
   }
 
   async delete(id) {

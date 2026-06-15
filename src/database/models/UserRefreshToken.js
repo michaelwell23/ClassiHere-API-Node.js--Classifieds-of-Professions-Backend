@@ -6,11 +6,11 @@ class UserRefreshToken extends Model {
       {
         id: {
           type: DataTypes.UUID,
-          defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
         },
         user_id: DataTypes.UUID,
-        token: DataTypes.TEXT,
+        jti: DataTypes.UUID,
+        token_hash: DataTypes.TEXT,
         expires_at: DataTypes.DATE,
       },
       {

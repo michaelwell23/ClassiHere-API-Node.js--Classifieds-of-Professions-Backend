@@ -10,6 +10,7 @@ const {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
+  generateJti,
 } = require('../../../shared/providers/auth/jwt.provider');
 
 class RefreshTokenService {
@@ -28,27 +29,19 @@ class RefreshTokenService {
       throw new AppError('User not found', 401);
     }
 
-    const sessions = await UserRefreshTokenRepository.findAllByUser(user.id);
+    const session = await UserRefreshTokenRepository.findByJti(payload.jti);
 
-    let currentSession = null;
-
-    for (const session of sessions) {
-      const match = await compareHash(refreshToken, session.token);
-
-      if (match) {
-        currentSession = session;
-
-        break;
-      }
+    if (!session) {
+      throw new AppError('Session not found', 401);
     }
 
-    if (!currentSession) {
+    const match = await compareHash(refreshToken, session.token_hash);
+
+    if (!match) {
       throw new AppError('Refresh token revoked', 401);
     }
 
-    if (currentSession.expires_at < new Date()) {
-      throw new AppError('Refresh token expired', 401);
-    }
+    const newJti = generateJti();
 
     const newAccessToken = generateAccessToken({
       sub: user.id,
@@ -56,6 +49,7 @@ class RefreshTokenService {
 
     const newRefreshToken = generateRefreshToken({
       sub: user.id,
+      jti: newJti,
     });
 
     const newHash = await generateHash(newRefreshToken);
@@ -64,17 +58,17 @@ class RefreshTokenService {
 
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    await UserRefreshTokenRepository.delete(currentSession.id);
+    await UserRefreshTokenRepository.delete(session.id);
 
     await UserRefreshTokenRepository.create({
       user_id: user.id,
-      token: newHash,
+      jti: newJti,
+      token_hash: newHash,
       expires_at: expiresAt,
     });
 
     return {
       access_token: newAccessToken,
-
       refresh_token: newRefreshToken,
     };
   }

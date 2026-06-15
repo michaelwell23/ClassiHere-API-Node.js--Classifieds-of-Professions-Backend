@@ -1,3 +1,5 @@
+const { randomUUID } = require('crypto');
+
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../../../config/jwt.config');
 
@@ -13,6 +15,10 @@ function generateRefreshToken(payload) {
   });
 }
 
+function generateJti() {
+  return randomUUID();
+}
+
 function verifyAccessToken(token) {
   return jwt.verify(token, jwtConfig.accessToken.secret);
 }
@@ -24,6 +30,7 @@ function verifyRefreshToken(token) {
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
+  generateJti,
   verifyAccessToken,
   verifyRefreshToken,
 };
