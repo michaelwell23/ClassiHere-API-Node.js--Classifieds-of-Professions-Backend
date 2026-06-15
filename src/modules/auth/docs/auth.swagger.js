@@ -234,3 +234,9 @@
  *     - Authentication
  *  summary: Refresh access token
  */
+
+// /auth/logout:
+//   post:
+//     tags:
+//       - Authentication
+//     summary: Logout current session

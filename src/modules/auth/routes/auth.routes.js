@@ -5,7 +5,9 @@ const ResendVerificationController = require('../controllers/ResendVerificationC
 const LoginController = require('../controllers/LoginController');
 const MeController = require('../controllers/MeController');
 const RefreshTokenController = require('../controllers/RefreshTokenController');
+const LogoutController = require('../controllers/LogoutController');
 
+const logoutDTO = require('../dtos/logout.dto');
 const verifyEmailDTO = require('../dtos/verify-email.dto');
 const resendVerificationDTO = require('../dtos/resend-verification.dto');
 const loginDTO = require('../dtos/login.dto');
@@ -17,6 +19,7 @@ const authMiddleware = require('../../../shared/middlewares/auth.middleware');
 const authRoutes = Router();
 
 authRoutes.post('/login', validationMiddleware(loginDTO), LoginController.handle);
+authRoutes.post('/logout', validationMiddleware(logoutDTO), LogoutController.handle);
 
 authRoutes.post(
   '/refresh-token',

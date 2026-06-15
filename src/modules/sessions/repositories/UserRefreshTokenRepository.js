@@ -19,6 +19,10 @@ class UserRefreshTokenRepository {
     });
   }
 
+  async findAll() {
+    return UserRefreshToken.findAll();
+  }
+
   async delete(id) {
     return UserRefreshToken.destroy({
       where: {
