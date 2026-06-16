@@ -240,3 +240,27 @@
 //     tags:
 //       - Authentication
 //     summary: Logout current session
+
+/**
+ * @swagger
+ *
+ * /auth/logout-all:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *
+ *     summary:
+ *       Logout from all devices
+ *
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     responses:
+ *       200:
+ *         description:
+ *           All sessions revoked
+ *
+ *       401:
+ *         description:
+ *           Unauthorized
+ */

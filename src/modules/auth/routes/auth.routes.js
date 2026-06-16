@@ -6,6 +6,7 @@ const LoginController = require('../controllers/LoginController');
 const MeController = require('../controllers/MeController');
 const RefreshTokenController = require('../controllers/RefreshTokenController');
 const LogoutController = require('../controllers/LogoutController');
+const LogoutAllController = require('../controllers/LogoutAllController');
 
 const logoutDTO = require('../dtos/logout.dto');
 const verifyEmailDTO = require('../dtos/verify-email.dto');
@@ -17,9 +18,6 @@ const validationMiddleware = require('../../../shared/middlewares/validation.mid
 const authMiddleware = require('../../../shared/middlewares/auth.middleware');
 
 const authRoutes = Router();
-
-authRoutes.post('/login', validationMiddleware(loginDTO), LoginController.handle);
-authRoutes.post('/logout', validationMiddleware(logoutDTO), LogoutController.handle);
 
 authRoutes.post(
   '/refresh-token',
@@ -40,5 +38,9 @@ authRoutes.post(
 );
 
 authRoutes.get('/me', authMiddleware, MeController.handle);
+
+authRoutes.post('/login', validationMiddleware(loginDTO), LoginController.handle);
+authRoutes.post('/logout', validationMiddleware(logoutDTO), LogoutController.handle);
+authRoutes.post('/logout-all', authMiddleware, LogoutAllController.handle);
 
 module.exports = authRoutes;
