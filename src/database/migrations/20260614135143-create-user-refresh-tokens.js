@@ -11,7 +11,6 @@ module.exports = {
 
       user_id: {
         type: Sequelize.UUID,
-
         allowNull: false,
 
         references: {
@@ -22,9 +21,14 @@ module.exports = {
         onDelete: 'CASCADE',
       },
 
-      token: {
+      jti: {
+        type: Sequelize.UUID,
+        allowNull: true,
+      },
+
+      token_hash: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
 
       expires_at: {
@@ -41,6 +45,15 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
+    });
+
+    await queryInterface.addIndex('user_refresh_tokens', ['jti'], {
+      unique: true,
+      name: 'idx_refresh_tokens_jti',
+    });
+
+    await queryInterface.addIndex('user_refresh_tokens', ['user_id'], {
+      name: 'idx_refresh_tokens_user_id',
     });
   },
 

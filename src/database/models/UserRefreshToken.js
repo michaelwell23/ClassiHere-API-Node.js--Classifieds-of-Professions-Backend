@@ -16,6 +16,7 @@ class UserRefreshToken extends Model {
       {
         sequelize,
         tableName: 'user_refresh_tokens',
+        underscored: true,
       }
     );
   }

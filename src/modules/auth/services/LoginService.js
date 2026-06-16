@@ -40,11 +40,12 @@ class LoginService {
 
     const accessToken = generateAccessToken({ userId: user.id });
 
-    const refreshTokenHash = await generateHash(refreshToken);
     const refreshToken = generateRefreshToken({
       sub: user.id,
       jti,
     });
+
+    const refreshTokenHash = await generateHash(refreshToken);
 
     expiresAt.setDate(expiresAt.getDate() + 30);
 
