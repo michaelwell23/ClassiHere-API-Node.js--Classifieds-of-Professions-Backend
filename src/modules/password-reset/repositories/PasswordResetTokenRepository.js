@@ -1,0 +1,35 @@
+const { randomUUID } = require('crypto');
+
+const PasswordResetToken = require('../../../database/models/PasswordResetToken');
+
+class PasswordResetTokenRepository {
+  async create(data) {
+    return PasswordResetToken.create({
+      id: randomUUID(),
+
+      ...data,
+    });
+  }
+
+  async findById(id) {
+    return PasswordResetToken.findByPk(id);
+  }
+
+  async findAllByUser(userId) {
+    return PasswordResetToken.findAll({
+      where: {
+        user_id: userId,
+      },
+    });
+  }
+
+  async update(id, data) {
+    await PasswordResetToken.update(data, {
+      where: { id },
+    });
+
+    return this.findById(id);
+  }
+}
+
+module.exports = new PasswordResetTokenRepository();

@@ -52,6 +52,11 @@ class User extends Model {
       foreignKey: 'user_id',
       as: 'verifications',
     });
+
+    this.hasMany(models.PasswordResetToken, {
+      foreignKey: 'user_id',
+      as: 'passwordResetTokens',
+    });
   }
 
   toJSON() {
