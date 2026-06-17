@@ -1,19 +1,18 @@
 /**
  * @swagger
- *
  * tags:
  *   - name: Authentication
- *     description: Authentication and account management
+ *     description: Authentication endpoints
  */
 
 /**
  * @swagger
- *
  * /auth/login:
  *   post:
  *     tags:
  *       - Authentication
- *     summary: User login
+ *     summary: Authenticate user
+ *     description: Authenticates a verified user and returns access and refresh tokens.
  *     requestBody:
  *       required: true
  *       content:
@@ -26,14 +25,13 @@
  *             properties:
  *               email:
  *                 type: string
- *                 example: usuario@email.com
+ *                 example: user@example.com
  *               password:
  *                 type: string
- *                 example: senha123
- *
+ *                 example: StrongPassword123
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Authentication successful
  *         content:
  *           application/json:
  *             schema:
@@ -41,74 +39,49 @@
  *               properties:
  *                 access_token:
  *                   type: string
- *
  *                 refresh_token:
  *                   type: string
- *
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       format: uuid
- *
- *                     first_name:
- *                       type: string
- *
- *                     last_name:
- *                       type: string
- *
- *                     email:
- *                       type: string
- *
- *                     is_email_verified:
- *                       type: boolean
- *
- *                     created_at:
- *                       type: string
- *                       format: date-time
- *
  *       401:
  *         description: Invalid credentials
- *
  *       403:
  *         description: Email not verified
  */
 
 /**
  * @swagger
- *
- * /auth/verify-email/{token}:
- *   get:
+ * /auth/verify-email:
+ *   post:
  *     tags:
  *       - Authentication
  *     summary: Verify user email
- *     description: Activates a user account using the verification token sent by email.
- *     parameters:
- *       - in: path
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: Email verification token
+ *     description: Verifies the user's email using the verification token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: 7f7b25c9-2f86-4cb0-a879-4d6b55d35c5f
  *     responses:
  *       200:
- *         description: Email verified successfully
+ *         description: Email successfully verified
  *       400:
  *         description: Invalid or expired token
- *       404:
- *         description: User not found
  */
 
 /**
  * @swagger
- *
  * /auth/resend-verification:
  *   post:
  *     tags:
  *       - Authentication
  *     summary: Resend verification email
- *     description: Generates a new verification token and sends a new verification email if the account is not yet verified.
+ *     description: Sends a new email verification token.
  *     requestBody:
  *       required: true
  *       content:
@@ -120,24 +93,24 @@
  *             properties:
  *               email:
  *                 type: string
- *                 format: email
- *                 example: john.doe@email.com
+ *                 example: user@example.com
  *     responses:
  *       200:
- *         description: Verification email sent or queued
+ *         description: Verification email sent
+ *       404:
+ *         description: User not found
  *       400:
- *         description: Validation error
+ *         description: Email already verified
  */
 
 /**
  * @swagger
- *
- * /auth/login:
+ * /auth/refresh-token:
  *   post:
  *     tags:
  *       - Authentication
- *     summary: User login
- *     description: Authenticates a user and returns a JWT access token.
+ *     summary: Generate new access token
+ *     description: Generates a new access token and refresh token using a valid refresh token.
  *     requestBody:
  *       required: true
  *       content:
@@ -145,64 +118,98 @@
  *           schema:
  *             type: object
  *             required:
- *               - email
- *               - password
+ *               - refresh_token
  *             properties:
- *               email:
+ *               refresh_token:
  *                 type: string
- *                 format: email
- *                 example: john.doe@email.com
- *               password:
- *                 type: string
- *                 example: Password@123
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Tokens successfully renewed
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 access_token:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       format: uuid
- *                     first_name:
- *                       type: string
- *                     last_name:
- *                       type: string
- *                     email:
- *                       type: string
- *                       format: email
- *                     is_email_verified:
- *                       type: boolean
- *                     is_active:
- *                       type: boolean
+ *                 refresh_token:
+ *                   type: string
  *       401:
- *         description: Invalid credentials
- *       403:
- *         description: Email not verified or account disabled
+ *         description: Invalid or expired refresh token
  */
 
 /**
  * @swagger
- *
+ * /auth/logout:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Logout current session
+ *     description: Revokes the current refresh token and terminates the active session.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refresh_token
+ *             properties:
+ *               refresh_token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Logout successfully completed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logged out successfully
+ *       401:
+ *         description: Invalid refresh token
+ */
+
+/**
+ * @swagger
+ * /auth/logout-all:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Logout all sessions
+ *     description: Revokes all active sessions for the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All sessions revoked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All sessions have been revoked successfully
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
  * /auth/me:
  *   get:
  *     tags:
  *       - Authentication
  *     summary: Get authenticated user
- *     description: Returns the currently authenticated user.
+ *     description: Returns the authenticated user's information.
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Authenticated user data
+ *         description: User successfully retrieved
  *         content:
  *           application/json:
  *             schema:
@@ -211,56 +218,18 @@
  *                 id:
  *                   type: string
  *                   format: uuid
- *                 first_name:
- *                   type: string
- *                 last_name:
+ *                 name:
  *                   type: string
  *                 email:
  *                   type: string
- *                   format: email
- *                 is_email_verified:
+ *                 email_verified:
  *                   type: boolean
- *                 is_active:
- *                   type: boolean
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
+ *                 updated_at:
+ *                   type: string
+ *                   format: date-time
  *       401:
  *         description: Unauthorized
- *
- */
-
-/**
- * /auth/refresh-token:
- * post:
- *   tags:
- *     - Authentication
- *  summary: Refresh access token
- */
-
-// /auth/logout:
-//   post:
-//     tags:
-//       - Authentication
-//     summary: Logout current session
-
-/**
- * @swagger
- *
- * /auth/logout-all:
- *   post:
- *     tags:
- *       - Authentication
- *
- *     summary:
- *       Logout from all devices
- *
- *     security:
- *       - bearerAuth: []
- *
- *     responses:
- *       200:
- *         description:
- *           All sessions revoked
- *
- *       401:
- *         description:
- *           Unauthorized
  */

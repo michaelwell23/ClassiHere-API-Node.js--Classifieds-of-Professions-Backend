@@ -32,6 +32,7 @@ async function authMiddleware(request, response, next) {
 
     request.user = {
       id: user.id,
+      email: user.email,
     };
 
     return next();
