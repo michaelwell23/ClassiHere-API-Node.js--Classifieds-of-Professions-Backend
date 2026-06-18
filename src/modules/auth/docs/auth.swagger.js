@@ -233,3 +233,32 @@
  *       401:
  *         description: Unauthorized
  */
+
+/**
+ * @swagger
+ *
+ * /auth/forgot-password:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *
+ *     summary:
+ *       Request password recovery
+ *
+ *     requestBody:
+ *       required: true
+ *
+ *     content:
+ *       application/json:
+ *         schema:
+ *           type: object
+ *
+ *           properties:
+ *             email:
+ *               type: string
+ *
+ *     responses:
+ *       200:
+ *         description:
+ *           Recovery request created
+ */

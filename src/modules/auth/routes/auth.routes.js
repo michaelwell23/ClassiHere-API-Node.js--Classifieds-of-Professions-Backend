@@ -7,12 +7,14 @@ const MeController = require('../controllers/MeController');
 const RefreshTokenController = require('../controllers/RefreshTokenController');
 const LogoutController = require('../controllers/LogoutController');
 const LogoutAllController = require('../controllers/LogoutAllController');
+const ForgotPasswordController = require('../controllers/ForgotPasswordController');
 
 const logoutDTO = require('../dtos/logout.dto');
 const verifyEmailDTO = require('../dtos/verify-email.dto');
 const resendVerificationDTO = require('../dtos/resend-verification.dto');
 const loginDTO = require('../dtos/login.dto');
 const refreshTokenDTO = require('../dtos/refresh-token.dto');
+const forgotPasswordDTO = require('../dtos/forgot-password.dto');
 
 const validationMiddleware = require('../../../shared/middlewares/validation.middleware');
 const authMiddleware = require('../../../shared/middlewares/auth.middleware');
@@ -42,5 +44,11 @@ authRoutes.post(
 authRoutes.post('/logout', validationMiddleware(logoutDTO), LogoutController.handle);
 authRoutes.post('/logout-all', authMiddleware, LogoutAllController.handle);
 authRoutes.get('/me', authMiddleware, MeController.handle);
+
+authRoutes.post(
+  '/forgot-password',
+  validationMiddleware(forgotPasswordDTO),
+  ForgotPasswordController.handle
+);
 
 module.exports = authRoutes;

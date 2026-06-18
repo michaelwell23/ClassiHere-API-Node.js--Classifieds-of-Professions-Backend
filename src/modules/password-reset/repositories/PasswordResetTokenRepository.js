@@ -6,7 +6,6 @@ class PasswordResetTokenRepository {
   async create(data) {
     return PasswordResetToken.create({
       id: randomUUID(),
-
       ...data,
     });
   }
@@ -23,9 +22,25 @@ class PasswordResetTokenRepository {
     });
   }
 
+  async invalidateAllByUser(userId) {
+    return PasswordResetToken.update(
+      {
+        used_at: new Date(),
+      },
+      {
+        where: {
+          user_id: userId,
+          used_at: null,
+        },
+      }
+    );
+  }
+
   async update(id, data) {
     await PasswordResetToken.update(data, {
-      where: { id },
+      where: {
+        id,
+      },
     });
 
     return this.findById(id);

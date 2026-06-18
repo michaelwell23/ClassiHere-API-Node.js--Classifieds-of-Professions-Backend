@@ -1,7 +1,7 @@
-const { Model } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 
 class PasswordResetToken extends Model {
-  static init(sequelize, DataTypes) {
+  static init(sequelize) {
     return super.init(
       {
         id: {
