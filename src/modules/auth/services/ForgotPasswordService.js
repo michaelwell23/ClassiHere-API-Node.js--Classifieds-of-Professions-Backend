@@ -1,18 +1,23 @@
 const { randomBytes } = require('crypto');
 
-const AppError = require('../../../shared/errors/AppError');
-
 const UserRepository = require('../../users/repositories/UserRepository');
+
 const PasswordResetTokenRepository = require('../../password-reset/repositories/PasswordResetTokenRepository');
 
 const { generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
+
+const MailProvider = require('../../../shared/providers/mail/MailProvider');
+
+const passwordResetTemplate = require('../../../shared/mail/templates/password-reset.template');
 
 class ForgotPasswordService {
   async execute(email) {
     const user = await UserRepository.findByEmail(email);
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      return {
+        message: 'If the email exists, password recovery instructions have been sent.',
+      };
     }
 
     await PasswordResetTokenRepository.invalidateAllByUser(user.id);
@@ -31,10 +36,19 @@ class ForgotPasswordService {
       expires_at: expiresAt,
     });
 
-    return {
-      message: 'Password recovery request created successfully',
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-      token,
+    await MailProvider.sendMail({
+      to: user.email,
+      subject: 'Recuperação de Senha',
+      html: passwordResetTemplate({
+        userName: user.name,
+        resetLink,
+      }),
+    });
+
+    return {
+      message: 'If the email exists, password recovery instructions have been sent.',
     };
   }
 }
