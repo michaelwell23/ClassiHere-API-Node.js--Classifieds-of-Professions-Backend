@@ -262,3 +262,15 @@
  *         description:
  *           Recovery request created
  */
+
+/**
+ * @swagger
+ *
+ * /auth/reset-password:
+ * post:
+ *   tags:
+ *     - Authentication
+ *
+ *   summary:
+ *     Reset user password
+ */

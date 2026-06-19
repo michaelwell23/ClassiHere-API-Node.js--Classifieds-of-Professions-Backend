@@ -22,6 +22,15 @@ class PasswordResetTokenRepository {
     });
   }
 
+  async findActiveByUser(userId) {
+    return PasswordResetToken.findAll({
+      where: {
+        user_id: userId,
+        used_at: null,
+      },
+    });
+  }
+
   async invalidateAllByUser(userId) {
     return PasswordResetToken.update(
       {
@@ -31,6 +40,19 @@ class PasswordResetTokenRepository {
         where: {
           user_id: userId,
           used_at: null,
+        },
+      }
+    );
+  }
+
+  async markAsUsed(id) {
+    return PasswordResetToken.update(
+      {
+        used_at: new Date(),
+      },
+      {
+        where: {
+          id,
         },
       }
     );
