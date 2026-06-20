@@ -40,7 +40,7 @@ class ResetPasswordService {
       password: passwordHash,
     });
 
-    await PasswordResetTokenRepository.markAsUsed(validToken.id);
+    await PasswordResetTokenRepository.invalidateAllByUser(user.id);
 
     return {
       message: 'Password updated successfully',

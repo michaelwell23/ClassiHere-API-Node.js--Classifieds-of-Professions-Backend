@@ -6,7 +6,7 @@ const PasswordResetTokenRepository = require('../../password-reset/repositories/
 
 const { generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
 
-const MailProvider = require('../../../shared/providers/mail/MailProvider');
+const { sendMail } = require('../../../shared/providers/mail/smtp.provider');
 
 const passwordResetTemplate = require('../../../shared/mail/templates/password-reset.template');
 
@@ -38,7 +38,7 @@ class ForgotPasswordService {
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-    await MailProvider.sendMail({
+    await sendMail({
       to: user.email,
       subject: 'Recuperação de Senha',
       html: passwordResetTemplate({

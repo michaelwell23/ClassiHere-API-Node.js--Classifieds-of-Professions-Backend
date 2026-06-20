@@ -1,4 +1,7 @@
-function passwordResetTemplate({ userName, resetLink }) {
+function passwordResetTemplate({ userName, resetId, token }) {
+  const resetLink =
+    `${process.env.FRONTEND_URL}` + `/reset-password` + `?id=${resetId}` + `&token=${token}`;
+
   return `
     <div
       style="
@@ -16,8 +19,7 @@ function passwordResetTemplate({ userName, resetLink }) {
       </p>
 
       <p>
-        Recebemos uma solicitação
-        para redefinir sua senha.
+        Recebemos uma solicitação para redefinir sua senha.
       </p>
 
       <p>
@@ -43,7 +45,7 @@ function passwordResetTemplate({ userName, resetLink }) {
       </p>
 
       <p>
-        Caso não tenha solicitado,
+        Caso você não tenha solicitado a redefinição da senha,
         ignore este e-mail.
       </p>
     </div>
