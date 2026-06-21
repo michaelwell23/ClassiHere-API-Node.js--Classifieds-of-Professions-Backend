@@ -9,6 +9,7 @@ const LogoutController = require('../controllers/LogoutController');
 const LogoutAllController = require('../controllers/LogoutAllController');
 const ForgotPasswordController = require('../controllers/ForgotPasswordController');
 const ResetPasswordController = require('../controllers/ResetPasswordController');
+const ChangePasswordController = require('../controllers/ChangePasswordController');
 
 const resetPasswordDTO = require('../dtos/reset-password.dto');
 const logoutDTO = require('../dtos/logout.dto');
@@ -17,6 +18,7 @@ const resendVerificationDTO = require('../dtos/resend-verification.dto');
 const loginDTO = require('../dtos/login.dto');
 const refreshTokenDTO = require('../dtos/refresh-token.dto');
 const forgotPasswordDTO = require('../dtos/forgot-password.dto');
+const changePasswordDTO = require('../dtos/change-password.dto');
 
 const validationMiddleware = require('../../../shared/middlewares/validation.middleware');
 const authMiddleware = require('../../../shared/middlewares/auth.middleware');
@@ -57,6 +59,13 @@ authRoutes.post(
   '/reset-password',
   validationMiddleware(resetPasswordDTO),
   ResetPasswordController.handle
+);
+
+authRoutes.patch(
+  '/change-password',
+  authMiddleware,
+  validationMiddleware(changePasswordDTO),
+  ChangePasswordController.handle
 );
 
 module.exports = authRoutes;
