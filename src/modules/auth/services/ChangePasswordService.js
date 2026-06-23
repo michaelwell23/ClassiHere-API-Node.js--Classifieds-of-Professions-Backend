@@ -2,6 +2,8 @@ const AppError = require('../../../shared/errors/AppError');
 
 const UserRepository = require('../../users/repositories/UserRepository');
 
+const UserRefreshTokenRepository = require('../../sessions/repositories/UserRefreshTokenRepository');
+
 const { compareHash, generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
 
 class ChangePasswordService {
@@ -30,8 +32,10 @@ class ChangePasswordService {
       password: passwordHash,
     });
 
+    await UserRefreshTokenRepository.deleteAllByUser(user.id);
+
     return {
-      message: 'Password changed successfully',
+      message: 'Password changed successfully. All sessions have been revoked.',
     };
   }
 }
