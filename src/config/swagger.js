@@ -1,31 +1,7 @@
-const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
-const options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'ClassiHere API',
-      version: '1.0.0',
-      description: 'API oficial do ClassiHere',
-    },
-    servers: [
-      {
-        url: 'http://localhost:3333',
-      },
-    ],
-  },
-  apis: ['./src/routes/*.js', './src/modules/**/docs/*.js'],
-  components: {
-    securitySchemes: {
-      bearerAuth: {
-        type: 'http',
+const swaggerDocument = require('../docs/swagger');
 
-        scheme: 'bearer',
-
-        bearerFormat: 'JWT',
-      },
-    },
-  },
+module.exports = (app) => {
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 };
-
-module.exports = swaggerJsdoc(options);
