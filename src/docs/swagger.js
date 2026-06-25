@@ -3,7 +3,6 @@ const usersPaths = require('../modules/users/docs/users.swagger');
 
 module.exports = {
   openapi: '3.0.0',
-
   info: {
     title: 'ClassiHere API',
     version: '1.0.0',
@@ -11,7 +10,7 @@ module.exports = {
   },
   servers: [
     {
-      url: 'http://localhost:3333/api',
+      url: 'http://localhost:3333/',
       description: 'Local Development',
     },
   ],
@@ -25,13 +24,13 @@ module.exports = {
       description: 'User management endpoints',
     },
   ],
-
   components: {
     securitySchemes: {
       bearerAuth: {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
+        description: 'JWT access token obtained through the login endpoint.',
       },
     },
     schemas: {
@@ -41,33 +40,39 @@ module.exports = {
           id: {
             type: 'string',
             format: 'uuid',
-            example: 'b6f2d4f6-b7b3-4c39-bf62-7f7df3b9c4d2',
+            example: 'd6f2f9b5-f6a5-4f0f-97b0-1c68f36a8e54',
           },
-          name: {
+          first_name: {
             type: 'string',
-            example: 'João Silva',
+            example: 'Michael',
+          },
+          last_name: {
+            type: 'string',
+            example: 'Walker',
           },
           email: {
             type: 'string',
             format: 'email',
-            example: 'joao@email.com',
+            example: 'michael.walker@example.com',
           },
-          cpf: {
+          phone: {
             type: 'string',
-            example: '12345678909',
+            example: '11987654321',
+            nullable: true,
           },
-
-          emailVerified: {
+          is_email_verified: {
             type: 'boolean',
             example: true,
           },
-
-          createdAt: {
+          is_active: {
+            type: 'boolean',
+            example: true,
+          },
+          created_at: {
             type: 'string',
             format: 'date-time',
           },
-
-          updatedAt: {
+          updated_at: {
             type: 'string',
             format: 'date-time',
           },
@@ -89,7 +94,6 @@ module.exports = {
 
       SuccessResponse: {
         type: 'object',
-
         properties: {
           message: {
             type: 'string',
@@ -100,7 +104,6 @@ module.exports = {
 
       ApiError: {
         type: 'object',
-
         properties: {
           statusCode: {
             type: 'integer',
@@ -109,6 +112,42 @@ module.exports = {
           message: {
             type: 'string',
             example: 'Validation error',
+          },
+          timestamp: {
+            type: 'string',
+            format: 'date-time',
+          },
+        },
+      },
+
+      UnauthorizedError: {
+        type: 'object',
+        properties: {
+          statusCode: {
+            type: 'integer',
+            example: 401,
+          },
+          message: {
+            type: 'string',
+            example: 'Invalid token',
+          },
+          timestamp: {
+            type: 'string',
+            format: 'date-time',
+          },
+        },
+      },
+
+      ForbiddenError: {
+        type: 'object',
+        properties: {
+          statusCode: {
+            type: 'integer',
+            example: 403,
+          },
+          message: {
+            type: 'string',
+            example: 'Access denied',
           },
           timestamp: {
             type: 'string',

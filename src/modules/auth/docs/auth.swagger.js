@@ -15,11 +15,11 @@ module.exports = {
                 email: {
                   type: 'string',
                   format: 'email',
-                  example: 'user@classihere.com',
+                  example: 'joe.doe@uk.org',
                 },
                 password: {
                   type: 'string',
-                  example: 'Password123',
+                  example: '12345678',
                 },
               },
             },
@@ -28,13 +28,11 @@ module.exports = {
       },
       responses: {
         200: {
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/AuthTokens',
-              },
-            },
-          },
+          description: 'User authenticated successfully',
+        },
+
+        401: {
+          description: 'Invalid credentials',
         },
       },
     },
@@ -45,31 +43,27 @@ module.exports = {
       tags: ['Authentication'],
       summary: 'Refresh access token',
       description: 'Generate a new access token using a valid refresh token.',
-
       requestBody: {
         required: true,
         content: {
           'application/json': {
             schema: {
               type: 'object',
-
-              required: ['refreshToken'],
-
+              required: ['refresh_token'],
               properties: {
-                refreshToken: {
+                refresh_token: {
                   type: 'string',
+                  example: 'eyJhbGciOiJIUzI1NiIs...',
                 },
               },
             },
           },
         },
       },
-
       responses: {
         200: {
           description: 'Token refreshed successfully',
         },
-
         401: {
           description: 'Invalid refresh token',
         },
@@ -80,37 +74,30 @@ module.exports = {
   '/auth/logout': {
     post: {
       tags: ['Authentication'],
-
       summary: 'Logout current session',
-
       description: 'Invalidate the provided refresh token.',
-
       security: [
         {
           bearerAuth: [],
         },
       ],
-
       requestBody: {
         required: true,
-
         content: {
           'application/json': {
             schema: {
               type: 'object',
-
-              required: ['refreshToken'],
-
+              required: ['refresh_token'],
               properties: {
-                refreshToken: {
+                refresh_token: {
                   type: 'string',
+                  example: 'eyJhbGciOiJIUzI1NiIs...',
                 },
               },
             },
           },
         },
       },
-
       responses: {
         200: {
           description: 'Logout completed successfully',
@@ -122,17 +109,13 @@ module.exports = {
   '/auth/logout-all': {
     post: {
       tags: ['Authentication'],
-
       summary: 'Logout all sessions',
-
       description: 'Invalidate all refresh tokens of the authenticated user.',
-
       security: [
         {
           bearerAuth: [],
         },
       ],
-
       responses: {
         200: {
           description: 'All sessions revoked',
@@ -144,22 +127,17 @@ module.exports = {
   '/auth/me': {
     get: {
       tags: ['Authentication'],
-
       summary: 'Get authenticated user',
-
       description: 'Return authenticated user information.',
-
       security: [
         {
           bearerAuth: [],
         },
       ],
-
       responses: {
         200: {
           description: 'Authenticated user returned',
         },
-
         401: {
           description: 'Unauthorized',
         },
@@ -170,21 +148,26 @@ module.exports = {
   '/auth/verify-email': {
     post: {
       tags: ['Authentication'],
-
       summary: 'Verify email address',
-
       description: 'Validate email verification token.',
-
+      parameters: [
+        {
+          name: 'token',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+            example: 'email-verification-token-xyz123',
+          },
+        },
+      ],
       requestBody: {
         required: true,
-
         content: {
           'application/json': {
             schema: {
               type: 'object',
-
               required: ['token'],
-
               properties: {
                 token: {
                   type: 'string',
@@ -208,14 +191,10 @@ module.exports = {
   '/auth/resend-verification': {
     post: {
       tags: ['Authentication'],
-
       summary: 'Resend verification email',
-
       description: 'Generate a new email verification token and send a new email.',
-
       requestBody: {
         required: true,
-
         content: {
           'application/json': {
             schema: {
@@ -225,6 +204,7 @@ module.exports = {
                 email: {
                   type: 'string',
                   format: 'email',
+                  example: 'joe.doe@uk.org',
                 },
               },
             },
@@ -255,13 +235,13 @@ module.exports = {
                 email: {
                   type: 'string',
                   format: 'email',
+                  example: 'joe.doe@uk.org',
                 },
               },
             },
           },
         },
       },
-
       responses: {
         200: {
           description: 'Recovery instructions sent successfully',
@@ -281,28 +261,26 @@ module.exports = {
           'application/json': {
             schema: {
               type: 'object',
-
               required: ['resetId', 'token', 'password'],
-
               properties: {
                 resetId: {
                   type: 'string',
                   format: 'uuid',
+                  example: 'a6f2d4f6-b7b3-4c39-bf62-7f7df3b9c4d2',
                 },
-
                 token: {
                   type: 'string',
+                  example: 'reset-token-123456',
                 },
-
                 password: {
                   type: 'string',
+                  example: 'newPassword123',
                 },
               },
             },
           },
         },
       },
-
       responses: {
         200: {
           description: 'Password updated successfully',
@@ -318,50 +296,41 @@ module.exports = {
   '/auth/change-password': {
     patch: {
       tags: ['Authentication'],
-
       summary: 'Change password',
-
       description: 'Change authenticated user password and revoke all active sessions.',
-
       security: [
         {
           bearerAuth: [],
         },
       ],
-
       requestBody: {
         required: true,
-
         content: {
           'application/json': {
             schema: {
               type: 'object',
-
               required: ['currentPassword', 'newPassword'],
-
               properties: {
                 currentPassword: {
                   type: 'string',
+                  example: '12345678',
                 },
-
                 newPassword: {
                   type: 'string',
+                  example: 'newPassword123',
                 },
               },
             },
           },
         },
       },
-
       responses: {
         200: {
           description: 'Password changed successfully',
         },
-
         400: {
           description: 'Current password is invalid',
         },
-
         401: {
           description: 'Unauthorized',
         },
