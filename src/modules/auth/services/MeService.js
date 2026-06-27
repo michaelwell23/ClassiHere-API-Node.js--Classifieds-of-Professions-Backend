@@ -6,7 +6,7 @@ class MeService {
   async execute(userId) {
     const user = await UserRepository.findById(userId);
 
-    return UserResponseDTO(user);
+    return { user: UserResponseDTO(user) };
   }
 }
 

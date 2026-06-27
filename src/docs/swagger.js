@@ -10,7 +10,7 @@ module.exports = {
   },
   servers: [
     {
-      url: 'http://localhost:3333/',
+      url: 'http://localhost:3333',
       description: 'Local Development',
     },
   ],
@@ -44,21 +44,26 @@ module.exports = {
           },
           first_name: {
             type: 'string',
-            example: 'Michael',
+            example: 'Joe',
           },
           last_name: {
             type: 'string',
-            example: 'Walker',
+            example: 'Doe',
           },
           email: {
             type: 'string',
             format: 'email',
-            example: 'michael.walker@example.com',
+            example: 'joe.doe@uk.org',
           },
           phone: {
             type: 'string',
-            example: '11987654321',
             nullable: true,
+            example: '4335083461',
+          },
+          cpf: {
+            type: 'string',
+            example: '***.***.***-**',
+            description: 'Masked CPF. The complete CPF is never returned by the API.',
           },
           is_email_verified: {
             type: 'boolean',
@@ -71,38 +76,96 @@ module.exports = {
           created_at: {
             type: 'string',
             format: 'date-time',
+            example: '2026-06-27T15:30:00.000Z',
           },
           updated_at: {
+            type: 'string',
+            format: 'date-time',
+            example: '2026-06-27T15:30:00.000Z',
+          },
+        },
+      },
+      AuthTokens: {
+        type: 'object',
+        properties: {
+          access_token: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          },
+          refresh_token: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          },
+        },
+      },
+      LoginResponse: {
+        type: 'object',
+        properties: {
+          user: {
+            $ref: '#/components/schemas/User',
+          },
+          tokens: {
+            $ref: '#/components/schemas/AuthTokens',
+          },
+        },
+      },
+
+      RefreshTokenResponse: {
+        type: 'object',
+        properties: {
+          tokens: {
+            $ref: '#/components/schemas/AuthTokens',
+          },
+        },
+      },
+      MeResponse: {
+        type: 'object',
+        properties: {
+          user: {
+            $ref: '#/components/schemas/User',
+          },
+        },
+      },
+      MessageResponse: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            example: 'Operation completed successfully.',
+          },
+        },
+      },
+      SuccessMessageResponse: {
+        type: 'object',
+        properties: {
+          success: {
+            type: 'boolean',
+            example: true,
+          },
+          message: {
+            type: 'string',
+            example: 'Email verified successfully.',
+          },
+        },
+      },
+      ApiError: {
+        type: 'object',
+        properties: {
+          statusCode: {
+            type: 'integer',
+            example: 500,
+          },
+          message: {
+            type: 'string',
+            example: 'Internal server error.',
+          },
+          timestamp: {
             type: 'string',
             format: 'date-time',
           },
         },
       },
-
-      AuthTokens: {
-        type: 'object',
-        properties: {
-          accessToken: {
-            type: 'string',
-          },
-
-          refreshToken: {
-            type: 'string',
-          },
-        },
-      },
-
-      SuccessResponse: {
-        type: 'object',
-        properties: {
-          message: {
-            type: 'string',
-            example: 'Operation completed successfully',
-          },
-        },
-      },
-
-      ApiError: {
+      ValidationError: {
         type: 'object',
         properties: {
           statusCode: {
@@ -111,7 +174,23 @@ module.exports = {
           },
           message: {
             type: 'string',
-            example: 'Validation error',
+            example: 'Validation failed.',
+          },
+          errors: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                field: {
+                  type: 'string',
+                  example: 'email',
+                },
+                message: {
+                  type: 'string',
+                  example: 'Invalid email format.',
+                },
+              },
+            },
           },
           timestamp: {
             type: 'string',
@@ -119,7 +198,6 @@ module.exports = {
           },
         },
       },
-
       UnauthorizedError: {
         type: 'object',
         properties: {
@@ -129,7 +207,7 @@ module.exports = {
           },
           message: {
             type: 'string',
-            example: 'Invalid token',
+            example: 'Invalid credentials.',
           },
           timestamp: {
             type: 'string',
@@ -137,7 +215,6 @@ module.exports = {
           },
         },
       },
-
       ForbiddenError: {
         type: 'object',
         properties: {
@@ -147,7 +224,24 @@ module.exports = {
           },
           message: {
             type: 'string',
-            example: 'Access denied',
+            example: 'Access denied.',
+          },
+          timestamp: {
+            type: 'string',
+            format: 'date-time',
+          },
+        },
+      },
+      NotFoundError: {
+        type: 'object',
+        properties: {
+          statusCode: {
+            type: 'integer',
+            example: 404,
+          },
+          message: {
+            type: 'string',
+            example: 'Resource not found.',
           },
           timestamp: {
             type: 'string',

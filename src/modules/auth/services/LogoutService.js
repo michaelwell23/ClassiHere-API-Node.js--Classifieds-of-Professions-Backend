@@ -27,7 +27,7 @@ class LogoutService {
     await UserRefreshTokenRepository.delete(currentSession.id);
 
     return {
-      message: 'Logged out successfully',
+      message: 'Logout successfully',
     };
   }
 }

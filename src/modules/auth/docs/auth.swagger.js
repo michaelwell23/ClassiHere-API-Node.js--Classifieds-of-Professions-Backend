@@ -28,11 +28,46 @@ module.exports = {
       },
       responses: {
         200: {
-          description: 'User authenticated successfully',
+          description: 'User authenticated successfully.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/LoginResponse',
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation failed.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
         },
 
         401: {
-          description: 'Invalid credentials',
+          description: 'Invalid credentials.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'Internal server error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
         },
       },
     },
@@ -62,10 +97,47 @@ module.exports = {
       },
       responses: {
         200: {
-          description: 'Token refreshed successfully',
+          description: 'Access token refreshed successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/RefreshTokenResponse',
+              },
+            },
+          },
         },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+
         401: {
-          description: 'Invalid refresh token',
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
         },
       },
     },
@@ -100,7 +172,45 @@ module.exports = {
       },
       responses: {
         200: {
-          description: 'Logout completed successfully',
+          description: 'Logout successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/MessageResponse',
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
         },
       },
     },
@@ -116,9 +226,35 @@ module.exports = {
           bearerAuth: [],
         },
       ],
-      responses: {
-        200: {
-          description: 'All sessions revoked',
+      200: {
+        description: 'All sessions revoked successfully.',
+
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/MessageResponse',
+            },
+          },
+        },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
         },
       },
     },
@@ -136,10 +272,47 @@ module.exports = {
       ],
       responses: {
         200: {
-          description: 'Authenticated user returned',
+          description: 'Authenticated user information.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/MeResponse',
+              },
+            },
+          },
         },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+
         401: {
-          description: 'Unauthorized',
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
         },
       },
     },
@@ -179,10 +352,47 @@ module.exports = {
       },
       responses: {
         200: {
-          description: 'Email verified successfully',
+          description: 'Email verified successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/SuccessMessageResponse',
+              },
+            },
+          },
         },
         400: {
-          description: 'Invalid or expired token',
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
         },
       },
     },
@@ -215,6 +425,38 @@ module.exports = {
         200: {
           description: 'Verification email sent successfully',
         },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -244,7 +486,36 @@ module.exports = {
       },
       responses: {
         200: {
-          description: 'Recovery instructions sent successfully',
+          description: 'Password recovery email processed.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/MessageResponse',
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
         },
       },
     },
@@ -283,11 +554,47 @@ module.exports = {
       },
       responses: {
         200: {
-          description: 'Password updated successfully',
+          description: 'Password updated successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/MessageResponse',
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
         },
 
-        400: {
-          description: 'Invalid or expired token',
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
         },
       },
     },
@@ -326,13 +633,47 @@ module.exports = {
       },
       responses: {
         200: {
-          description: 'Password changed successfully',
+          description: 'Password changed successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/MessageResponse',
+              },
+            },
+          },
         },
         400: {
-          description: 'Current password is invalid',
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
         },
+
         401: {
-          description: 'Unauthorized',
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
         },
       },
     },

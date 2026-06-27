@@ -68,8 +68,10 @@ class RefreshTokenService {
     });
 
     return {
-      access_token: newAccessToken,
-      refresh_token: newRefreshToken,
+      tokens: {
+        access_token: newAccessToken,
+        refresh_token: newRefreshToken,
+      },
     };
   }
 }
