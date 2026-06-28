@@ -1,6 +1,6 @@
 const logger = console;
 
-const SendVerificationEmailService = require('../../modules/auth/services/SendVerificationEmailService');
+const SendVerificationEmailService = require('../../shared/services/SendVerificationEmailService');
 
 class SendVerificationEmailJob {
   async execute(payload) {

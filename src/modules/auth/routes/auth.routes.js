@@ -1,24 +1,24 @@
 const { Router } = require('express');
 
-const VerifyEmailController = require('../controllers/VerifyEmailController');
-const ResendVerificationController = require('../controllers/ResendVerificationController');
-const LoginController = require('../controllers/LoginController');
-const MeController = require('../controllers/MeController');
-const RefreshTokenController = require('../controllers/RefreshTokenController');
-const LogoutController = require('../controllers/LogoutController');
-const LogoutAllController = require('../controllers/LogoutAllController');
-const ForgotPasswordController = require('../controllers/ForgotPasswordController');
-const ResetPasswordController = require('../controllers/ResetPasswordController');
-const ChangePasswordController = require('../controllers/ChangePasswordController');
+const LoginController = require('../Login/Controllers/LoginController');
+const LogoutController = require('../Logout/Controllers/LogoutController');
+const RefreshTokenController = require('../RefreshToken/Controllers/RefreshTokenController');
+const LogoutAllController = require('../LogoutAll/Controllers/LogoutAllController');
+const MeController = require('../Me/Controllers/MeController');
+const VerifyEmailController = require('../VerifyEmail/Controllers/VerifyEmailController');
+const ResendVerificationController = require('../ResendVerification/Controllers/ResendVerificationController');
+const ForgotPasswordController = require('../ForgotPassword/Controllers/ForgotPasswordController');
+const ResetPasswordController = require('../ResetPassword/Controllers/ResetPasswordController');
+const ChangePasswordController = require('../ChangePassword/Controllers/ChangePasswordController');
 
-const resetPasswordDTO = require('../dtos/reset-password.dto');
-const logoutDTO = require('../dtos/logout.dto');
-const verifyEmailDTO = require('../dtos/verify-email.dto');
-const resendVerificationDTO = require('../dtos/resend-verification.dto');
-const loginDTO = require('../dtos/login.dto');
-const refreshTokenDTO = require('../dtos/refresh-token.dto');
-const forgotPasswordDTO = require('../dtos/forgot-password.dto');
-const changePasswordDTO = require('../dtos/change-password.dto');
+const loginDTO = require('../Login/DTOs/login.dto');
+const refreshTokenDTO = require('../RefreshToken/DTOs/refresh-token.dto');
+const logoutDTO = require('../Logout/DTOs/logout.dto');
+const verifyEmailDTO = require('../VerifyEmail/DTOs/verify-email.dto');
+const resendVerificationDTO = require('../ResendVerification/DTOs/resend-verification.dto');
+const forgotPasswordDTO = require('../ForgotPassword/DTOs/forgot-password.dto');
+const resetPasswordDTO = require('../ResetPassword/DTOs/reset-password.dto');
+const changePasswordDTO = require('../ChangePassword/DTOs/change-password.dto');
 
 const validationMiddleware = require('../../../shared/middlewares/validation.middleware');
 const authMiddleware = require('../../../shared/middlewares/auth.middleware');
