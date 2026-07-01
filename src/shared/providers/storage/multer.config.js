@@ -2,6 +2,8 @@ const path = require('path');
 const multer = require('multer');
 const crypto = require('crypto');
 
+const AppError = require('../../errors/AppError');
+
 module.exports = multer({
   storage: multer.diskStorage({
     destination(req, file, callback) {
@@ -22,7 +24,7 @@ module.exports = multer({
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
     if (!allowedMimeTypes.includes(file.mimetype)) {
-      return callback(new Error('Invalid image format.'));
+      callback(new AppError('Only JPEG, PNG and WebP images are allowed.', 400));
     }
 
     callback(null, true);

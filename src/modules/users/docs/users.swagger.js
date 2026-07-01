@@ -43,6 +43,10 @@ module.exports = {
                   type: 'string',
                   example: '11987654321',
                 },
+                avatar: {
+                  type: 'string',
+                  format: 'binary',
+                },
               },
             },
           },
@@ -155,6 +159,10 @@ module.exports = {
                 phone: {
                   type: 'string',
                   example: '11987654321',
+                },
+                avatar: {
+                  type: 'string',
+                  format: 'binary',
                 },
               },
             },
