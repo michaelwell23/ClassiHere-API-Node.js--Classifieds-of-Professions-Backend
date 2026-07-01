@@ -28,6 +28,20 @@ class UserRepository {
   async delete(user) {
     return user.destroy();
   }
+  async updateProfileImage(userId, profileImage) {
+    await User.update(
+      {
+        profile_image: profileImage,
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+
+    return this.findById(userId);
+  }
 }
 
 module.exports = new UserRepository();

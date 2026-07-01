@@ -27,3 +27,9 @@ logs
 .idea
 .vscode
 .DS_Store
+
+storage/avatars/users/*
+storage/temp/*
+
+!storage/avatars/users/.gitkeep
+!storage/temp/.gitkeep

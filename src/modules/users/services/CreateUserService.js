@@ -1,61 +1,53 @@
+const AppError = require('../../../shared/errors/AppError');
 const UserRepository = require('../repositories/UserRepository');
 const UserVerificationRepository = require('../repositories/UserVerificationRepository');
 
 const emailVerificationConfig = require('../../../config/email-verification');
-
-const AppError = require('../../../shared/errors/AppError');
 const { generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
 const generateVerificationToken = require('../../../shared/utils/generate-verification-token');
+const imageProcessor = require('../../../shared/providers/storage/image.processor');
+const localStorageProvider = require('../../../shared/providers/storage/local.provider');
 
 const SendVerificationEmailJob = require('../../../shared/jobs/SendVerificationEmailJob');
 
 class CreateUserService {
-  async execute(data) {
-    const existingEmail = await UserRepository.findByEmail(data.email);
-
-    if (existingEmail) {
-      throw new AppError('Email already exists', 409);
-    }
-
-    if (data.cpf) {
-      const existingCpf = await UserRepository.findByCpf(data.cpf);
-
-      if (existingCpf) {
-        throw new AppError('CPF already exists', 409);
-      }
-    }
-
-    const hashedPassword = await generateHash(data.password);
-
-    const userData = {
-      ...data,
-      password: hashedPassword,
-      is_email_verified: false,
-      is_active: true,
-    };
-
-    const user = await UserRepository.create(userData);
-    const token = generateVerificationToken();
-
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + emailVerificationConfig.expiresInHours);
-
-    await UserVerificationRepository.create({
-      user_id: user.id,
-      token,
-      expires_at: expiresAt,
-    });
+  async execute({ data, file }) {
+    let avatarPath = null;
 
     try {
-      await SendVerificationEmailJob.execute({
-        user,
-        token,
-      });
-    } catch (error) {
-      console.error('Email send failed', error);
-    }
+      const existingEmail = await UserRepository.findByEmail(data.email);
 
-    return user;
+      if (existingEmail) {
+        throw new AppError('E-mail already registered', 409);
+      }
+
+      if (data.cpf) {
+        const existingCpf = await UserRepository.findByCpf(data.cpf);
+
+        if (existingCpf) {
+          throw new AppError('CPF already registered', 409);
+        }
+      }
+
+      if (file) {
+        avatarPath = await imageProcessor.process(file.path);
+      }
+
+      const user = await UserRepository.create({
+        ...data,
+        avatar_path: avatarPath,
+        is_email_verified: false,
+        is_active: true,
+      });
+
+      return user;
+    } catch (error) {
+      if (avatarPath) {
+        await localStorageProvider.delete(avatarPath);
+      }
+
+      throw error;
+    }
   }
 }
 

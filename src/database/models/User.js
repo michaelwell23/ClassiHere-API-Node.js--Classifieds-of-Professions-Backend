@@ -22,6 +22,10 @@ class User extends Model {
           allowNull: false,
         },
         phone: DataTypes.STRING,
+        avatar_path: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
         cpf: {
           type: DataTypes.STRING,
           allowNull: false,

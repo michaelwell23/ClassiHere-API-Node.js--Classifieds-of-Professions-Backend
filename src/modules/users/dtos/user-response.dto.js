@@ -5,6 +5,7 @@ function userResponseDTO(user) {
     last_name: user.last_name,
     email: user.email,
     phone: user.phone,
+    avatar_url: user.avatar_path ? `/storage/${user.avatar_path}` : null,
     is_email_verified: user.is_email_verified,
     is_active: user.is_active,
     created_at: user.created_at,
