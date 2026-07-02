@@ -678,4 +678,79 @@ module.exports = {
       },
     },
   },
+
+  'auth/verify-phone': {
+    patch: {
+      tags: ['Authentication'],
+      summary: 'Verify phone number',
+      description: 'Validate phone verification code.',
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['code'],
+              properties: {
+                code: {
+                  type: 'string',
+                  example: '123456',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Phone verified successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/SuccessMessageResponse',
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'ApiError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };

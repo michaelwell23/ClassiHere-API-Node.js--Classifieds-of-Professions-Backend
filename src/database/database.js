@@ -5,13 +5,20 @@ const User = require('./models/User');
 const UserVerification = require('./models/UserVerification');
 const UserRefreshToken = require('./models/UserRefreshToken');
 const PasswordResetToken = require('./models/PasswordResetToken');
+const UserPhoneVerification = require('./models/UserPhoneVerification');
 
 const env = process.env.NODE_ENV || 'development';
 const config = databaseConfig[env];
 
 const connection = new Sequelize(config);
 
-const models = [User, UserVerification, UserRefreshToken, PasswordResetToken];
+const models = [
+  User,
+  UserVerification,
+  UserPhoneVerification,
+  UserRefreshToken,
+  PasswordResetToken,
+];
 
 models.forEach((model) => model.init(connection));
 models.forEach((model) => {
