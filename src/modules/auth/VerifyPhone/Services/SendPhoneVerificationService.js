@@ -1,6 +1,6 @@
-const UserRepository = require('../../users/repositories/UserRepository');
-const UserPhoneVerificationRepository = require('../repositories/UserPhoneVerificationRepository');
-const LocalPhoneProvider = require('../../../shared/providers/phone/local.provider');
+const UserRepository = require('../../../users/repositories/UserRepository');
+const UserPhoneVerificationRepository = require('../../Repositories/UserPhoneVerificationRepository');
+const LocalPhoneProvider = require('../../../../shared/providers/phone/local.provider');
 
 class SendPhoneVerificationService {
   async execute(userId) {

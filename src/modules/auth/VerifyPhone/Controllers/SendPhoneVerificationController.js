@@ -1,4 +1,4 @@
-const SendPhoneVerificationService = require('../services/SendPhoneVerificationService');
+const SendPhoneVerificationService = require('../Services/SendPhoneVerificationService');
 
 class SendPhoneVerificationController {
   async handle(request, response, next) {

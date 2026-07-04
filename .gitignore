@@ -33,3 +33,6 @@ storage/temp/*
 
 !storage/avatars/users/.gitkeep
 !storage/temp/.gitkeep
+
+storage/phone-verification/*
+!storage/phone-verification/.gitkeep

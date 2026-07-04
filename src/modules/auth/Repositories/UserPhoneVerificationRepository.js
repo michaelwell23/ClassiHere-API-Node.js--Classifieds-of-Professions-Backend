@@ -1,14 +1,26 @@
 const UserPhoneVerification = require('../../../database/models/UserPhoneVerification');
 
 class UserPhoneVerificationRepository {
-  async findValidCode(userId, code) {
+  async findByUserIdAndCode(userId, code) {
     return UserPhoneVerification.findOne({
       where: {
         user_id: userId,
         code,
-        verified_at: null,
       },
     });
+  }
+
+  async invalidate(id) {
+    return UserPhoneVerification.update(
+      {
+        verified_at: new Date(),
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
   }
 
   async save(verification) {

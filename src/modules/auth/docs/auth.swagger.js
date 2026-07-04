@@ -753,4 +753,51 @@ module.exports = {
       },
     },
   },
+
+  'auth/phone-verification': {
+    post: {
+      tags: ['Authentication'],
+      summary: 'Send phone verification code',
+      description: "Generate a new phone verification code and send it to the user's phone number.",
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Verification code sent successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/MessageResponse',
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+            },
+          },
+        },
+
+        401: {
+          description: 'UnathourizedError.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedError',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };

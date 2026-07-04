@@ -4,26 +4,29 @@ const UserRepository = require('../../../users/repositories/UserRepository');
 
 class VerifyPhoneService {
   async execute({ userId, code }) {
-    const verification = await UserPhoneVerificationRepository.findValidCode(userId, code);
+    const verification = await UserPhoneVerificationRepository.findByUserIdAndCode(userId, code);
 
     if (!verification) {
       throw new AppError('Invalid verification code.', 400);
+    }
+
+    if (verification.verified_at) {
+      throw new AppError('Verification code has already been used.', 400);
     }
 
     if (verification.expires_at < new Date()) {
       throw new AppError('Verification code has expired.', 400);
     }
 
-    verification.verified_at = new Date();
+    await UserPhoneVerificationRepository.invalidate(verification.id);
 
-    await UserPhoneVerificationRepository.save(verification);
+    const user = await UserRepository.findById(userId);
 
-    await UserRepository.update(userId, {
+    await user.update({
       is_phone_verified: true,
     });
 
     return {
-      success: true,
       message: 'Phone verified successfully.',
     };
   }
