@@ -1,4 +1,4 @@
-const VerifyPhoneService = require('../services/VerifyPhoneService');
+const VerifyPhoneService = require('../Services/VerifyPhoneService');
 
 class VerifyPhoneController {
   async handle(request, response, next) {
