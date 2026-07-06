@@ -682,7 +682,7 @@ module.exports = {
   'auth/verify-phone': {
     patch: {
       tags: ['Authentication'],
-      summary: 'Verify phone number',
+      summary: 'Verify phone',
       description: 'Validate phone verification code.',
       security: [
         {
@@ -758,7 +758,7 @@ module.exports = {
     post: {
       tags: ['Authentication'],
       summary: 'Send phone verification code',
-      description: "Generate a new phone verification code and send it to the user's phone number.",
+      description: 'Generate a new phone verification code for the authenticated user.',
       security: [
         {
           bearerAuth: [],

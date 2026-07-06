@@ -3,11 +3,13 @@ const DeleteUserService = require('../services/DeleteUserService');
 class DeleteUserController {
   async handle(request, response, next) {
     try {
-      await DeleteUserService.execute(request.params.id);
+      const { id } = request.validated.params;
 
-      return response.status(204).json({ message: 'User deleted successfully' });
+      const result = await DeleteUserService.execute(id);
+
+      return response.status(200).json(result);
     } catch (error) {
-      return next(error);
+      next(error);
     }
   }
 }
