@@ -25,6 +25,10 @@ class RefreshTokenService {
 
     const user = await UserRepository.findById(payload.sub);
 
+    if (!user.is_active) {
+      throw new AppError('User account is deactivated.', 403);
+    }
+
     if (!user) {
       throw new AppError('User not found', 401);
     }

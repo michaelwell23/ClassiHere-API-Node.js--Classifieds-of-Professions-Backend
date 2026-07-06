@@ -39,6 +39,7 @@ class User extends Model {
           type: DataTypes.BOOLEAN,
           defaultValue: true,
         },
+        deactivated_at: DataTypes.DATE,
       },
       {
         sequelize,

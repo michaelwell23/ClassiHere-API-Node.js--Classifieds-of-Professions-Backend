@@ -9,6 +9,7 @@ function userResponseDTO(user) {
     is_email_verified: user.is_email_verified,
     is_phone_verified: user.is_phone_verified,
     is_active: user.is_active,
+    deactivated_at: user.deactivated_at,
     created_at: user.created_at,
     updated_at: user.updated_at,
   };

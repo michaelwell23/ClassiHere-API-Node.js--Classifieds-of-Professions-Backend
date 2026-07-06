@@ -226,4 +226,76 @@ module.exports = {
       },
     },
   },
+
+  '/users/{id}/deactivate': {
+    patch: {
+      tags: ['Users'],
+      summary: 'Deactivate user account',
+      description: 'Deactivate user account.',
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid',
+          },
+          example: 'd6f2f9b5-f6a5-4f0f-97b0-1c68f36a8e54',
+        },
+      ],
+      responses: {
+        200: {
+          description: 'User account deactivated successfully',
+        },
+        404: {
+          description: 'User not found',
+        },
+        401: {
+          description: 'Unauthorized',
+        },
+      },
+    },
+  },
+
+  '/users/{id}/reactivate': {
+    patch: {
+      tags: ['Users'],
+      summary: 'Reactivate user account',
+      description: 'Reactivate user account.',
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid',
+          },
+          example: 'd6f2f9b5-f6a5-4f0f-97b0-1c68f36a8e54',
+        },
+      ],
+      responses: {
+        200: {
+          description: 'User account reactivated successfully',
+        },
+        404: {
+          description: 'User not found',
+        },
+        401: {
+          description: 'Unauthorized',
+        },
+      },
+    },
+  },
 };

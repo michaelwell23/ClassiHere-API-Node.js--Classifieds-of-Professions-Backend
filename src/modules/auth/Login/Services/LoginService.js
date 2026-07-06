@@ -20,6 +20,10 @@ class LoginService {
 
     const user = await UserRepository.findByEmail(email);
 
+    if (!user.is_active) {
+      throw new AppError('User account is deactivated.', 403);
+    }
+
     if (!user) {
       throw new AppError('Invalid email or password', 401);
     }
