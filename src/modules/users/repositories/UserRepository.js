@@ -68,6 +68,29 @@ class UserRepository {
       }
     );
   }
+
+  async incrementFailedLoginAttempts(user) {
+    return user.update({
+      failed_login_attempts: user.failed_login_attempts + 1,
+    });
+  }
+
+  async resetFailedLoginAttempts(user) {
+    return user.update({
+      failed_login_attempts: 0,
+      locked_until: null,
+    });
+  }
+
+  async lockUserUntil(user, lockedUntil) {
+    return user.update({
+      locked_until: lockedUntil,
+    });
+  }
+
+  async updateSecurity(user, data) {
+    return user.update(data);
+  }
 }
 
 module.exports = new UserRepository();

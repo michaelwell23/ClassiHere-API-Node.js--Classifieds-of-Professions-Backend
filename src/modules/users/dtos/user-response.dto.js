@@ -11,6 +11,9 @@ function userResponseDTO(user) {
     is_active: user.is_active,
     deactivated_at: user.deactivated_at,
     last_login_at: user.last_login_at,
+    failed_login_attempts: user.failed_login_attempts,
+    locked_until: user.locked_until,
+
     created_at: user.created_at,
     updated_at: user.updated_at,
   };
