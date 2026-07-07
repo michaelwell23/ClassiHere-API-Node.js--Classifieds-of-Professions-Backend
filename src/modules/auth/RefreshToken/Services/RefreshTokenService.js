@@ -56,6 +56,8 @@ class RefreshTokenService {
       jti: newJti,
     });
 
+    await UserRepository.updateLastLogin(user.id);
+
     const newHash = await generateHash(newRefreshToken);
 
     const expiresAt = new Date();

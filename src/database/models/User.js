@@ -40,6 +40,7 @@ class User extends Model {
           defaultValue: true,
         },
         deactivated_at: DataTypes.DATE,
+        last_login_at: DataTypes.DATE,
       },
       {
         sequelize,

@@ -49,9 +49,11 @@ class LoginService {
       jti,
     });
 
+    expiresAt.setDate(expiresAt.getDate() + 30);
+
     const refreshTokenHash = await generateHash(refreshToken);
 
-    expiresAt.setDate(expiresAt.getDate() + 30);
+    await UserRepository.updateLastLogin(user.id);
 
     await UserRefreshTokenRepository.create({
       user_id: user.id,

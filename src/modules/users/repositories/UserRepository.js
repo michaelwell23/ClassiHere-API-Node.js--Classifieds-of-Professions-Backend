@@ -1,5 +1,5 @@
 const User = require('../../../database/models/User');
-
+const Op = require('sequelize');
 class UserRepository {
   async create(data) {
     return User.create(data);
@@ -41,6 +41,32 @@ class UserRepository {
     );
 
     return this.findById(userId);
+  }
+
+  async findUsersPendingDeletion(limitDate) {
+    console.log(Op);
+    return User.findAll({
+      where: {
+        is_active: false,
+        deleted_at: null,
+        deactivated_at: {
+          [Op.lte]: limitDate,
+        },
+      },
+    });
+  }
+
+  async updateLastLogin(userId) {
+    return User.update(
+      {
+        last_login_at: new Date(),
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
   }
 }
 
