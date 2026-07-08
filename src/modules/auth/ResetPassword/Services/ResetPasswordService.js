@@ -40,6 +40,11 @@ class ResetPasswordService {
       password: passwordHash,
     });
 
+    await UserRepository.updateSecurity(user, {
+      failed_login_attempts: 0,
+      locked_until: null,
+    });
+
     await PasswordResetTokenRepository.invalidateAllByUser(user.id);
 
     return {

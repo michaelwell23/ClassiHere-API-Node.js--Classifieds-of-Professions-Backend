@@ -32,6 +32,11 @@ class ChangePasswordService {
       password: passwordHash,
     });
 
+    await UserRepository.updateSecurity(user, {
+      failed_login_attempts: 0,
+      locked_until: null,
+    });
+
     await UserRefreshTokenRepository.deleteAllByUser(user.id);
 
     return {
