@@ -1,70 +1,85 @@
 const AppError = require('../../../../shared/errors/AppError');
-
-const UserRepository = require('../../../users/repositories/UserRepository');
+const UserRepository = require('../../../users/Repositories/UserRepository');
 const UserRefreshTokenRepository = require('../../Repositories/UserRefreshTokenRepository');
 
-const { generateHash, compareHash } = require('../../../../shared/providers/hash/bcrypt.provider');
-const { generateJti } = require('../../../../shared/providers/auth/jwt.provider');
+const {
+  MAX_LOGIN_ATTEMPTS,
+  ACCOUNT_LOCK_DURATION_MINUTES,
+} = require('../../../../config/security');
 
+const { compareHash } = require('../../../../shared/providers/hash/bcrypt.provider');
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require('../../../../shared/providers/auth/jwt.provider');
 
-const UserResponseDTO = require('../../../users/dtos/user-response.dto');
-
 class LoginService {
   async execute({ email, password }) {
-    const expiresAt = new Date();
-    const jti = generateJti();
-
     const user = await UserRepository.findByEmail(email);
+
+    if (!user) {
+      throw new AppError('Invalid email or password.', 401);
+    }
 
     if (!user.is_active) {
       throw new AppError('User account is deactivated.', 403);
     }
 
-    if (!user) {
-      throw new AppError('Invalid email or password', 401);
+    if (user.locked_until && user.locked_until > new Date()) {
+      throw new AppError('Account temporarily locked due to multiple failed login attempts.', 423);
     }
 
-    const passwordMatch = await compareHash(password, user.password);
+    const passwordMatches = await compareHash(password, user.password);
 
-    if (!passwordMatch) {
-      throw new AppError('Invalid email or password', 401);
+    if (!passwordMatches) {
+      const attempts = user.failed_login_attempts + 1;
+
+      if (attempts >= MAX_LOGIN_ATTEMPTS) {
+        const lockedUntil = new Date();
+
+        lockedUntil.setMinutes(lockedUntil.getMinutes() + ACCOUNT_LOCK_DURATION_MINUTES);
+
+        await UserRepository.updateSecurity(user, {
+          failed_login_attempts: attempts,
+          locked_until: lockedUntil,
+        });
+
+        throw new AppError(
+          'Account temporarily locked due to multiple failed login attempts.',
+          423
+        );
+      }
+
+      await UserRepository.updateSecurity(user, {
+        failed_login_attempts: attempts,
+      });
+
+      throw new AppError('Invalid email or password.', 401);
     }
 
-    if (!user.is_email_verified) {
-      throw new AppError('Email not verified', 403);
+    if (user.failed_login_attempts > 0 || user.locked_until) {
+      await UserRepository.updateSecurity(user, {
+        failed_login_attempts: 0,
+        locked_until: null,
+      });
     }
 
-    if (!user.is_active) {
-      throw new AppError('User account disabled', 403);
-    }
+    const accessToken = generateAccessToken(user);
 
-    const accessToken = generateAccessToken({ userId: user.id });
-
-    const refreshToken = generateRefreshToken({
-      sub: user.id,
-      jti,
-    });
-
-    const refreshTokenHash = await generateHash(refreshToken);
-
-    expiresAt.setDate(expiresAt.getDate() + 30);
+    const refreshToken = generateRefreshToken();
 
     await UserRefreshTokenRepository.create({
       user_id: user.id,
-      jti,
-      token: refreshTokenHash,
-      expires_at: expiresAt,
+      token: refreshToken,
     });
 
+    await UserRepository.updateLastLogin(user.id);
+
     return {
-      user: UserResponseDTO(user),
+      user: user,
       tokens: {
-        refresh_token: refreshToken,
         access_token: accessToken,
+        refresh_token: refreshToken,
       },
     };
   }

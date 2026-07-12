@@ -1,4 +1,4 @@
-const UserRepository = require('../../../users/repositories/UserRepository');
+const UserRepository = require('../../../users/Repositories/UserRepository');
 const PasswordResetTokenRepository = require('../../Repositories/PasswordResetTokenRepository');
 
 const AppError = require('../../../../shared/errors/AppError');
@@ -38,6 +38,11 @@ class ResetPasswordService {
 
     await UserRepository.update(user.id, {
       password: passwordHash,
+    });
+
+    await UserRepository.updateSecurity(user, {
+      failed_login_attempts: 0,
+      locked_until: null,
     });
 
     await PasswordResetTokenRepository.invalidateAllByUser(user.id);

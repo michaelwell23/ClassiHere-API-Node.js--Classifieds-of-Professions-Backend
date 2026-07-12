@@ -1,4 +1,4 @@
-const UserRepository = require('../../../users/repositories/UserRepository');
+const UserRepository = require('../../../users/Repositories/UserRepository');
 const UserPhoneVerificationRepository = require('../../Repositories/UserPhoneVerificationRepository');
 const LocalPhoneProvider = require('../../../../shared/providers/phone/local.provider');
 

@@ -2,7 +2,7 @@ const AppError = require('../errors/AppError');
 
 const { verifyToken } = require('../providers/auth/jwt.provider');
 
-const UserRepository = require('../../modules/users/repositories/UserRepository');
+const UserRepository = require('../../modules/users/Repositories/UserRepository');
 
 async function authMiddleware(request, response, next) {
   try {

@@ -40,6 +40,10 @@ class User extends Model {
           defaultValue: true,
         },
         deactivated_at: DataTypes.DATE,
+        last_login_at: DataTypes.DATE,
+        failed_login_attempts: DataTypes.INTEGER,
+
+        locked_until: DataTypes.DATE,
       },
       {
         sequelize,

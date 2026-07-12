@@ -1,7 +1,6 @@
 const AppError = require('../../../../shared/errors/AppError');
 
-const UserRepository = require('../../../users/repositories/UserRepository');
-
+const UserRepository = require('../../../users/Repositories/UserRepository');
 const UserRefreshTokenRepository = require('../../Repositories/UserRefreshTokenRepository');
 
 const { compareHash, generateHash } = require('../../../../shared/providers/hash/bcrypt.provider');
@@ -30,6 +29,11 @@ class ChangePasswordService {
 
     await UserRepository.update(user.id, {
       password: passwordHash,
+    });
+
+    await UserRepository.updateSecurity(user, {
+      failed_login_attempts: 0,
+      locked_until: null,
     });
 
     await UserRefreshTokenRepository.deleteAllByUser(user.id);

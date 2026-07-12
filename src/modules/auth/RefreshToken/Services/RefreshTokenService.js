@@ -1,6 +1,6 @@
 const AppError = require('../../../../shared/errors/AppError');
 
-const UserRepository = require('../../../users/repositories/UserRepository');
+const UserRepository = require('../../../users/Repositories/UserRepository');
 
 const UserRefreshTokenRepository = require('../../Repositories/UserRefreshTokenRepository');
 
@@ -55,6 +55,8 @@ class RefreshTokenService {
       sub: user.id,
       jti: newJti,
     });
+
+    await UserRepository.updateLastLogin(user.id);
 
     const newHash = await generateHash(newRefreshToken);
 
