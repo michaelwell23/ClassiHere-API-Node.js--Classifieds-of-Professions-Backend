@@ -1,4 +1,4 @@
-const AcceptTermsService = require('./AcceptTermsService');
+const AcceptTermsService = require('../Services/AcceptTermsService');
 
 class AcceptTermsController {
   async handle(request, response, next) {

@@ -1,5 +1,7 @@
 const LoginService = require('../../Login/Services/LoginService');
 
+const UserResponseDTO = require('../../../../shared/DTOs/responses/user-response.dto');
+
 class LoginController {
   async handle(request, response) {
     try {
@@ -7,7 +9,7 @@ class LoginController {
 
       const result = await LoginService.execute({ email, password });
 
-      return response.status(200).json(result);
+      return response.status(200).json(UserResponseDTO(result));
     } catch (error) {
       return response.status(error.statusCode || 500).json({ error: error.message });
     }

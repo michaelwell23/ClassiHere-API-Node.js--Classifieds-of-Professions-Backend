@@ -1,6 +1,6 @@
-const UserRepository = require('../repositories/UserRepository');
+const UserRepository = require('../../Repositories/UserRepository');
 
-const AppError = require('../../../shared/errors/AppError');
+const AppError = require('../../../../shared/errors/AppError');
 class DeleteUserService {
   async execute(id) {
     const user = await UserRepository.findById(id);

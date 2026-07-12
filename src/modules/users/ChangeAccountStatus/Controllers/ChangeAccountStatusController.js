@@ -1,4 +1,4 @@
-const ChangeAccountStatusService = require('../services/ChangeAccountStatusService');
+const ChangeAccountStatusService = require('../Services/ChangeAccountStatusService');
 
 class ChangeAccountStatusController {
   async handle(request, response, next) {

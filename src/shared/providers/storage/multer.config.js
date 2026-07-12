@@ -7,7 +7,7 @@ const AppError = require('../../errors/AppError');
 module.exports = multer({
   storage: multer.diskStorage({
     destination(req, file, callback) {
-      callback(null, path.resolve(process.cwd(), 'storage', 'temp'));
+      callback(null, path.resolve(process.cwd(), 'storage', 'avatars', 'users'));
     },
 
     filename(req, file, callback) {

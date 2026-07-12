@@ -1,5 +1,5 @@
-const UserRepository = require('../../../users/repositories/UserRepository');
-const UserVerificationRepository = require('../../../users/repositories/UserVerificationRepository');
+const UserRepository = require('../../../users/Repositories/UserRepository');
+const UserVerificationRepository = require('../../../users/Repositories/UserVerificationRepository');
 
 const SendVerificationEmailJob = require('../../../../shared/jobs/SendVerificationEmailJob');
 const generateVerificationToken = require('../../../../shared/utils/generate-verification-token');

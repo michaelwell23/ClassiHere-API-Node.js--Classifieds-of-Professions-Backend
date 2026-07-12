@@ -2,18 +2,18 @@ const { Router } = require('express');
 
 const validate = require('../../../shared/middlewares/validation.middleware');
 const authMiddleware = require('../../../shared/middlewares/auth.middleware');
-const upload = require('../../../shared/middlewares/upload.middleware');
+const upload = require('../../../shared/providers/storage/multer.config');
 
-const createUserDTO = require('../dtos/create-user.dto');
-const updateUserDTO = require('../dtos/update-user.dto');
-const userIdDTO = require('../dtos/get-user.dto');
-const changeAccountStatusDTO = require('../dtos/change-account-status.dto');
+const userIdDTO = require('../GetUser/DTOs/get-user.dto');
+const createUserDTO = require('../CreateUsers/DTOs/create-user.dto');
+const updateUserDTO = require('../UpdateUsers/DTOs/update-user.dto');
+const changeAccountStatusDTO = require('../ChangeAccountStatus/DTOs/change-account-status.dto');
 
-const CreateUserController = require('../controllers/CreateUserController');
-const GetUserController = require('../controllers/GetUserController');
-const UpdateUserController = require('../controllers/UpdateUserController');
-const DeleteUserController = require('../controllers/DeleteUserController');
-const ChangeAccountStatusController = require('../controllers/ChangeAccountStatusController');
+const GetUserController = require('../GetUser/Controllers/GetUserController');
+const CreateUserController = require('../CreateUsers/Controllers/CreateUserController');
+const UpdateUserController = require('../UpdateUsers/Controllers/UpdateUserController');
+const DeleteUserController = require('../DeleteUsers/Controllers/DeleteUserController');
+const ChangeAccountStatusController = require('../ChangeAccountStatus/Controllers/ChangeAccountStatusController');
 
 const usersRoutes = Router();
 

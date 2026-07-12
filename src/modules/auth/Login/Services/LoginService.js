@@ -1,7 +1,6 @@
 const AppError = require('../../../../shared/errors/AppError');
-const UserRepository = require('../../../users/repositories/UserRepository');
+const UserRepository = require('../../../users/Repositories/UserRepository');
 const UserRefreshTokenRepository = require('../../Repositories/UserRefreshTokenRepository');
-const UserResponseDTO = require('../../../users/dtos/user-response.dto');
 
 const {
   MAX_LOGIN_ATTEMPTS,
@@ -77,7 +76,7 @@ class LoginService {
     await UserRepository.updateLastLogin(user.id);
 
     return {
-      user: UserResponseDTO(user),
+      user: user,
       tokens: {
         access_token: accessToken,
         refresh_token: refreshToken,

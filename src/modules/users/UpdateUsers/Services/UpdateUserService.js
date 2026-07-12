@@ -1,10 +1,9 @@
-const AppError = require('../../../shared/errors/AppError');
+const AppError = require('../../../../shared/errors/AppError');
 
-const UserRepository = require('../repositories/UserRepository');
-const UserResponseDTO = require('../dtos/user-response.dto');
+const UserRepository = require('../../Repositories/UserRepository');
 
-const imageProcessor = require('../../../shared/providers/storage/image.processor');
-const localStorageProvider = require('../../../shared/providers/storage/local.provider');
+const imageProcessor = require('../../../../shared/providers/storage/image.processor');
+const localStorageProvider = require('../../../../shared/providers/storage/local.provider');
 
 class UpdateUserService {
   async execute({ id, data, file }) {
@@ -30,7 +29,7 @@ class UpdateUserService {
         await localStorageProvider.delete(user.avatar_path);
       }
 
-      return UserResponseDTO(user);
+      return user;
     } catch (error) {
       if (file && newAvatarPath && newAvatarPath !== user.avatar_path) {
         await localStorageProvider.delete(newAvatarPath);

@@ -1,14 +1,9 @@
-const AppError = require('../../../shared/errors/AppError');
-const UserRepository = require('../repositories/UserRepository');
-const UserVerificationRepository = require('../repositories/UserVerificationRepository');
+const AppError = require('../../../../shared/errors/AppError');
 
-const emailVerificationConfig = require('../../../config/email-verification');
-const { generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
-const generateVerificationToken = require('../../../shared/utils/generate-verification-token');
-const imageProcessor = require('../../../shared/providers/storage/image.processor');
-const localStorageProvider = require('../../../shared/providers/storage/local.provider');
+const UserRepository = require('../../Repositories/UserRepository');
 
-const SendVerificationEmailJob = require('../../../shared/jobs/SendVerificationEmailJob');
+const imageProcessor = require('../../../../shared/providers/storage/image.processor');
+const localStorageProvider = require('../../../../shared/providers/storage/local.provider');
 
 class CreateUserService {
   async execute({ data, file }) {

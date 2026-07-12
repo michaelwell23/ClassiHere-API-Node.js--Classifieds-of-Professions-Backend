@@ -1,7 +1,7 @@
 const AppError = require('../../../shared/errors/AppError');
 
-const TermRepository = require('../repositories/TermRepository');
-const UserTermAcceptanceRepository = require('../repositories/UserTermAcceptanceRepository');
+const TermRepository = require('../Repositories/TermRepository');
+const UserTermAcceptanceRepository = require('../Repositories/UserTermAcceptanceRepository');
 
 class AcceptTermsService {
   async execute({ userId, ipAddress, userAgent }) {

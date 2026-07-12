@@ -1,12 +1,10 @@
-const UserRepository = require('../../../users/repositories/UserRepository');
-
-const UserResponseDTO = require('../../../users/dtos/user-response.dto');
+const UserRepository = require('../../../users/Repositories/UserRepository');
 
 class MeService {
   async execute(userId) {
     const user = await UserRepository.findById(userId);
 
-    return { user: UserResponseDTO(user) };
+    return { user };
   }
 }
 

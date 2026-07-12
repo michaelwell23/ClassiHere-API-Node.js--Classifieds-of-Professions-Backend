@@ -1,13 +1,11 @@
-const GetUserService = require('../services/GetUserService');
+const GetUserService = require('../Services/GetUserService');
 
-const userResponseDTO = require('../dtos/user-response.dto');
+const userResponseDTO = require('../../../../shared/DTOs/responses/user-response.dto');
 
 class GetUserController {
   async handle(request, response, next) {
     try {
       const user = await GetUserService.execute(request.params.id);
-
-      console.log(user);
 
       return response.status(200).json({
         success: true,
