@@ -1,9 +1,10 @@
 require('dotenv').config();
 
 const app = require('./app');
+const environment = require('./config/environment');
 const database = require('./database/database');
 
-const PORT = process.env.PORT || 3000;
+const PORT = environment.PORT || 3000;
 
 async function bootstrap() {
   try {

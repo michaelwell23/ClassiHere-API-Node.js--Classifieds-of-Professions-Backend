@@ -1,11 +1,11 @@
 const UserRepository = require('../../../modules/users/repositories/UserRepository');
-const { ACCOUNT_DELETION_GRACE_PERIOD_DAYS } = require('../../../config/account');
 
+const environment = require('../../../config/environment');
 class DeleteInactiveUsersJob {
   async execute() {
     const limitDate = new Date();
 
-    limitDate.setDate(limitDate.getDate() - ACCOUNT_DELETION_GRACE_PERIOD_DAYS);
+    limitDate.setDate(limitDate.getDate() - environment.accountDeletionGracePeriodDays);
 
     const users = await UserRepository.findUsersPendingDeletion(limitDate);
 

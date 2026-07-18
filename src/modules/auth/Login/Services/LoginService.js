@@ -2,10 +2,7 @@ const AppError = require('../../../../shared/errors/AppError');
 const UserRepository = require('../../../users/Repositories/UserRepository');
 const UserRefreshTokenRepository = require('../../Repositories/UserRefreshTokenRepository');
 
-const {
-  MAX_LOGIN_ATTEMPTS,
-  ACCOUNT_LOCK_DURATION_MINUTES,
-} = require('../../../../config/security');
+const authConfig = require('../../../../config/auth');
 
 const { compareHash } = require('../../../../shared/providers/hash/bcrypt.provider');
 const {
@@ -34,10 +31,10 @@ class LoginService {
     if (!passwordMatches) {
       const attempts = user.failed_login_attempts + 1;
 
-      if (attempts >= MAX_LOGIN_ATTEMPTS) {
+      if (attempts >= authConfig.accountLock.maxFailedAttempts) {
         const lockedUntil = new Date();
 
-        lockedUntil.setMinutes(lockedUntil.getMinutes() + ACCOUNT_LOCK_DURATION_MINUTES);
+        lockedUntil.setMinutes(lockedUntil.getMinutes() + authConfig.accountLock.lockDuration);
 
         await UserRepository.updateSecurity(user, {
           failed_login_attempts: attempts,
