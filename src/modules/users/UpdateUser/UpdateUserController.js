@@ -1,6 +1,6 @@
-const UpdateUserService = require('../Services/UpdateUserService');
+const UpdateUserService = require('./UpdateUserService');
 
-const userResponseDTO = require('../../../../shared/DTOs/responses/user-response.dto');
+const userResponseDTO = require('../../../shared/DTOs/responses/user-response.dto');
 
 class UpdateUserController {
   async handle(request, response, next) {

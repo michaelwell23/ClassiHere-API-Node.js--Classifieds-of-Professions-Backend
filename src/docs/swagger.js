@@ -1,5 +1,5 @@
 const authPaths = require('../modules/auth/docs/auth.swagger');
-const usersPaths = require('../modules/users/docs/users.swagger');
+const usersPaths = require('../modules/users/users.swagger');
 
 module.exports = {
   openapi: '3.0.0',

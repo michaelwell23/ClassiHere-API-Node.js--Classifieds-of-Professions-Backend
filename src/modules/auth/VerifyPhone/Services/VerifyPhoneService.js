@@ -1,6 +1,6 @@
 const AppError = require('../../../../shared/errors/AppError');
 const UserPhoneVerificationRepository = require('../../Repositories/UserPhoneVerificationRepository');
-const UserRepository = require('../../../users/Repositories/UserRepository');
+const UserRepository = require('../../../users/repositories/UserRepository');
 
 class VerifyPhoneService {
   async execute({ userId, code }) {

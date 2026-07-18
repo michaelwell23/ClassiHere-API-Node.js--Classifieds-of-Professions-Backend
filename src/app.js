@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 
-const routes = require('./routes/router');
+const routes = require('./router');
 
 const notFound = require('./shared/middlewares/notFound');
 const errorHandler = require('./shared/middlewares/errorHandler');

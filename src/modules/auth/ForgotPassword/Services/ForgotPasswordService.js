@@ -1,6 +1,6 @@
 const { randomBytes } = require('crypto');
 
-const UserRepository = require('../../../users/Repositories/UserRepository');
+const UserRepository = require('../../../users/repositories/UserRepository');
 
 const PasswordResetTokenRepository = require('../../Repositories/PasswordResetTokenRepository');
 

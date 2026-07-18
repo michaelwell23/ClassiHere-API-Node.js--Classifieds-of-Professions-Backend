@@ -1,6 +1,6 @@
-const AppError = require('../../../../shared/errors/AppError');
+const AppError = require('../../../shared/errors/AppError');
 
-const UserRepository = require('../../Repositories/UserRepository');
+const UserRepository = require('../repositories/UserRepository');
 
 class GetUserService {
   async execute(id) {

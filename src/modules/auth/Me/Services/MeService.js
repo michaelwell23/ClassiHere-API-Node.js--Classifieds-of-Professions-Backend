@@ -1,4 +1,4 @@
-const UserRepository = require('../../../users/Repositories/UserRepository');
+const UserRepository = require('../../../users/repositories/UserRepository');
 
 class MeService {
   async execute(userId) {

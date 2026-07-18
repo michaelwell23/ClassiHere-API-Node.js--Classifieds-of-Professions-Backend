@@ -1,9 +1,9 @@
-const AppError = require('../../../../shared/errors/AppError');
+const AppError = require('../../../shared/errors/AppError');
 
-const UserRepository = require('../../Repositories/UserRepository');
+const UserRepository = require('../repositories/UserRepository');
 
-const imageProcessor = require('../../../../shared/providers/storage/image.processor');
-const localStorageProvider = require('../../../../shared/providers/storage/local.provider');
+const imageProcessor = require('../../../shared/providers/storage/image.processor');
+const localStorageProvider = require('../../../shared/providers/storage/local.provider');
 
 class UpdateUserService {
   async execute({ id, data, file }) {
