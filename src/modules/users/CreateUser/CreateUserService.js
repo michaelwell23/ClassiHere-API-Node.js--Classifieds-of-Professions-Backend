@@ -8,8 +8,6 @@ const imageProcessor = require('../../../shared/providers/storage/image.processo
 
 const localStorageProvider = require('../../../shared/providers/storage/local.provider');
 
-const UserResponseDTO = require('../../../shared/DTOs/responses/user-response.dto');
-
 class CreateUserService {
   async execute({ data, file }) {
     let avatarPath = null;
@@ -41,7 +39,7 @@ class CreateUserService {
         }
       }
 
-      const hashedPassword = await bcryptProvider.hash(data.password);
+      const hashedPassword = await bcryptProvider.generateHash(data.password);
 
       if (file) {
         avatarPath = await imageProcessor.process(file.path);
@@ -59,7 +57,7 @@ class CreateUserService {
         is_active: true,
       });
 
-      return UserResponseDTO.toResponse(user);
+      return user;
     } catch (error) {
       if (avatarPath) {
         try {

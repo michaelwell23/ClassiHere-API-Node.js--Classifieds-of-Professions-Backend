@@ -1,12 +1,9 @@
+const { Op } = require('sequelize');
+
 const User = require('../../../database/models/User');
-const Op = require('sequelize');
 class UserRepository {
   async create(data) {
     return User.create(data);
-  }
-
-  async save(user) {
-    return user.save();
   }
 
   async findById(id) {
@@ -21,39 +18,12 @@ class UserRepository {
     return User.findOne({ where: { cpf } });
   }
 
+  async findByPhone(phone) {
+    return User.findOne({ where: { phone } });
+  }
+
   async update(user, data) {
     return user.update(data);
-  }
-
-  async delete(user) {
-    return user.destroy();
-  }
-  async updateProfileImage(userId, profileImage) {
-    await User.update(
-      {
-        profile_image: profileImage,
-      },
-      {
-        where: {
-          id: userId,
-        },
-      }
-    );
-
-    return this.findById(userId);
-  }
-
-  async findUsersPendingDeletion(limitDate) {
-    console.log(Op);
-    return User.findAll({
-      where: {
-        is_active: false,
-        deleted_at: null,
-        deactivated_at: {
-          [Op.lte]: limitDate,
-        },
-      },
-    });
   }
 
   async updateLastLogin(userId) {
@@ -69,27 +39,31 @@ class UserRepository {
     );
   }
 
-  async incrementFailedLoginAttempts(user) {
-    return user.update({
-      failed_login_attempts: user.failed_login_attempts + 1,
-    });
+  async updateSecurity(user, data, options = {}) {
+    return user.update(
+      {
+        failed_login_attempts: data.failed_login_attempts,
+        locked_until: data.locked_until,
+      },
+      options
+    );
   }
 
-  async resetFailedLoginAttempts(user) {
-    return user.update({
-      failed_login_attempts: 0,
-      locked_until: null,
-    });
+  async delete(user) {
+    return user.destroy();
   }
 
-  async lockUserUntil(user, lockedUntil) {
-    return user.update({
-      locked_until: lockedUntil,
+  async findUsersPendingDeletion(limitDate) {
+    console.log(Op);
+    return User.findAll({
+      where: {
+        is_active: false,
+        deleted_at: null,
+        deactivated_at: {
+          [Op.lte]: limitDate,
+        },
+      },
     });
-  }
-
-  async updateSecurity(user, data) {
-    return user.update(data);
   }
 }
 

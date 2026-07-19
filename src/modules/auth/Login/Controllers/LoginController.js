@@ -1,6 +1,6 @@
 const LoginService = require('../../Login/Services/LoginService');
 
-const UserResponseDTO = require('../../../../shared/DTOs/responses/user-response.dto');
+const UserResponseDTO = require('../../../users/user-response.dto');
 
 class LoginController {
   async handle(request, response) {
