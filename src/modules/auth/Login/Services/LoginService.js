@@ -8,7 +8,7 @@ const { compareHash } = require('../../../../shared/providers/hash/bcrypt.provid
 const {
   generateAccessToken,
   generateRefreshToken,
-} = require('../../../../shared/providers/auth/jwt.provider');
+} = require('../../../../shared/providers/jwt.auth.provider');
 
 class LoginService {
   async execute({ email, password }) {
@@ -36,7 +36,7 @@ class LoginService {
 
         lockedUntil.setMinutes(lockedUntil.getMinutes() + authConfig.accountLock.lockDuration);
 
-        await UserRepository.updateSecurity(user, {
+        await UserRepository.update(user, {
           failed_login_attempts: attempts,
           locked_until: lockedUntil,
         });
@@ -47,7 +47,7 @@ class LoginService {
         );
       }
 
-      await UserRepository.updateSecurity(user, {
+      await UserRepository.update(user, {
         failed_login_attempts: attempts,
       });
 
@@ -55,7 +55,7 @@ class LoginService {
     }
 
     if (user.failed_login_attempts > 0 || user.locked_until) {
-      await UserRepository.updateSecurity(user, {
+      await UserRepository.update(user, {
         failed_login_attempts: 0,
         locked_until: null,
       });
@@ -70,7 +70,9 @@ class LoginService {
       token: refreshToken,
     });
 
-    await UserRepository.updateLastLogin(user.id);
+    await UserRepository.update(user, {
+      last_login_at: new Date(),
+    });
 
     return {
       user: user,

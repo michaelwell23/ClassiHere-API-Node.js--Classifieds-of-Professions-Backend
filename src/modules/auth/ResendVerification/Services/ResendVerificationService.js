@@ -17,7 +17,7 @@ class ResendVerificationService {
       };
     }
 
-    await UserVerificationRepository.deleteByUser(user.id);
+    await UserVerificationRepository.deleteByUserId(user.id);
 
     const token = generateVerificationToken();
 

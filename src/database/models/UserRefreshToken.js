@@ -6,12 +6,30 @@ class UserRefreshToken extends Model {
       {
         id: {
           type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
         },
-        user_id: DataTypes.UUID,
-        jti: DataTypes.UUID,
-        token_hash: DataTypes.TEXT,
-        expires_at: DataTypes.DATE,
+
+        user_id: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
+
+        jti: {
+          type: DataTypes.UUID,
+          allowNull: false,
+          unique: true,
+        },
+
+        token_hash: {
+          type: DataTypes.TEXT,
+          allowNull: false,
+        },
+
+        expires_at: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
       },
       {
         sequelize,

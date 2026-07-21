@@ -7,6 +7,7 @@ class UpdateUserController {
     try {
       const user = await UpdateUserService.execute({
         id: request.params.id,
+        authenticatedUserId: request.user.id,
         data: request.body,
         file: request.file,
       });

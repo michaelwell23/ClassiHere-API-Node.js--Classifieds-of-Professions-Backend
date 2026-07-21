@@ -8,15 +8,27 @@ function parsePositiveInteger(value, fallback) {
   return parsedValue;
 }
 
+const accessTokenSecret = process.env.JWT_SECRET;
+
+const refreshTokenSecret = process.env.JWT_REFRESH_SECRET;
+
+if (!accessTokenSecret) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
+if (!refreshTokenSecret) {
+  throw new Error('JWT_REFRESH_SECRET environment variable is required');
+}
+
 module.exports = {
   jwt: {
     accessToken: {
-      secret: process.env.JWT_SECRET,
+      secret: accessTokenSecret,
       expiresIn: process.env.JWT_EXPIRES_IN || '1d',
     },
 
     refreshToken: {
-      secret: process.env.JWT_REFRESH_SECRET,
+      secret: refreshTokenSecret,
       expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
     },
   },
@@ -27,6 +39,7 @@ module.exports = {
 
   loginSecurity: {
     maxAttempts: parsePositiveInteger(process.env.MAX_LOGIN_ATTEMPTS, 5),
+
     lockDurationMinutes: parsePositiveInteger(process.env.ACCOUNT_LOCK_DURATION_MINUTES, 30),
   },
 };

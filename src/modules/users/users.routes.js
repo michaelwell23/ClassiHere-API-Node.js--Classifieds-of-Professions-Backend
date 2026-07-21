@@ -2,8 +2,8 @@ const { Router } = require('express');
 
 const validate = require('../../shared/middlewares/validation.middleware');
 const authMiddleware = require('../../shared/middlewares/auth.middleware');
-const upload = require('../../shared/providers/storage/multer.config');
 
+const upload = require('../../shared/providers/storage/multer.config');
 const userIdDTO = require('./user-id.dto');
 const createUserDTO = require('./CreateUser/create-user.dto');
 const updateUserDTO = require('./UpdateUser/update-user.dto');
@@ -18,34 +18,27 @@ const usersRoutes = Router();
 
 usersRoutes.post(
   '/',
-  validate(createUserDTO),
   upload.single('avatar'),
+  validate(createUserDTO),
   CreateUserController.handle
 );
 
-usersRoutes.put(
+usersRoutes.patch(
   '/:id',
-  validate(updateUserDTO),
   authMiddleware,
   upload.single('avatar'),
+  validate(updateUserDTO),
   UpdateUserController.handle
 );
 
-usersRoutes.get('/:id', validate(userIdDTO), authMiddleware, GetUserController.handle);
+usersRoutes.get('/:id', authMiddleware, validate(userIdDTO), GetUserController.handle);
 
-usersRoutes.delete('/:id', validate(userIdDTO), authMiddleware, DeleteUserController.handle);
+usersRoutes.delete('/:id', authMiddleware, validate(userIdDTO), DeleteUserController.handle);
 
 usersRoutes.patch(
   '/:id/deactivate',
-  validate(userIdDTO),
   authMiddleware,
-  ChangeAccountStatusController.handle
-);
-
-usersRoutes.patch(
-  '/:id/reactivate',
   validate(userIdDTO),
-  authMiddleware,
   ChangeAccountStatusController.handle
 );
 

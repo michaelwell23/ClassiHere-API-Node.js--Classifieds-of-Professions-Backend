@@ -1,38 +1,32 @@
 const AppError = require('../../../shared/errors/AppError');
 
-const UserRepository = require('../repositories/UserRepository');
-
 const bcryptProvider = require('../../../shared/providers/hash/bcrypt.provider');
 
 const imageProcessor = require('../../../shared/providers/storage/image.processor');
 
 const localStorageProvider = require('../../../shared/providers/storage/local.provider');
 
+const UserRepository = require('../repositories/UserRepository');
+
 class CreateUserService {
   async execute({ data, file }) {
     let avatarPath = null;
 
     try {
-      const email = data.email.trim().toLowerCase();
-      const cpf = data.cpf ? data.cpf.replace(/\D/g, '') : null;
-      const phone = data.phone ? data.phone.replace(/\D/g, '') : null;
-
-      const existingEmail = await UserRepository.findByEmail(email);
+      const existingEmail = await UserRepository.findByEmail(data.email);
 
       if (existingEmail) {
         throw new AppError('E-mail already registered', 409);
       }
 
-      if (cpf) {
-        const existingCpf = await UserRepository.findByCpf(cpf);
+      const existingCpf = await UserRepository.findByCpf(data.cpf);
 
-        if (existingCpf) {
-          throw new AppError('CPF already registered', 409);
-        }
+      if (existingCpf) {
+        throw new AppError('CPF already registered', 409);
       }
 
-      if (phone) {
-        const existingPhone = await UserRepository.findByPhone(phone);
+      if (data.phone) {
+        const existingPhone = await UserRepository.findByPhone(data.phone);
 
         if (existingPhone) {
           throw new AppError('Phone already registered', 409);
@@ -45,32 +39,27 @@ class CreateUserService {
         avatarPath = await imageProcessor.process(file.path);
       }
 
-      const user = await UserRepository.create({
-        ...data,
-        email,
-        cpf,
-        phone,
+      return await UserRepository.create({
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
         password: hashedPassword,
+        phone: data.phone ?? null,
+        cpf: data.cpf,
         avatar_path: avatarPath,
         is_email_verified: false,
         is_phone_verified: false,
         is_active: true,
       });
-
-      return user;
     } catch (error) {
-      if (avatarPath) {
-        try {
+      try {
+        if (avatarPath) {
           await localStorageProvider.delete(avatarPath);
-        } catch {
-          // O erro original da criação deve ser preservado.
-        }
-      } else if (file?.path) {
-        try {
+        } else if (file?.path) {
           await localStorageProvider.delete(file.path);
-        } catch {
-          // O erro original do processamento deve ser preservado.
         }
+      } catch {
+        // Preserva o erro original do caso de uso.
       }
 
       throw error;

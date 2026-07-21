@@ -1,42 +1,37 @@
 const AppError = require('../errors/AppError');
 
 function validate(schema) {
-  return (req, res, next) => {
+  return (request, response, next) => {
     const result = schema.safeParse({
-      body: req.body,
-      params: req.params,
-      query: req.query,
-      file: req.file,
+      body: request.body,
+      params: request.params,
+      query: request.query,
+      file: request.file,
     });
 
     if (!result.success) {
-      const errors = result.error.issues.map((issue) => ({
-        field: issue.path.join('.'),
-        message: issue.message,
-      }));
-
-      return next(new AppError('Validation failed', 400, errors));
+      return next(new AppError('Validation failed', 400, result.error.flatten()));
     }
 
     const { body, params, query, file } = result.data;
 
     if (body !== undefined) {
-      req.body = body;
+      request.body = body;
     }
 
     if (params !== undefined) {
-      req.params = params;
+      request.params = params;
     }
 
     if (query !== undefined) {
-      req.query = query;
+      request.query = query;
     }
 
     if (file !== undefined) {
-      req.file = file;
+      request.file = file;
     }
 
-    req.validated = result.data;
+    request.validated = result.data;
 
     return next();
   };

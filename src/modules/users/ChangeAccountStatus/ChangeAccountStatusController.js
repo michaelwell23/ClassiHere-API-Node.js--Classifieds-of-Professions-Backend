@@ -3,16 +3,15 @@ const ChangeAccountStatusService = require('./ChangeAccountStatusService');
 class ChangeAccountStatusController {
   async handle(request, response, next) {
     try {
-      const { id } = request.validated.params;
-
-      const action = request.path.endsWith('/deactivate') ? 'deactivate' : 'reactivate';
-
       const result = await ChangeAccountStatusService.execute({
-        id,
-        action,
+        id: request.params.id,
+        authenticatedUserId: request.user.id,
       });
 
-      return response.status(200).json(result);
+      return response.status(200).json({
+        success: true,
+        data: result,
+      });
     } catch (error) {
       return next(error);
     }

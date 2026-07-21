@@ -5,7 +5,10 @@ const userResponseDTO = require('../user-response.dto');
 class GetUserController {
   async handle(request, response, next) {
     try {
-      const user = await GetUserService.execute(request.params.id);
+      const user = await GetUserService.execute({
+        id: request.params.id,
+        authenticatedUserId: request.user.id,
+      });
 
       return response.status(200).json({
         success: true,

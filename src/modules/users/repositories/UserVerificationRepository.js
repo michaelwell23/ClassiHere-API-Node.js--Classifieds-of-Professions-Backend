@@ -13,23 +13,7 @@ class UserVerificationRepository {
     });
   }
 
-  async findByUserId(userId) {
-    return UserVerification.findOne({
-      where: {
-        user_id: userId,
-      },
-    });
-  }
-
-  async delete(id) {
-    return UserVerification.destroy({
-      where: {
-        id,
-      },
-    });
-  }
-
-  async deleteByUser(userId) {
+  async deleteByUserId(userId) {
     return UserVerification.destroy({
       where: {
         user_id: userId,

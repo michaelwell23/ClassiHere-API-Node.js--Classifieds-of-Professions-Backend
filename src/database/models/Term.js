@@ -4,14 +4,27 @@ class Term extends Model {
   static init(sequelize) {
     super.init(
       {
-        id: {
-          type: DataTypes.UUID,
-          primaryKey: true,
+        ersion: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
         },
-        version: DataTypes.STRING,
-        title: DataTypes.STRING,
-        document_path: DataTypes.STRING,
-        is_active: DataTypes.BOOLEAN,
+
+        title: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+
+        document_path: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+
+        is_active: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: true,
+        },
       },
       {
         sequelize,

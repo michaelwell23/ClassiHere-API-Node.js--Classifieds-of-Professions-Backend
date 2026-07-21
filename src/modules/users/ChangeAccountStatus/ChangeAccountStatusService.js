@@ -1,43 +1,34 @@
 const AppError = require('../../../shared/errors/AppError');
+
 const UserRepository = require('../repositories/UserRepository');
+
 const UserRefreshTokenRepository = require('../../auth/Repositories/UserRefreshTokenRepository');
 
 class ChangeAccountStatusService {
-  async execute({ id, action }) {
+  async execute({ id, authenticatedUserId }) {
+    if (id !== authenticatedUserId) {
+      throw new AppError('You are not allowed to deactivate this user', 403);
+    }
+
     const user = await UserRepository.findById(id);
 
     if (!user) {
-      throw new AppError('User not found.', 404);
+      throw new AppError('User not found', 404);
     }
 
-    if (action === 'deactivate') {
-      if (!user.is_active) {
-        throw new AppError('User account is already deactivated.', 400);
-      }
-
-      await user.update({
-        is_active: false,
-        deactivated_at: new Date(),
-      });
-
-      await UserRefreshTokenRepository.deleteAllByUserId(user.id);
-
-      return {
-        message: 'User account deactivated successfully.',
-      };
+    if (!user.is_active) {
+      throw new AppError('User account is already deactivated', 409);
     }
 
-    if (user.is_active) {
-      throw new AppError('User account is already active.', 400);
-    }
+    await UserRefreshTokenRepository.deleteAllByUserId(user.id);
 
-    await user.update({
-      is_active: true,
-      deactivated_at: null,
+    await UserRepository.update(user, {
+      is_active: false,
+      deactivated_at: new Date(),
     });
 
     return {
-      message: 'User account reactivated successfully.',
+      message: 'User account deactivated successfully',
     };
   }
 }

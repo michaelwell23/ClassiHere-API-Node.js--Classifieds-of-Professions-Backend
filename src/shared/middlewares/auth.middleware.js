@@ -1,6 +1,6 @@
 const AppError = require('../errors/AppError');
 
-const { verifyToken } = require('../providers/auth/jwt.provider');
+const { verifyAccessToken } = require('../providers/jwt.auth.provider');
 
 const UserRepository = require('../../modules/users/repositories/UserRepository');
 
@@ -12,18 +12,24 @@ async function authMiddleware(request, response, next) {
       throw new AppError('Authentication token missing', 401);
     }
 
-    const [scheme, token] = authHeader.split(' ');
+    const authParts = authHeader.trim().split(/\s+/);
 
-    if (scheme !== 'Bearer' || !token) {
-      throw new AppError('Invalid token format', 401);
+    if (authParts.length !== 2 || authParts[0] !== 'Bearer' || !authParts[1]) {
+      throw new AppError('Invalid authentication token format', 401);
     }
 
-    const decoded = verifyToken(token);
+    const token = authParts[1];
+
+    const decoded = verifyAccessToken(token);
+
+    if (!decoded.sub || typeof decoded.sub !== 'string') {
+      throw new AppError('Invalid authentication token', 401);
+    }
 
     const user = await UserRepository.findById(decoded.sub);
 
     if (!user) {
-      throw new AppError('User not found', 401);
+      throw new AppError('Invalid authentication token', 401);
     }
 
     if (!user.is_active) {
@@ -37,6 +43,14 @@ async function authMiddleware(request, response, next) {
 
     return next();
   } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return next(new AppError('Authentication token expired', 401));
+    }
+
+    if (error.name === 'JsonWebTokenError' || error.name === 'NotBeforeError') {
+      return next(new AppError('Invalid authentication token', 401));
+    }
+
     return next(error);
   }
 }

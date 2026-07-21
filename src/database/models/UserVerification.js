@@ -13,9 +13,18 @@ class UserVerification extends Model {
         user_id: {
           type: DataTypes.UUID,
           allowNull: false,
+          unique: true,
         },
-        token: DataTypes.STRING,
-        expires_at: DataTypes.DATE,
+        token: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
+        },
+
+        expires_at: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
       },
       {
         sequelize,

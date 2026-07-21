@@ -10,49 +10,90 @@ class User extends Model {
           primaryKey: true,
         },
 
-        first_name: DataTypes.STRING,
-        last_name: DataTypes.STRING,
+        first_name: {
+          type: DataTypes.STRING(100),
+          allowNull: false,
+        },
+
+        last_name: {
+          type: DataTypes.STRING(100),
+          allowNull: false,
+        },
+
         email: {
           type: DataTypes.STRING,
           allowNull: false,
           unique: true,
         },
+
         password: {
           type: DataTypes.STRING,
           allowNull: false,
         },
-        phone: DataTypes.STRING,
+
+        phone: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+
         avatar_path: {
           type: DataTypes.STRING,
           allowNull: true,
         },
+
         cpf: {
           type: DataTypes.STRING,
           allowNull: false,
           unique: true,
         },
+
         is_email_verified: {
           type: DataTypes.BOOLEAN,
+          allowNull: false,
           defaultValue: false,
         },
+
+        is_phone_verified: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+
         is_active: {
           type: DataTypes.BOOLEAN,
+          allowNull: false,
           defaultValue: true,
         },
-        deactivated_at: DataTypes.DATE,
-        last_login_at: DataTypes.DATE,
-        failed_login_attempts: DataTypes.INTEGER,
 
-        locked_until: DataTypes.DATE,
+        deactivated_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
+
+        last_login_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
+
+        failed_login_attempts: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
+
+        locked_until: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
       },
       {
         sequelize,
-
         tableName: 'users',
         underscored: true,
         paranoid: true,
       }
     );
+
     return this;
   }
 
@@ -70,6 +111,16 @@ class User extends Model {
     this.hasMany(models.UserPhoneVerification, {
       foreignKey: 'user_id',
       as: 'phoneVerifications',
+    });
+
+    this.hasMany(models.UserRefreshToken, {
+      foreignKey: 'user_id',
+      as: 'refreshTokens',
+    });
+
+    this.hasMany(models.UserTermAcceptance, {
+      foreignKey: 'user_id',
+      as: 'termAcceptances',
     });
   }
 

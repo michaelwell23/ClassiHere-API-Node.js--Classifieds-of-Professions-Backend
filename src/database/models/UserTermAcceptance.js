@@ -6,13 +6,34 @@ class UserTermAcceptance extends Model {
       {
         id: {
           type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
         },
-        user_id: DataTypes.UUID,
-        term_id: DataTypes.UUID,
-        accepted_at: DataTypes.DATE,
-        ip_address: DataTypes.STRING,
-        user_agent: DataTypes.TEXT,
+
+        user_id: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
+
+        term_id: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
+
+        accepted_at: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+
+        ip_address: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+
+        user_agent: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+        },
       },
       {
         sequelize,

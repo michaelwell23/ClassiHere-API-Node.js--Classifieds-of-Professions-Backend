@@ -11,7 +11,7 @@ const {
   generateRefreshToken,
   verifyRefreshToken,
   generateJti,
-} = require('../../../../shared/providers/auth/jwt.provider');
+} = require('../../../../shared/providers/jwt.auth.provider');
 
 class RefreshTokenService {
   async execute(refreshToken) {
@@ -55,8 +55,6 @@ class RefreshTokenService {
       sub: user.id,
       jti: newJti,
     });
-
-    await UserRepository.updateLastLogin(user.id);
 
     const newHash = await generateHash(newRefreshToken);
 

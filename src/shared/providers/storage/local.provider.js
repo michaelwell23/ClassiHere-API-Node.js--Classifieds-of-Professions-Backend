@@ -2,18 +2,21 @@ const path = require('path');
 const fs = require('fs/promises');
 
 class LocalStorageProvider {
-  async delete(avatarPath) {
-    if (!avatarPath) {
+  async delete(filePath) {
+    if (!filePath) {
       return;
     }
 
-    const filePath = path.resolve(process.cwd(), 'storage', avatarPath);
+    const resolvedPath = path.isAbsolute(filePath)
+      ? filePath
+      : path.resolve(process.cwd(), 'storage', filePath);
 
     try {
-      await fs.access(filePath);
-      await fs.unlink(filePath);
-    } catch {
-      // arquivo já não existe
+      await fs.unlink(resolvedPath);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
     }
   }
 }

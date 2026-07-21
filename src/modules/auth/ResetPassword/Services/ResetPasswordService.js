@@ -36,11 +36,8 @@ class ResetPasswordService {
 
     const passwordHash = await generateHash(password);
 
-    await UserRepository.update(user.id, {
+    await UserRepository.update(user, {
       password: passwordHash,
-    });
-
-    await UserRepository.updateSecurity(user, {
       failed_login_attempts: 0,
       locked_until: null,
     });

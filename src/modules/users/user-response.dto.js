@@ -6,6 +6,7 @@ function buildAvatarUrl(avatarPath) {
   }
 
   const normalizedBaseUrl = environment.appUrl.replace(/\/+$/, '');
+
   const normalizedPath = avatarPath.replace(/^\/+/, '');
 
   return `${normalizedBaseUrl}/${normalizedPath}`;

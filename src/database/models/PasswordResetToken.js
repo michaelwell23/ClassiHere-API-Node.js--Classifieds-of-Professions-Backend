@@ -6,12 +6,29 @@ class PasswordResetToken extends Model {
       {
         id: {
           type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
         },
-        user_id: DataTypes.UUID,
-        token_hash: DataTypes.TEXT,
-        expires_at: DataTypes.DATE,
-        used_at: DataTypes.DATE,
+
+        user_id: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
+
+        token_hash: {
+          type: DataTypes.TEXT,
+          allowNull: false,
+        },
+
+        expires_at: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+
+        used_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
       },
       {
         sequelize,

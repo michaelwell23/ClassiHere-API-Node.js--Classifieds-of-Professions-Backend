@@ -45,6 +45,12 @@ module.exports = {
         defaultValue: false,
       },
 
+      is_phone_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+
       is_active: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

@@ -6,7 +6,6 @@ class UserRefreshTokenRepository {
   async create(data) {
     return UserRefreshToken.create({
       id: randomUUID(),
-
       ...data,
     });
   }
@@ -27,7 +26,7 @@ class UserRefreshTokenRepository {
     });
   }
 
-  async deleteAllByUser(userId) {
+  async deleteAllByUserId(userId) {
     return UserRefreshToken.destroy({
       where: {
         user_id: userId,

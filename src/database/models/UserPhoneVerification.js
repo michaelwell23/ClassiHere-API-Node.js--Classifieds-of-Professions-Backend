@@ -6,13 +6,29 @@ class UserPhoneVerification extends Model {
       {
         id: {
           type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
         },
 
-        user_id: DataTypes.UUID,
-        code: DataTypes.STRING,
-        expires_at: DataTypes.DATE,
-        verified_at: DataTypes.DATE,
+        user_id: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
+
+        code: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+
+        expires_at: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+
+        verified_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
       },
       {
         sequelize,

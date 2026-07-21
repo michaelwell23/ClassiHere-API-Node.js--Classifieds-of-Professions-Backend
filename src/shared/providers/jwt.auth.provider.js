@@ -1,17 +1,18 @@
 const { randomUUID } = require('crypto');
 
 const jwt = require('jsonwebtoken');
-const authConfig = require('../../../config/auth');
+
+const authConfig = require('../../config/auth');
 
 function generateAccessToken(payload) {
-  return jwt.sign(payload, authConfig.accessToken.secret, {
-    expiresIn: authConfig.accessToken.expiresIn,
+  return jwt.sign(payload, authConfig.jwt.accessToken.secret, {
+    expiresIn: authConfig.jwt.accessToken.expiresIn,
   });
 }
 
 function generateRefreshToken(payload) {
-  return jwt.sign(payload, authConfig.refreshToken.secret, {
-    expiresIn: authConfig.refreshToken.expiresIn,
+  return jwt.sign(payload, authConfig.jwt.refreshToken.secret, {
+    expiresIn: authConfig.jwt.refreshToken.expiresIn,
   });
 }
 
@@ -20,11 +21,11 @@ function generateJti() {
 }
 
 function verifyAccessToken(token) {
-  return jwt.verify(token, authConfig.accessToken.secret);
+  return jwt.verify(token, authConfig.jwt.accessToken.secret);
 }
 
 function verifyRefreshToken(token) {
-  return jwt.verify(token, authConfig.refreshToken.secret);
+  return jwt.verify(token, authConfig.jwt.refreshToken.secret);
 }
 
 module.exports = {

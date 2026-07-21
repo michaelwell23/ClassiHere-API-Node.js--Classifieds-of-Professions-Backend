@@ -12,7 +12,7 @@ class DeleteInactiveUsersJob {
     let deleted = 0;
 
     for (const user of users) {
-      await UserRepository.delete(user);
+      await UserRepository.softDelete(user);
       deleted++;
     }
 

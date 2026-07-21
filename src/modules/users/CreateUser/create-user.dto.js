@@ -28,11 +28,20 @@ const createUserDTO = z.object({
         .min(8, 'Password must contain at least 8 characters')
         .max(100, 'Password must contain at most 100 characters'),
 
-      phone: z.string().trim().min(1, 'Phone cannot be empty').optional(),
+      phone: z
+        .string()
+        .trim()
+        .min(1, 'Phone cannot be empty')
+        .transform((phone) => phone.replace(/\D/g, ''))
+        .optional(),
 
-      cpf: z.string().trim().refine(isValidCPF, {
-        message: 'Invalid CPF',
-      }),
+      cpf: z
+        .string()
+        .trim()
+        .transform((cpf) => cpf.replace(/\D/g, ''))
+        .refine(isValidCPF, {
+          message: 'Invalid CPF',
+        }),
     })
     .strict(),
 });

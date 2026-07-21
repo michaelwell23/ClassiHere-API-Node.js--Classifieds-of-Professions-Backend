@@ -2,9 +2,11 @@ const { z } = require('zod');
 
 const updateUserDTO = z
   .object({
-    params: z.object({
-      id: z.string().uuid('Invalid user ID'),
-    }),
+    params: z
+      .object({
+        id: z.string().uuid('Invalid user ID'),
+      })
+      .strict(),
 
     body: z
       .object({
@@ -22,7 +24,15 @@ const updateUserDTO = z
           .max(100, 'Last name must contain at most 100 characters')
           .optional(),
 
-        phone: z.string().trim().min(1, 'Phone cannot be empty').optional(),
+        phone: z
+          .string()
+          .trim()
+          .min(1, 'Phone cannot be empty')
+          .transform((phone) => phone.replace(/\D/g, ''))
+          .refine((phone) => phone.length > 0, {
+            message: 'Phone cannot be empty',
+          })
+          .optional(),
       })
       .strict(),
 
