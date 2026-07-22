@@ -2,7 +2,7 @@ const AppError = require('../../../shared/errors/AppError');
 
 const UserRepository = require('../../users/repositories/UserRepository');
 
-const UserRefreshTokenRepository = require('../Repositories/UserRefreshTokenRepository');
+const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
 
 const { compareHash, generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
 
@@ -62,7 +62,7 @@ class RefreshTokenService {
 
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    await UserRefreshTokenRepository.delete(session.id);
+    await UserRefreshTokenRepository.deleteById(session.id);
 
     await UserRefreshTokenRepository.create({
       user_id: user.id,

@@ -2,7 +2,7 @@ const AppError = require('../../../shared/errors/AppError');
 
 const { compareHash } = require('../../../shared/providers/hash/bcrypt.provider');
 
-const UserRefreshTokenRepository = require('../Repositories/UserRefreshTokenRepository');
+const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
 
 class LogoutService {
   async execute(refreshToken) {

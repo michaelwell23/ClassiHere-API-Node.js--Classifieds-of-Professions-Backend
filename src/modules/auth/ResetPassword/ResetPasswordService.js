@@ -1,5 +1,5 @@
 const UserRepository = require('../../users/repositories/UserRepository');
-const PasswordResetTokenRepository = require('../Repositories/PasswordResetTokenRepository');
+const PasswordResetTokenRepository = require('../repositories/PasswordResetTokenRepository');
 
 const AppError = require('../../../shared/errors/AppError');
 const { compareHash, generateHash } = require('../../../shared/providers/hash/bcrypt.provider');

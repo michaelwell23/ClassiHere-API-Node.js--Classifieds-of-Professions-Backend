@@ -1,6 +1,6 @@
 const environment = require('../../config/environment');
 
-const verifyEmailTemplate = require('../providers/mail/templates/verify-email.template');
+const verifyEmailTemplate = require('../../templates/mail/users/verify-email.template');
 
 const { sendMail } = require('../providers/mail/smtp.provider');
 

@@ -2,13 +2,13 @@ const { randomBytes } = require('crypto');
 
 const UserRepository = require('../../users/repositories/UserRepository');
 
-const PasswordResetTokenRepository = require('../Repositories/PasswordResetTokenRepository');
+const PasswordResetTokenRepository = require('../repositories/PasswordResetTokenRepository');
 
 const { generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
 
 const { sendMail } = require('../../../shared/providers/mail/smtp.provider');
 
-const passwordResetTemplate = require('../../../shared/mail/templates/password-reset.template');
+const passwordResetTemplate = require('../../../templates/mail/users/password-reset.template');
 
 class ForgotPasswordService {
   async execute(email) {

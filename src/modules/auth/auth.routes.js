@@ -9,7 +9,6 @@ const forgotPasswordDTO = require('./ForgotPassword/forgot-password.dto');
 const resetPasswordDTO = require('./ResetPassword/reset-password.dto');
 const changePasswordDTO = require('./ChangePassword/change-password.dto');
 const verifyPhoneDTO = require('./VerifyPhone/verify-phone.dto');
-const sendPhoneVerificationDTO = require('./SendPhoneVerification/send-phone-verification.dto');
 
 const LoginController = require('./Login/LoginController');
 const LogoutController = require('./Logout/LogoutController');
@@ -50,12 +49,7 @@ authRoutes.patch(
   VerifyPhoneController.handle
 );
 
-authRoutes.post(
-  '/phone-verification',
-  authMiddleware,
-  validationMiddleware(sendPhoneVerificationDTO),
-  SendPhoneVerificationController.handle
-);
+authRoutes.post('/phone-verification', authMiddleware, SendPhoneVerificationController.handle);
 
 authRoutes.post(
   '/refresh-token',

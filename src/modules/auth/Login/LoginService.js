@@ -1,6 +1,6 @@
 const AppError = require('../../../shared/errors/AppError');
 const UserRepository = require('../../users/repositories/UserRepository');
-const UserRefreshTokenRepository = require('../Repositories/UserRefreshTokenRepository');
+const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
 
 const authConfig = require('../../../config/auth');
 

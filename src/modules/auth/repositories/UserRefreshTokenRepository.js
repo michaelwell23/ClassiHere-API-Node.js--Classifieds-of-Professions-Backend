@@ -18,7 +18,7 @@ class UserRefreshTokenRepository {
     });
   }
 
-  async delete(id) {
+  async deleteById(id) {
     return UserRefreshToken.destroy({
       where: {
         id,

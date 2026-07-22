@@ -1,5 +1,5 @@
 const AppError = require('../../../shared/errors/AppError');
-const UserPhoneVerificationRepository = require('../Repositories/UserPhoneVerificationRepository');
+const UserPhoneVerificationRepository = require('../repositories/UserPhoneVerificationRepository');
 const UserRepository = require('../../users/repositories/UserRepository');
 
 class VerifyPhoneService {

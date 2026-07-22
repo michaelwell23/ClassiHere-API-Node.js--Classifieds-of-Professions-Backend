@@ -2,7 +2,7 @@ const AppError = require('../../../shared/errors/AppError');
 
 const UserRepository = require('../../users/repositories/UserRepository');
 
-const UserVerificationRepository = require('../../users/repositories/UserVerificationRepository');
+const UserVerificationRepository = require('../repositories/UserVerificationRepository');
 
 class VerifyEmailService {
   async execute(token) {

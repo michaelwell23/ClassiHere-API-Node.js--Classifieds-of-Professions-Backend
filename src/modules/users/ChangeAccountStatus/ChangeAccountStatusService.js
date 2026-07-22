@@ -2,7 +2,7 @@ const AppError = require('../../../shared/errors/AppError');
 
 const UserRepository = require('../repositories/UserRepository');
 
-const UserRefreshTokenRepository = require('../../auth/Repositories/UserRefreshTokenRepository');
+const UserRefreshTokenRepository = require('../../auth/repositories/UserRefreshTokenRepository');
 
 class ChangeAccountStatusService {
   async execute({ id, authenticatedUserId }) {
