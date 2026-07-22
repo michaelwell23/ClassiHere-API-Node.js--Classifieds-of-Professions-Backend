@@ -1,9 +1,9 @@
 const { Router } = require('express');
 
 const loginDTO = require('./Login/login.dto');
-const refreshTokenDTO = require('./refresh-token.dto');
+const refreshTokenDTO = require('./RefreshToken/refresh-token.dto');
 const logoutDTO = require('./Logout/logout.dto');
-const verifyEmailDTO = require('./verify-email.dto');
+const verifyEmailDTO = require('./VerifyEmail/verify-email.dto');
 const resendVerificationDTO = require('./ResendVerification/resend-verification.dto');
 const forgotPasswordDTO = require('./ForgotPassword/forgot-password.dto');
 const resetPasswordDTO = require('./ResetPassword/reset-password.dto');

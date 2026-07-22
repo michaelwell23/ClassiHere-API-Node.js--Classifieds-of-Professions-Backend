@@ -12,7 +12,7 @@ class ResetPasswordService {
       throw new AppError('Invalid token', 400);
     }
 
-    const activeTokens = await PasswordResetTokenRepository.findActiveByUser(user.id);
+    const activeTokens = await PasswordResetTokenRepository.findById(user.id);
 
     let validToken = null;
 
@@ -42,7 +42,7 @@ class ResetPasswordService {
       locked_until: null,
     });
 
-    await PasswordResetTokenRepository.invalidateAllByUser(user.id);
+    await PasswordResetTokenRepository.invalidateAllByUserId(user.id);
 
     return {
       message: 'Password updated successfully',

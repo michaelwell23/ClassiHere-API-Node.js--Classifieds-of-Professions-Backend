@@ -1,16 +1,21 @@
 const UserPhoneVerification = require('../../../database/models/UserPhoneVerification');
 
 class UserPhoneVerificationRepository {
-  async findByUserIdAndCode(userId, code) {
+  async create(data) {
+    return UserPhoneVerification.create(data);
+  }
+
+  async findPendingByUserIdAndCode(userId, code) {
     return UserPhoneVerification.findOne({
       where: {
         user_id: userId,
         code,
+        verified_at: null,
       },
     });
   }
 
-  async invalidate(id) {
+  async markAsVerified(id) {
     return UserPhoneVerification.update(
       {
         verified_at: new Date(),
@@ -18,13 +23,10 @@ class UserPhoneVerificationRepository {
       {
         where: {
           id,
+          verified_at: null,
         },
       }
     );
-  }
-
-  async save(verification) {
-    return verification.save();
   }
 
   async deletePendingByUserId(userId) {
@@ -34,10 +36,6 @@ class UserPhoneVerificationRepository {
         verified_at: null,
       },
     });
-  }
-
-  async create(data) {
-    return UserPhoneVerification.create(data);
   }
 }
 

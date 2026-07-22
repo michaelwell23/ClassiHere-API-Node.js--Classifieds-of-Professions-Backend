@@ -28,7 +28,7 @@ class VerifyEmailService {
       is_email_verified: true,
     });
 
-    await UserVerificationRepository.deleteByToken(token);
+    await UserVerificationRepository.deleteByUserId(verification.user_id);
 
     return {
       success: true,

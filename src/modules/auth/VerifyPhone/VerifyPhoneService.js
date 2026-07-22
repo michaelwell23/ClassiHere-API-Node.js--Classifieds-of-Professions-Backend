@@ -4,7 +4,10 @@ const UserRepository = require('../../users/repositories/UserRepository');
 
 class VerifyPhoneService {
   async execute({ userId, code }) {
-    const verification = await UserPhoneVerificationRepository.findByUserIdAndCode(userId, code);
+    const verification = await UserPhoneVerificationRepository.findPendingByUserIdAndCode(
+      userId,
+      code
+    );
 
     if (!verification) {
       throw new AppError('Invalid verification code.', 400);
@@ -18,7 +21,7 @@ class VerifyPhoneService {
       throw new AppError('Verification code has expired.', 400);
     }
 
-    await UserPhoneVerificationRepository.invalidate(verification.id);
+    await UserPhoneVerificationRepository.markAsVerified(verification.id);
 
     const user = await UserRepository.findById(userId);
 

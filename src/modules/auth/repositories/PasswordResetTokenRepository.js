@@ -14,24 +14,7 @@ class PasswordResetTokenRepository {
     return PasswordResetToken.findByPk(id);
   }
 
-  async findAllByUser(userId) {
-    return PasswordResetToken.findAll({
-      where: {
-        user_id: userId,
-      },
-    });
-  }
-
-  async findActiveByUser(userId) {
-    return PasswordResetToken.findAll({
-      where: {
-        user_id: userId,
-        used_at: null,
-      },
-    });
-  }
-
-  async invalidateAllByUser(userId) {
+  async invalidateAllByUserId(userId) {
     return PasswordResetToken.update(
       {
         used_at: new Date(),
@@ -53,19 +36,10 @@ class PasswordResetTokenRepository {
       {
         where: {
           id,
+          used_at: null,
         },
       }
     );
-  }
-
-  async update(id, data) {
-    await PasswordResetToken.update(data, {
-      where: {
-        id,
-      },
-    });
-
-    return this.findById(id);
   }
 }
 

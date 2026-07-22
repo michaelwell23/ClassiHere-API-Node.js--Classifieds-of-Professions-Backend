@@ -20,14 +20,6 @@ class UserVerificationRepository {
       },
     });
   }
-
-  async deleteByToken(token) {
-    return UserVerification.destroy({
-      where: {
-        token,
-      },
-    });
-  }
 }
 
 module.exports = new UserVerificationRepository();
