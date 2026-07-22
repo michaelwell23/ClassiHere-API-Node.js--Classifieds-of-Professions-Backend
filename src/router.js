@@ -1,7 +1,7 @@
 const { Router } = require('express');
 
 const usersRoutes = require('./modules/users/users.routes');
-const authRoutes = require('./modules/auth/routes/auth.routes');
+const authRoutes = require('./modules/auth/auth.routes');
 const legalRoutes = require('./modules/legal/Routes/legal.routes');
 
 const routes = Router();

@@ -1,6 +1,6 @@
 const environment = require('../config/environment');
 
-const authPaths = require('../modules/auth/docs/auth.swagger');
+const authPaths = require('../modules/auth/auth.swagger');
 const usersPaths = require('../modules/users/users.swagger');
 
 module.exports = {
