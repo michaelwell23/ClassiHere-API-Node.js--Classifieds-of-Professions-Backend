@@ -1,22 +1,16 @@
-function parsePositiveInteger(value, fallback) {
-  const parsedValue = Number.parseInt(value, 10);
+const env = require('./env');
 
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
-    return fallback;
-  }
-
-  return parsedValue;
-}
+const nodeEnv = env.getString('NODE_ENV', 'development');
 
 module.exports = {
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv,
 
-  port: parsePositiveInteger(process.env.PORT, 3000),
+  isDevelopment: nodeEnv === 'development',
+  isTest: nodeEnv === 'test',
+  isProduction: nodeEnv === 'production',
 
-  appUrl: process.env.APP_URL || 'http://localhost:3000',
+  port: env.getPositiveInteger('PORT', 3000),
+  appUrl: env.getString('APP_URL', 'http://localhost:3000'),
 
-  accountDeletionGracePeriodDays: parsePositiveInteger(
-    process.env.ACCOUNT_DELETION_GRACE_PERIOD_DAYS,
-    90
-  ),
+  accountDeletionGracePeriodDays: env.getPositiveInteger('ACCOUNT_DELETION_GRACE_PERIOD_DAYS', 90),
 };

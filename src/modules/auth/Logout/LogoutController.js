@@ -3,11 +3,12 @@ const LogoutService = require('./LogoutService');
 class LogoutController {
   async handle(request, response, next) {
     try {
-      const { refresh_token } = request.validated.body;
+      const result = await LogoutService.execute(request.validated.body);
 
-      const result = await LogoutService.execute(refresh_token);
-
-      return response.status(200).json(result);
+      return response.status(200).json({
+        success: true,
+        data: result,
+      });
     } catch (error) {
       return next(error);
     }

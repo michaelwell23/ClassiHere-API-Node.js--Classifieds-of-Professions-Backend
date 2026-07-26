@@ -1,15 +1,13 @@
-const LogoutAllService = require('./LogoutAllService');
+const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
 
-class LogoutAllController {
-  async handle(request, response, next) {
-    try {
-      const result = await LogoutAllService.execute(request.user.id);
+class LogoutAllService {
+  async execute({ authenticatedUserId }) {
+    await UserRefreshTokenRepository.deleteAllByUserId(authenticatedUserId);
 
-      return response.status(200).json(result);
-    } catch (error) {
-      return next(error);
-    }
+    return {
+      message: 'All sessions have been revoked successfully.',
+    };
   }
 }
 
-module.exports = new LogoutAllController();
+module.exports = new LogoutAllService();

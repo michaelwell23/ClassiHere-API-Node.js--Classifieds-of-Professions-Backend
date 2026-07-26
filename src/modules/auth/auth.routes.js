@@ -29,6 +29,8 @@ const authMiddleware = require('../../shared/middlewares/auth.middleware');
 const authRoutes = Router();
 
 authRoutes.post('/login', validationMiddleware(loginDTO), LoginController.handle);
+authRoutes.post('/logout', validationMiddleware(logoutDTO), LogoutController.handle);
+authRoutes.post('/logout-all', authMiddleware, LogoutAllController.handle);
 
 authRoutes.get(
   '/verify-email/:token',
@@ -57,8 +59,6 @@ authRoutes.post(
   RefreshTokenController.handle
 );
 
-authRoutes.post('/logout', validationMiddleware(logoutDTO), LogoutController.handle);
-authRoutes.post('/logout-all', authMiddleware, LogoutAllController.handle);
 authRoutes.get('/me', authMiddleware, MeController.handle);
 
 authRoutes.post(

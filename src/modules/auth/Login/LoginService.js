@@ -1,87 +1,89 @@
 const AppError = require('../../../shared/errors/AppError');
+
 const UserRepository = require('../../users/repositories/UserRepository');
 const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
 
-const authConfig = require('../../../config/auth');
-
-const { compareHash } = require('../../../shared/providers/hash/bcrypt.provider');
 const {
   generateAccessToken,
   generateRefreshToken,
-} = require('../../../shared/providers/jwt.auth.provider');
+  generateJti,
+  hashRefreshToken,
+  verifyRefreshToken,
+} = require('../providers/jwt.provider');
 
-class LoginService {
-  async execute({ email, password }) {
-    const user = await UserRepository.findByEmail(email);
+class RefreshTokenService {
+  async execute({ refresh_token }) {
+    let payload;
+
+    try {
+      payload = verifyRefreshToken(refresh_token);
+    } catch {
+      throw new AppError('Invalid or expired refresh token.', 401);
+    }
+
+    if (!payload.sub || !payload.jti) {
+      throw new AppError('Invalid refresh token.', 401);
+    }
+
+    const session = await UserRefreshTokenRepository.findByJti(payload.jti);
+
+    if (!session) {
+      throw new AppError('Invalid or revoked refresh token.', 401);
+    }
+
+    if (session.token_hash !== hashRefreshToken(refresh_token)) {
+      throw new AppError('Invalid or revoked refresh token.', 401);
+    }
+
+    if (session.user_id !== payload.sub) {
+      throw new AppError('Invalid refresh token.', 401);
+    }
+
+    if (session.expires_at && session.expires_at <= new Date()) {
+      await UserRefreshTokenRepository.deleteById(session.id);
+
+      throw new AppError('Refresh token expired.', 401);
+    }
+
+    const user = await UserRepository.findById(payload.sub);
 
     if (!user) {
-      throw new AppError('Invalid email or password.', 401);
+      await UserRefreshTokenRepository.deleteById(session.id);
+
+      throw new AppError('Invalid refresh token.', 401);
     }
 
     if (!user.is_active) {
+      await UserRefreshTokenRepository.deleteAllByUserId(user.id);
+
       throw new AppError('User account is deactivated.', 403);
     }
 
-    if (user.locked_until && user.locked_until > new Date()) {
-      throw new AppError('Account temporarily locked due to multiple failed login attempts.', 423);
-    }
+    const newJti = generateJti();
 
-    const passwordMatches = await compareHash(password, user.password);
+    const accessToken = generateAccessToken(user.id);
+    const newRefreshToken = generateRefreshToken(user.id, newJti);
 
-    if (!passwordMatches) {
-      const attempts = user.failed_login_attempts + 1;
+    const newPayload = verifyRefreshToken(newRefreshToken);
 
-      if (attempts >= authConfig.accountLock.maxFailedAttempts) {
-        const lockedUntil = new Date();
-
-        lockedUntil.setMinutes(lockedUntil.getMinutes() + authConfig.accountLock.lockDuration);
-
-        await UserRepository.update(user, {
-          failed_login_attempts: attempts,
-          locked_until: lockedUntil,
-        });
-
-        throw new AppError(
-          'Account temporarily locked due to multiple failed login attempts.',
-          423
-        );
-      }
-
-      await UserRepository.update(user, {
-        failed_login_attempts: attempts,
-      });
-
-      throw new AppError('Invalid email or password.', 401);
-    }
-
-    if (user.failed_login_attempts > 0 || user.locked_until) {
-      await UserRepository.update(user, {
-        failed_login_attempts: 0,
-        locked_until: null,
-      });
-    }
-
-    const accessToken = generateAccessToken(user);
-
-    const refreshToken = generateRefreshToken();
-
-    await UserRefreshTokenRepository.create({
+    const rotatedSession = await UserRefreshTokenRepository.rotate(session.id, {
       user_id: user.id,
-      token: refreshToken,
+      jti: newJti,
+      token_hash: hashRefreshToken(newRefreshToken),
+      expires_at: new Date(newPayload.exp * 1000),
     });
 
-    await UserRepository.update(user, {
-      last_login_at: new Date(),
-    });
+    if (!rotatedSession) {
+      throw new AppError('Refresh token has already been used.', 401);
+    }
 
     return {
-      user: user,
       tokens: {
         access_token: accessToken,
-        refresh_token: refreshToken,
+        refresh_token: newRefreshToken,
       },
     };
   }
 }
 
-module.exports = new LoginService();
+module.exports = new RefreshTokenService();

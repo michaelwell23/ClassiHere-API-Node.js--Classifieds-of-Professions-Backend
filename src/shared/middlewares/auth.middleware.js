@@ -1,6 +1,6 @@
 const AppError = require('../errors/AppError');
 
-const { verifyAccessToken } = require('../providers/jwt.auth.provider');
+const { verifyAccessToken } = require('../../modules/auth/providers/jwt.provider');
 
 const UserRepository = require('../../modules/users/repositories/UserRepository');
 

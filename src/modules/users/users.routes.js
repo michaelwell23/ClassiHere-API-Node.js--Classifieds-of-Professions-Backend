@@ -2,8 +2,8 @@ const { Router } = require('express');
 
 const validate = require('../../shared/middlewares/validation.middleware');
 const authMiddleware = require('../../shared/middlewares/auth.middleware');
+const upload = require('../../shared/middlewares/upload.middleware');
 
-const upload = require('../../shared/providers/storage/multer.config');
 const userIdDTO = require('./user-id.dto');
 const createUserDTO = require('./CreateUser/create-user.dto');
 const updateUserDTO = require('./UpdateUser/update-user.dto');

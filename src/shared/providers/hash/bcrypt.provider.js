@@ -1,13 +1,13 @@
 const bcrypt = require('bcryptjs');
 
-const SALT_ROUNDS = 10;
+const authConfig = require('../../../config/auth');
 
 async function generateHash(payload) {
-  return bcrypt.hash(payload, SALT_ROUNDS);
+  return bcrypt.hash(payload, authConfig.password.saltRounds);
 }
 
-async function compareHash(payload, hashed) {
-  return bcrypt.compare(payload, hashed);
+async function compareHash(payload, hashedPayload) {
+  return bcrypt.compare(payload, hashedPayload);
 }
 
 module.exports = {

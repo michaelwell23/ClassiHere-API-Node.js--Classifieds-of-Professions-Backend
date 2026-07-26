@@ -1,17 +1,15 @@
-function parsePort(value, fallback) {
-  const parsedValue = Number.parseInt(value, 10);
+const env = require('./env');
 
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
-    return fallback;
-  }
-
-  return parsedValue;
-}
+const port = env.getPositiveInteger('MAIL_PORT', 587);
 
 module.exports = {
-  host: process.env.MAIL_HOST,
-  port: parsePort(process.env.MAIL_PORT, 587),
-  user: process.env.MAIL_USER,
-  password: process.env.MAIL_PASSWORD,
-  from: process.env.MAIL_FROM,
+  host: env.getString('MAIL_HOST'),
+  port,
+
+  secure: env.getBoolean('MAIL_SECURE', port === 465),
+
+  user: env.getString('MAIL_USER'),
+  password: env.getString('MAIL_PASSWORD'),
+
+  from: env.getString('MAIL_FROM', env.getString('MAIL_USER')),
 };

@@ -1,12 +1,10 @@
-const AppError = require('../../../shared/errors/AppError');
-
-const bcryptProvider = require('../../../shared/providers/hash/bcrypt.provider');
-
-const imageProcessor = require('../../../shared/providers/storage/image.processor');
-
-const localStorageProvider = require('../../../shared/providers/storage/local.provider');
-
 const UserRepository = require('../repositories/UserRepository');
+
+const imageProcessor = require('../providers/avatar.processor');
+
+const AppError = require('../../../shared/errors/AppError');
+const bcryptProvider = require('../../../shared/providers/hash/bcrypt.provider');
+const localStorageProvider = require('../../../shared/providers/storage/local.provider');
 
 class CreateUserService {
   async execute({ data, file }) {

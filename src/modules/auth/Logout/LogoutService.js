@@ -1,33 +1,19 @@
-const AppError = require('../../../shared/errors/AppError');
-
-const { compareHash } = require('../../../shared/providers/hash/bcrypt.provider');
-
 const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
 
+const { hashRefreshToken } = require('../providers/jwt.provider');
+
 class LogoutService {
-  async execute(refreshToken) {
-    const sessions = await UserRefreshTokenRepository.findAll();
+  async execute({ refresh_token }) {
+    const session = await UserRefreshTokenRepository.findByTokenHash(
+      hashRefreshToken(refresh_token)
+    );
 
-    let currentSession = null;
-
-    for (const session of sessions) {
-      const match = await compareHash(refreshToken, session.token);
-
-      if (match) {
-        currentSession = session;
-
-        break;
-      }
+    if (session) {
+      await UserRefreshTokenRepository.deleteById(session.id);
     }
-
-    if (!currentSession) {
-      throw new AppError('Session not found', 404);
-    }
-
-    await UserRefreshTokenRepository.delete(currentSession.id);
 
     return {
-      message: 'Logout successfully',
+      message: 'Logout completed successfully.',
     };
   }
 }

@@ -11,7 +11,7 @@ const {
   generateRefreshToken,
   verifyRefreshToken,
   generateJti,
-} = require('../../../shared/providers/jwt.auth.provider');
+} = require('../providers/jwt.provider');
 
 class RefreshTokenService {
   async execute(refreshToken) {
