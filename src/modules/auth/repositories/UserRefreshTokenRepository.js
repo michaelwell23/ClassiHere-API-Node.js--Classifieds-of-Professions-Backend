@@ -30,11 +30,12 @@ class UserRefreshTokenRepository {
     });
   }
 
-  async deleteAllByUserId(userId) {
+  async deleteAllByUserId(userId, options = {}) {
     return UserRefreshToken.destroy({
       where: {
         user_id: userId,
       },
+      ...options,
     });
   }
 

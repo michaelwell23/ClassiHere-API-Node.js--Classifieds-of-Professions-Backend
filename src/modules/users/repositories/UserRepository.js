@@ -35,8 +35,8 @@ class UserRepository {
     });
   }
 
-  async update(user, data) {
-    return user.update(data);
+  async update(user, data, options = {}) {
+    return user.update(data, options);
   }
 
   async softDelete(user) {

@@ -6,23 +6,23 @@ const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepo
 const { compareHash, generateHash } = require('../../../shared/providers/hash/bcrypt.provider');
 
 class ChangePasswordService {
-  async execute({ userId, currentPassword, newPassword }) {
-    const user = await UserRepository.findById(userId);
+  async execute({ authenticatedUserId, currentPassword, newPassword }) {
+    const user = await UserRepository.findById(authenticatedUserId);
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('User not found.', 404);
     }
 
-    const passwordMatches = await compareHash(currentPassword, user.password);
+    const currentPasswordMatches = await compareHash(currentPassword, user.password);
 
-    if (!passwordMatches) {
-      throw new AppError('Current password is invalid', 400);
+    if (!currentPasswordMatches) {
+      throw new AppError('Current password is invalid.', 400);
     }
 
-    const samePassword = await compareHash(newPassword, user.password);
+    const newPasswordMatchesCurrent = await compareHash(newPassword, user.password);
 
-    if (samePassword) {
-      throw new AppError('New password must be different from current password', 400);
+    if (newPasswordMatchesCurrent) {
+      throw new AppError('New password must be different from current password.', 400);
     }
 
     const passwordHash = await generateHash(newPassword);
@@ -33,10 +33,10 @@ class ChangePasswordService {
       locked_until: null,
     });
 
-    await UserRefreshTokenRepository.deleteAllByUser(user.id);
+    await UserRefreshTokenRepository.deleteAllByUserId(user.id);
 
     return {
-      message: 'Password changed successfully. All sessions have been revoked.',
+      message: 'Password changed successfully. All sessions were revoked.',
     };
   }
 }

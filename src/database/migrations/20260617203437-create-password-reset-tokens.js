@@ -50,7 +50,11 @@ module.exports = {
     });
 
     await queryInterface.addIndex('password_reset_tokens', ['user_id'], {
-      name: 'idx_password_reset_tokens_user_id',
+      name: 'password_reset_tokens_user_id_idx',
+    });
+
+    await queryInterface.addIndex('password_reset_tokens', ['expires_at'], {
+      name: 'password_reset_tokens_expires_at_idx',
     });
   },
 

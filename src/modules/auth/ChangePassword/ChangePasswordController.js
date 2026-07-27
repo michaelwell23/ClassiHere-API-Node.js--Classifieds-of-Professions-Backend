@@ -4,11 +4,14 @@ class ChangePasswordController {
   async handle(request, response, next) {
     try {
       const result = await ChangePasswordService.execute({
-        userId: request.user.id,
+        authenticatedUserId: request.user.id,
         ...request.validated.body,
       });
 
-      return response.status(200).json(result);
+      return response.status(200).json({
+        success: true,
+        data: result,
+      });
     } catch (error) {
       return next(error);
     }

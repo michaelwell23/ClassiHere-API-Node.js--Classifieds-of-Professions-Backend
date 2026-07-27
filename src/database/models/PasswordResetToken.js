@@ -16,7 +16,7 @@ class PasswordResetToken extends Model {
         },
 
         token_hash: {
-          type: DataTypes.TEXT,
+          type: DataTypes.STRING(64),
           allowNull: false,
         },
 
@@ -33,6 +33,7 @@ class PasswordResetToken extends Model {
       {
         sequelize,
         tableName: 'password_reset_tokens',
+        underscored: true,
       }
     );
   }

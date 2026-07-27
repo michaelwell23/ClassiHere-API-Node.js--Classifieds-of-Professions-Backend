@@ -24,4 +24,8 @@ module.exports = {
     maxAttempts: env.getPositiveInteger('MAX_LOGIN_ATTEMPTS', 5),
     lockDurationMinutes: env.getPositiveInteger('ACCOUNT_LOCK_DURATION_MINUTES', 30),
   },
+
+  passwordReset: {
+    expiresInMinutes: env.getPositiveInteger('PASSWORD_RESET_EXPIRES_IN_MINUTES', 60),
+  },
 };

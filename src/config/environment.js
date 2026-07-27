@@ -12,5 +12,7 @@ module.exports = {
   port: env.getPositiveInteger('PORT', 3000),
   appUrl: env.getString('APP_URL', 'http://localhost:3000'),
 
+  frontendUrl: env.getString('FRONTEND_URL', 'http://localhost:3000'),
+
   accountDeletionGracePeriodDays: env.getPositiveInteger('ACCOUNT_DELETION_GRACE_PERIOD_DAYS', 90),
 };
