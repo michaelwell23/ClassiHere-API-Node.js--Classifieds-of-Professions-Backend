@@ -2,7 +2,7 @@ const { Model, DataTypes } = require('sequelize');
 
 class UserPhoneVerification extends Model {
   static init(sequelize) {
-    super.init(
+    return super.init(
       {
         id: {
           type: DataTypes.UUID,
@@ -15,14 +15,20 @@ class UserPhoneVerification extends Model {
           allowNull: false,
         },
 
-        code: {
-          type: DataTypes.STRING,
+        code_hash: {
+          type: DataTypes.STRING(64),
           allowNull: false,
         },
 
         expires_at: {
           type: DataTypes.DATE,
           allowNull: false,
+        },
+
+        attempts: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
         },
 
         verified_at: {
@@ -33,11 +39,8 @@ class UserPhoneVerification extends Model {
       {
         sequelize,
         tableName: 'user_phone_verifications',
-        underscored: true,
       }
     );
-
-    return this;
   }
 
   static associate(models) {

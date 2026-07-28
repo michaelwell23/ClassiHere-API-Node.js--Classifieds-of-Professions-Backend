@@ -25,6 +25,7 @@ const SendPhoneVerificationController = require('./SendPhoneVerification/SendPho
 
 const validationMiddleware = require('../../shared/middlewares/validation.middleware');
 const authMiddleware = require('../../shared/middlewares/auth.middleware');
+const validate = require('../../shared/middlewares/validation.middleware');
 
 const authRoutes = Router();
 
@@ -44,14 +45,14 @@ authRoutes.post(
   ResendVerificationController.handle
 );
 
-authRoutes.patch(
-  '/verify-phone',
+authRoutes.post('/phone/send-verification', authMiddleware, SendPhoneVerificationController.handle);
+
+authRoutes.post(
+  '/phone/verify',
   authMiddleware,
-  validationMiddleware(verifyPhoneDTO),
+  validate(verifyPhoneDTO),
   VerifyPhoneController.handle
 );
-
-authRoutes.post('/phone-verification', authMiddleware, SendPhoneVerificationController.handle);
 
 authRoutes.post(
   '/refresh-token',

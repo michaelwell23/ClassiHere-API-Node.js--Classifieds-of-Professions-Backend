@@ -2,7 +2,7 @@ const { Model, DataTypes } = require('sequelize');
 
 class UserVerification extends Model {
   static init(sequelize) {
-    super.init(
+    return super.init(
       {
         id: {
           type: DataTypes.UUID,
@@ -13,10 +13,10 @@ class UserVerification extends Model {
         user_id: {
           type: DataTypes.UUID,
           allowNull: false,
-          unique: true,
         },
-        token: {
-          type: DataTypes.STRING,
+
+        token_hash: {
+          type: DataTypes.STRING(64),
           allowNull: false,
           unique: true,
         },
@@ -25,15 +25,17 @@ class UserVerification extends Model {
           type: DataTypes.DATE,
           allowNull: false,
         },
+
+        used_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
       },
       {
         sequelize,
         tableName: 'user_verifications',
-        underscored: true,
       }
     );
-
-    return this;
   }
 
   static associate(models) {

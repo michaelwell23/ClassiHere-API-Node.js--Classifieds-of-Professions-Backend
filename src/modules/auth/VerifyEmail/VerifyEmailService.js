@@ -1,38 +1,63 @@
+const database = require('../../../database');
+
 const AppError = require('../../../shared/errors/AppError');
 
 const UserRepository = require('../../users/repositories/UserRepository');
 
 const UserVerificationRepository = require('../repositories/UserVerificationRepository');
 
+const { hashOpaqueToken } = require('../providers/opaque-token.provider');
+
 class VerifyEmailService {
-  async execute(token) {
-    const verification = await UserVerificationRepository.findByToken(token);
+  async execute({ token }) {
+    const tokenHash = hashOpaqueToken(token);
+
+    const verification = await UserVerificationRepository.findActiveByTokenHash(tokenHash);
 
     if (!verification) {
-      throw new AppError('Invalid verification token', 400);
-    }
-
-    const now = new Date();
-
-    if (verification.expires_at < now) {
-      throw new AppError('Verification token expired', 400);
+      throw new AppError('Invalid or expired verification token.', 400);
     }
 
     const user = await UserRepository.findById(verification.user_id);
 
-    if (!user) {
-      throw new AppError('User not found', 404);
+    if (!user || !user.is_active) {
+      throw new AppError('Invalid or expired verification token.', 400);
     }
 
-    await UserRepository.update(user, {
-      is_email_verified: true,
+    if (user.is_email_verified) {
+      await UserVerificationRepository.invalidateAllByUserId(user.id);
+
+      return {
+        message: 'Email is already verified.',
+      };
+    }
+
+    await database.transaction(async (transaction) => {
+      const tokenConsumed = await UserVerificationRepository.markAsUsed(verification.id, {
+        transaction,
+      });
+
+      if (!tokenConsumed) {
+        throw new AppError('Verification token has already been used.', 400);
+      }
+
+      await UserRepository.update(
+        user,
+        {
+          is_email_verified: true,
+        },
+        {
+          transaction,
+        }
+      );
+
+      await UserVerificationRepository.invalidateOthersByUserId(user.id, verification.id, {
+        transaction,
+      });
     });
 
-    await UserVerificationRepository.deleteByUserId(verification.user_id);
-
     return {
-      success: true,
-      message: 'Email verified successfully',
+      message: 'Email verified successfully.',
     };
   }
 }

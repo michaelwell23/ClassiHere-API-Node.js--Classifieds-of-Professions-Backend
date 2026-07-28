@@ -3,11 +3,16 @@ const SendPhoneVerificationService = require('./SendPhoneVerificationService');
 class SendPhoneVerificationController {
   async handle(request, response, next) {
     try {
-      const result = await SendPhoneVerificationService.execute(request.user.id);
+      const result = await SendPhoneVerificationService.execute({
+        authenticatedUserId: request.user.id,
+      });
 
-      return response.json(result);
+      return response.status(200).json({
+        success: true,
+        data: result,
+      });
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 }
