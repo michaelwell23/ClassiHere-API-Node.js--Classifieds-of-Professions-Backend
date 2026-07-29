@@ -18,6 +18,12 @@ function getTransporter() {
               pass: mailConfig.password,
             }
           : undefined,
+
+      connectionTimeout: mailConfig.connectionTimeout,
+
+      greetingTimeout: mailConfig.greetingTimeout,
+
+      socketTimeout: mailConfig.socketTimeout,
     });
   }
 
@@ -25,8 +31,21 @@ function getTransporter() {
 }
 
 async function sendMail({ to, subject, html, text }) {
+  if (!to) {
+    throw new TypeError('Mail recipient is required.');
+  }
+
+  if (!subject) {
+    throw new TypeError('Mail subject is required.');
+  }
+
+  if (!html && !text) {
+    throw new TypeError('Mail content is required.');
+  }
+
   return getTransporter().sendMail({
     from: mailConfig.from,
+    replyTo: mailConfig.replyTo || undefined,
     to,
     subject,
     html,

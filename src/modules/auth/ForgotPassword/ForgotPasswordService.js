@@ -2,13 +2,10 @@ const UserRepository = require('../../users/repositories/UserRepository');
 const PasswordResetTokenRepository = require('../repositories/PasswordResetTokenRepository');
 
 const authConfig = require('../../../config/auth');
-const environment = require('../../../config/environment');
 
 const { generateOpaqueToken, hashOpaqueToken } = require('../providers/opaque-token.provider');
 
-const { sendMail } = require('../../../shared/providers/mail/smtp.provider');
-
-const passwordResetTemplate = require('../../../templates/mail/users/password-reset.template');
+const SendPasswordResetEmailService = require('../../../shared/services/SendPasswordResetEmailService');
 
 const genericResponse = {
   message: 'If the email exists, password recovery instructions have been sent.',
@@ -35,21 +32,11 @@ class ForgotPasswordService {
       expires_at: expiresAt,
     });
 
-    const resetUrl = new URL('/reset-password', environment.frontendUrl);
-
-    resetUrl.searchParams.set('id', resetToken.id);
-    resetUrl.searchParams.set('token', token);
-
-    const message = passwordResetTemplate({
-      userName: user.name,
-      resetLink: resetUrl.toString(),
-      expiresInMinutes: authConfig.passwordReset.expiresInMinutes,
-    });
-
     try {
-      await sendMail({
-        to: user.email,
-        ...message,
+      await SendPasswordResetEmailService.execute({
+        user,
+        resetId: resetToken.id,
+        token,
       });
     } catch (error) {
       await PasswordResetTokenRepository.markAsUsed(resetToken.id);

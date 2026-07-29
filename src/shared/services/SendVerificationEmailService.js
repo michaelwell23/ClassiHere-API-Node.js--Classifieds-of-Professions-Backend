@@ -1,22 +1,25 @@
 const environment = require('../../config/environment');
-
-const verifyEmailTemplate = require('../../templates/mail/users/verify-email.template');
+const authConfig = require('../../config/auth');
 
 const { sendMail } = require('../providers/mail/smtp.provider');
 
+const verifyEmailTemplate = require('../../templates/mail/users/verify-email.template');
+
 class SendVerificationEmailService {
   async execute({ user, token }) {
-    const verificationUrl = `${environment.appUrl}/verify-email?token=${token}`;
+    const verificationUrl = new URL('/verify-email', environment.frontendUrl);
 
-    const html = verifyEmailTemplate({
-      firstName: user.first_name,
-      verificationUrl,
+    verificationUrl.searchParams.set('token', token);
+
+    const message = verifyEmailTemplate({
+      userName: user.first_name || user.name || 'usuário',
+      verificationLink: verificationUrl.toString(),
+      expiresInHours: authConfig.emailVerification.expiresInHours,
     });
 
-    await sendMail({
+    return sendMail({
       to: user.email,
-      subject: 'Confirme seu e-mail',
-      html,
+      ...message,
     });
   }
 }

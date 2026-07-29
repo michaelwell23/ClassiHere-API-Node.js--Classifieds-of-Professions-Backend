@@ -2,7 +2,7 @@ const UserRepository = require('../../users/repositories/UserRepository');
 
 const UserVerificationRepository = require('../repositories/UserVerificationRepository');
 
-const SendVerificationEmailJob = require('../../../shared/jobs/SendVerificationEmailJob');
+const SendVerificationEmailService = require('../../../shared/services/SendVerificationEmailService');
 
 const authConfig = require('../../../config/auth');
 
@@ -31,7 +31,7 @@ class ResendVerificationService {
     });
 
     try {
-      await SendVerificationEmailJob.execute({
+      await SendVerificationEmailService.execute({
         user,
         token,
       });
