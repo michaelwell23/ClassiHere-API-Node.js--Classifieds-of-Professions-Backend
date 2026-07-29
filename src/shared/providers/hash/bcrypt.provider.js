@@ -2,15 +2,19 @@ const bcrypt = require('bcryptjs');
 
 const authConfig = require('../../../config/auth');
 
-async function generateHash(payload) {
-  return bcrypt.hash(payload, authConfig.password.saltRounds);
+async function hashPassword(password) {
+  return bcrypt.hash(password, authConfig.password.saltRounds);
 }
 
-async function compareHash(payload, hashedPayload) {
-  return bcrypt.compare(payload, hashedPayload);
+async function comparePassword(password, passwordHash) {
+  if (typeof password !== 'string' || typeof passwordHash !== 'string') {
+    return false;
+  }
+
+  return bcrypt.compare(password, passwordHash);
 }
 
 module.exports = {
-  generateHash,
-  compareHash,
+  hashPassword,
+  comparePassword,
 };

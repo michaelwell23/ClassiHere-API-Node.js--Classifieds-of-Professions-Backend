@@ -1,5 +1,9 @@
-function isValidCPF(cpf) {
-  cpf = cpf.replace(/\D/g, '');
+function isValidCPF(value) {
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  const cpf = value.replace(/\D/g, '');
 
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
     return false;
@@ -7,29 +11,33 @@ function isValidCPF(cpf) {
 
   let sum = 0;
 
-  for (let i = 0; i < 9; i++) {
-    sum += Number(cpf[i]) * (10 - i);
+  for (let index = 0; index < 9; index++) {
+    sum += Number(cpf[index]) * (10 - index);
   }
 
-  let digit = (sum * 10) % 11;
+  let firstDigit = (sum * 10) % 11;
 
-  if (digit === 10) digit = 0;
+  if (firstDigit === 10) {
+    firstDigit = 0;
+  }
 
-  if (digit !== Number(cpf[9])) {
+  if (firstDigit !== Number(cpf[9])) {
     return false;
   }
 
   sum = 0;
 
-  for (let i = 0; i < 10; i++) {
-    sum += Number(cpf[i]) * (11 - i);
+  for (let index = 0; index < 10; index++) {
+    sum += Number(cpf[index]) * (11 - index);
   }
 
-  digit = (sum * 10) % 11;
+  let secondDigit = (sum * 10) % 11;
 
-  if (digit === 10) digit = 0;
+  if (secondDigit === 10) {
+    secondDigit = 0;
+  }
 
-  return digit === Number(cpf[10]);
+  return secondDigit === Number(cpf[10]);
 }
 
 module.exports = isValidCPF;

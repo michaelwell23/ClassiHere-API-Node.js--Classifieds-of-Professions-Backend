@@ -1,15 +1,30 @@
 const DeleteInactiveUsersJob = require('./DeleteInactiveUsersJob');
 
-(async () => {
+async function run() {
   try {
     const result = await DeleteInactiveUsersJob.execute();
 
-    console.log(result);
-
-    process.exit(0);
+    console.log(
+      JSON.stringify({
+        job: 'delete-inactive-users',
+        success: true,
+        ...result,
+      })
+    );
   } catch (error) {
-    console.error(error);
+    console.error(
+      JSON.stringify({
+        job: 'delete-inactive-users',
+        success: false,
+        error: {
+          name: error.name,
+          message: error.message,
+        },
+      })
+    );
 
-    process.exit(1);
+    process.exitCode = 1;
   }
-})();
+}
+
+run();

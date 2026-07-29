@@ -1,29 +1,51 @@
 const fs = require('fs/promises');
 const path = require('path');
 
-class LocalPhoneProvider {
-  async send({ phone, code, expiresAt }) {
-    const directory = path.resolve(process.cwd(), 'storage', 'phone-verification');
+const uploadConfig = require('../../../config/upload');
 
-    await fs.mkdir(directory, {
-      recursive: true,
-    });
+function resolveStoragePath(filePath) {
+  if (typeof filePath !== 'string' || !filePath.trim()) {
+    throw new TypeError('Storage file path must be a non-empty string.');
+  }
 
-    const file = path.join(directory, `${phone}.json`);
+  if (path.isAbsolute(filePath)) {
+    throw new Error('Absolute storage paths are not allowed.');
+  }
 
-    await fs.writeFile(
-      file,
-      JSON.stringify(
-        {
-          phone,
-          code,
-          expires_at: expiresAt,
-        },
-        null,
-        2
-      )
-    );
+  const storageRoot = path.resolve(uploadConfig.storageDirectory);
+
+  const resolvedPath = path.resolve(storageRoot, filePath);
+
+  const isInsideStorage =
+    resolvedPath === storageRoot || resolvedPath.startsWith(`${storageRoot}${path.sep}`);
+
+  if (!isInsideStorage) {
+    throw new Error('Storage path is outside the configured directory.');
+  }
+
+  return resolvedPath;
+}
+
+async function deleteFile(filePath) {
+  if (!filePath) {
+    return false;
+  }
+
+  const resolvedPath = resolveStoragePath(filePath);
+
+  try {
+    await fs.unlink(resolvedPath);
+
+    return true;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return false;
+    }
+
+    throw error;
   }
 }
 
-module.exports = new LocalPhoneProvider();
+module.exports = {
+  delete: deleteFile,
+};

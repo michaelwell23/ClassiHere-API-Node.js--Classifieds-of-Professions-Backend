@@ -53,6 +53,30 @@ class UserRepository {
       },
     });
   }
+
+  async softDeleteUsersPendingDeletion(limitDate, options = {}) {
+    const [affectedRows] = await User.update(
+      {
+        deleted_at: new Date(),
+      },
+      {
+        where: {
+          deletion_requested_at: {
+            [Op.lte]: limitDate,
+          },
+
+          deleted_at: null,
+
+          // Ajustar conforme os campos reais:
+          deletion_cancelled_at: null,
+        },
+
+        transaction: options.transaction,
+      }
+    );
+
+    return affectedRows;
+  }
 }
 
 module.exports = new UserRepository();
