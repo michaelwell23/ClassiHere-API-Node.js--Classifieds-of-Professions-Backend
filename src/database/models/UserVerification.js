@@ -34,6 +34,16 @@ class UserVerification extends Model {
       {
         sequelize,
         tableName: 'user_verifications',
+        underscored: true,
+
+        indexes: [
+          {
+            fields: ['user_id'],
+          },
+          {
+            fields: ['expires_at'],
+          },
+        ],
       }
     );
   }
@@ -42,7 +52,19 @@ class UserVerification extends Model {
     this.belongsTo(models.User, {
       foreignKey: 'user_id',
       as: 'user',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
+  }
+
+  toJSON() {
+    const values = {
+      ...this.get(),
+    };
+
+    delete values.token_hash;
+
+    return values;
   }
 }
 

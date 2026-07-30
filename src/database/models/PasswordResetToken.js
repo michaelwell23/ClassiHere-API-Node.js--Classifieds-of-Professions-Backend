@@ -18,6 +18,7 @@ class PasswordResetToken extends Model {
         token_hash: {
           type: DataTypes.STRING(64),
           allowNull: false,
+          unique: true,
         },
 
         expires_at: {
@@ -33,7 +34,17 @@ class PasswordResetToken extends Model {
       {
         sequelize,
         tableName: 'password_reset_tokens',
+
         underscored: true,
+
+        indexes: [
+          {
+            fields: ['user_id'],
+          },
+          {
+            fields: ['expires_at'],
+          },
+        ],
       }
     );
   }
@@ -42,7 +53,19 @@ class PasswordResetToken extends Model {
     this.belongsTo(models.User, {
       foreignKey: 'user_id',
       as: 'user',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
+  }
+
+  toJSON() {
+    const values = {
+      ...this.get(),
+    };
+
+    delete values.token_hash;
+
+    return values;
   }
 }
 

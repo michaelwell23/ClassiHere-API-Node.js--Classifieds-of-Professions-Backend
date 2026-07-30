@@ -29,6 +29,10 @@ class UserPhoneVerification extends Model {
           type: DataTypes.INTEGER,
           allowNull: false,
           defaultValue: 0,
+
+          validate: {
+            min: 0,
+          },
         },
 
         verified_at: {
@@ -39,6 +43,17 @@ class UserPhoneVerification extends Model {
       {
         sequelize,
         tableName: 'user_phone_verifications',
+
+        underscored: true,
+
+        indexes: [
+          {
+            fields: ['user_id', 'created_at'],
+          },
+          {
+            fields: ['expires_at'],
+          },
+        ],
       }
     );
   }
@@ -47,7 +62,19 @@ class UserPhoneVerification extends Model {
     this.belongsTo(models.User, {
       foreignKey: 'user_id',
       as: 'user',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
+  }
+
+  toJSON() {
+    const values = {
+      ...this.get(),
+    };
+
+    delete values.code_hash;
+
+    return values;
   }
 }
 
