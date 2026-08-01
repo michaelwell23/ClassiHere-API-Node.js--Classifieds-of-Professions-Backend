@@ -1,9 +1,9 @@
-const environment = require('../../config/environment');
-const authConfig = require('../../config/auth');
+const environment = require('../../../config/environment');
+const authConfig = require('../../../config/auth');
 
-const { sendMail } = require('../providers/mail/smtp.provider');
+const { sendMail } = require('../../../shared/providers/mail/smtp.provider');
 
-const passwordResetTemplate = require('../../templates/mail/users/password-reset.template');
+const passwordResetTemplate = require('./templates/password-reset.template');
 
 class SendPasswordResetEmailService {
   async execute({ user, resetId, token }) {

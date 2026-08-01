@@ -1,6 +1,6 @@
-const escapeHtml = require('../components/escape-html');
+const escapeHtml = require('../../../../templates/mail/components/escape-html');
 
-const mailLayoutTemplate = require('../components/mail-layout.template');
+const mailLayoutTemplate = require('../../../../templates/mail/components/mail-layout.template');
 
 function passwordResetTemplate({ userName, resetLink, expiresInMinutes }) {
   const subject = 'Redefina sua senha do ClassiHere';
