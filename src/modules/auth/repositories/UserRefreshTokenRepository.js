@@ -1,32 +1,36 @@
 const database = require('../../../database');
+
 const UserRefreshToken = require('../../../database/models/UserRefreshToken');
 
 class UserRefreshTokenRepository {
-  async create(data) {
-    return UserRefreshToken.create(data);
+  async create(data, options = {}) {
+    return UserRefreshToken.create(data, options);
   }
 
-  async findByJti(jti) {
+  async findByJti(jti, options = {}) {
     return UserRefreshToken.findOne({
       where: {
         jti,
       },
+      ...options,
     });
   }
 
-  async findByTokenHash(tokenHash) {
+  async findByTokenHash(tokenHash, options = {}) {
     return UserRefreshToken.findOne({
       where: {
         token_hash: tokenHash,
       },
+      ...options,
     });
   }
 
-  async deleteById(id) {
+  async deleteById(id, options = {}) {
     return UserRefreshToken.destroy({
       where: {
         id,
       },
+      ...options,
     });
   }
 
