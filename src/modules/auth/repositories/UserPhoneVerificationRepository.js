@@ -13,7 +13,9 @@ class UserPhoneVerificationRepository {
         user_id: userId,
         verified_at: null,
       },
+
       order: [['created_at', 'DESC']],
+
       ...options,
     });
   }
@@ -23,17 +25,20 @@ class UserPhoneVerificationRepository {
       where: {
         user_id: userId,
         verified_at: null,
+
         created_at: {
           [Op.gte]: createdAfter,
         },
       },
+
       order: [['created_at', 'DESC']],
+
       ...options,
     });
   }
 
   async incrementAttempts(id, options = {}) {
-    const [updatedRows] = await UserPhoneVerification.increment(
+    return UserPhoneVerification.increment(
       {
         attempts: 1,
       },
@@ -42,11 +47,10 @@ class UserPhoneVerificationRepository {
           id,
           verified_at: null,
         },
+
         ...options,
       }
     );
-
-    return updatedRows;
   }
 
   async markAsVerified(id, options = {}) {
@@ -59,6 +63,7 @@ class UserPhoneVerificationRepository {
           id,
           verified_at: null,
         },
+
         ...options,
       }
     );
@@ -75,10 +80,12 @@ class UserPhoneVerificationRepository {
         where: {
           user_id: userId,
           verified_at: null,
+
           id: {
             [Op.ne]: excludedVerificationId,
           },
         },
+
         ...options,
       }
     );
@@ -89,6 +96,7 @@ class UserPhoneVerificationRepository {
       where: {
         id,
       },
+
       ...options,
     });
   }

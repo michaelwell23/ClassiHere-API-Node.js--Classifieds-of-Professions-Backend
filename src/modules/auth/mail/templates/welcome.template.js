@@ -1,4 +1,4 @@
-const escapeHtml = require('../components/escape-html');
+const escapeHtml = require('../../../../templates/mail/components/escape-html');
 
 function welcomeTemplate({ userName }) {
   const safeUserName = escapeHtml(userName || 'usuário');

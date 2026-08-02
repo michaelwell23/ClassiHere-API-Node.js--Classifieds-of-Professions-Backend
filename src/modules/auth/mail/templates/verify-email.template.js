@@ -1,6 +1,6 @@
-const escapeHtml = require('../components/escape-html');
+const escapeHtml = require('../../../../templates/mail/components/escape-html');
 
-const mailLayoutTemplate = require('../components/mail-layout.template');
+const mailLayoutTemplate = require('../../../../templates/mail/components/mail-layout.template');
 
 function verifyEmailTemplate({ userName, verificationLink, expiresInHours }) {
   const subject = 'Confirme seu e-mail no ClassiHere';

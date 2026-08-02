@@ -12,10 +12,12 @@ class UserVerificationRepository {
       where: {
         token_hash: tokenHash,
         used_at: null,
+
         expires_at: {
           [Op.gt]: new Date(),
         },
       },
+
       ...options,
     });
   }
@@ -30,6 +32,7 @@ class UserVerificationRepository {
           id,
           used_at: null,
         },
+
         ...options,
       }
     );
@@ -47,6 +50,7 @@ class UserVerificationRepository {
           user_id: userId,
           used_at: null,
         },
+
         ...options,
       }
     );
@@ -61,10 +65,12 @@ class UserVerificationRepository {
         where: {
           user_id: userId,
           used_at: null,
+
           id: {
             [Op.ne]: excludedVerificationId,
           },
         },
+
         ...options,
       }
     );
@@ -75,6 +81,7 @@ class UserVerificationRepository {
       where: {
         id,
       },
+
       ...options,
     });
   }
