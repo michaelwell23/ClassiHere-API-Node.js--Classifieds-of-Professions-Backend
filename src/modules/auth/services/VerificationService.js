@@ -97,14 +97,17 @@ class VerificationService {
         Date.now() + authConfig.emailVerification.expiresInHours * 60 * 60 * 1000
       ),
     });
-
     try {
       await SendVerificationEmailService.execute({
         user,
         token,
       });
     } catch (error) {
-      await UserVerificationRepository.deleteById(verification.id);
+      try {
+        await UserVerificationRepository.deleteById(verification.id);
+      } catch (cleanupError) {
+        error.cleanupError = cleanupError;
+      }
 
       throw error;
     }

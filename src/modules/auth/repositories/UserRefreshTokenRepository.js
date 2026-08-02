@@ -12,6 +12,7 @@ class UserRefreshTokenRepository {
       where: {
         jti,
       },
+
       ...options,
     });
   }
@@ -21,6 +22,7 @@ class UserRefreshTokenRepository {
       where: {
         token_hash: tokenHash,
       },
+
       ...options,
     });
   }
@@ -30,6 +32,7 @@ class UserRefreshTokenRepository {
       where: {
         id,
       },
+
       ...options,
     });
   }
@@ -39,16 +42,18 @@ class UserRefreshTokenRepository {
       where: {
         user_id: userId,
       },
+
       ...options,
     });
   }
 
-  async rotate(sessionId, data) {
+  async rotate(sessionId, newSessionData) {
     return database.transaction(async (transaction) => {
       const deletedSessions = await UserRefreshToken.destroy({
         where: {
           id: sessionId,
         },
+
         transaction,
       });
 
@@ -56,7 +61,7 @@ class UserRefreshTokenRepository {
         return null;
       }
 
-      return UserRefreshToken.create(data, {
+      return UserRefreshToken.create(newSessionData, {
         transaction,
       });
     });

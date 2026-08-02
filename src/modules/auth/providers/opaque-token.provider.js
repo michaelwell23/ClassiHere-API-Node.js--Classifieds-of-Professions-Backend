@@ -1,28 +1,37 @@
 const { createHash, randomBytes, timingSafeEqual } = require('crypto');
 
-function generateOpaqueToken(size = 32) {
-  return randomBytes(size).toString('hex');
+function generateOpaqueToken(byteLength = 32) {
+  if (!Number.isInteger(byteLength) || byteLength < 16) {
+    throw new TypeError('Opaque token byte length must be an integer greater than or equal to 16.');
+  }
+
+  return randomBytes(byteLength).toString('hex');
 }
 
 function hashOpaqueToken(token) {
+  if (typeof token !== 'string' || !token) {
+    throw new TypeError('Opaque token must be a non-empty string.');
+  }
+
   return createHash('sha256').update(token).digest('hex');
 }
 
 function compareOpaqueToken(token, storedHash) {
-  if (!token || !storedHash) {
+  if (typeof token !== 'string' || typeof storedHash !== 'string') {
     return false;
   }
 
-  const tokenHash = hashOpaqueToken(token);
+  const calculatedHash = hashOpaqueToken(token);
 
-  const tokenBuffer = Buffer.from(tokenHash, 'hex');
+  const calculatedBuffer = Buffer.from(calculatedHash, 'hex');
+
   const storedBuffer = Buffer.from(storedHash, 'hex');
 
-  if (tokenBuffer.length !== storedBuffer.length) {
+  if (calculatedBuffer.length !== storedBuffer.length) {
     return false;
   }
 
-  return timingSafeEqual(tokenBuffer, storedBuffer);
+  return timingSafeEqual(calculatedBuffer, storedBuffer);
 }
 
 module.exports = {

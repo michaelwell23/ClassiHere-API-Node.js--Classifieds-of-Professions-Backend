@@ -97,7 +97,11 @@ class PasswordService {
         token,
       });
     } catch (error) {
-      await PasswordResetTokenRepository.markAsUsed(resetToken.id);
+      try {
+        await PasswordResetTokenRepository.deleteById(resetToken.id);
+      } catch (cleanupError) {
+        error.cleanupError = cleanupError;
+      }
 
       throw error;
     }

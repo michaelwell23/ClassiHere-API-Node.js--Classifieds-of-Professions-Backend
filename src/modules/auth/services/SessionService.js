@@ -16,6 +16,7 @@ const {
   generateJti,
   hashRefreshToken,
   verifyRefreshToken,
+  compareRefreshTokenHash,
 } = require('../providers/jwt.provider');
 
 class SessionService {
@@ -162,7 +163,9 @@ class SessionService {
 
     const presentedTokenHash = hashRefreshToken(refresh_token);
 
-    if (session.token_hash !== presentedTokenHash) {
+    const tokenMatches = compareRefreshTokenHash(refresh_token, session.token_hash);
+
+    if (!tokenMatches) {
       throw new AppError('Invalid or revoked refresh token.', 401);
     }
 

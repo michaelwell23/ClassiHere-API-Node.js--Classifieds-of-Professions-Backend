@@ -7,11 +7,15 @@ function generatePhoneVerificationCode() {
 }
 
 function hashPhoneVerificationCode(code) {
+  if (typeof code !== 'string' || !/^\d{6}$/.test(code)) {
+    throw new TypeError('Phone verification code must contain exactly 6 digits.');
+  }
+
   return createHmac('sha256', authConfig.phoneVerification.codeSecret).update(code).digest('hex');
 }
 
-function comparePhoneVerificationCode(code, storedCodeHash) {
-  if (!code || !storedCodeHash) {
+function comparePhoneVerificationCode(code, storedHash) {
+  if (typeof code !== 'string' || typeof storedHash !== 'string' || !/^\d{6}$/.test(code)) {
     return false;
   }
 
@@ -19,7 +23,7 @@ function comparePhoneVerificationCode(code, storedCodeHash) {
 
   const calculatedBuffer = Buffer.from(calculatedHash, 'hex');
 
-  const storedBuffer = Buffer.from(storedCodeHash, 'hex');
+  const storedBuffer = Buffer.from(storedHash, 'hex');
 
   if (calculatedBuffer.length !== storedBuffer.length) {
     return false;

@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 const AppError = require('../errors/AppError');
 
 const { verifyAccessToken } = require('../../modules/auth/providers/jwt.provider');
@@ -6,34 +8,38 @@ const UserRepository = require('../../modules/users/repositories/UserRepository'
 
 async function authMiddleware(request, response, next) {
   try {
-    const authHeader = request.headers.authorization;
+    const authorization = request.headers.authorization;
 
-    if (!authHeader) {
-      throw new AppError('Authentication token missing', 401);
+    if (!authorization) {
+      throw new AppError('Authentication token is required.', 401);
     }
 
-    const authParts = authHeader.trim().split(/\s+/);
+    const [scheme, token, extraValue] = authorization.trim().split(/\s+/);
 
-    if (authParts.length !== 2 || authParts[0] !== 'Bearer' || !authParts[1]) {
-      throw new AppError('Invalid authentication token format', 401);
+    if (scheme !== 'Bearer' || !token || extraValue) {
+      throw new AppError('Invalid authorization header.', 401);
     }
 
-    const token = authParts[1];
+    let payload;
 
-    const decoded = verifyAccessToken(token);
+    try {
+      payload = verifyAccessToken(token);
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new AppError('Access token has expired.', 401);
+      }
 
-    if (!decoded.sub || typeof decoded.sub !== 'string') {
-      throw new AppError('Invalid authentication token', 401);
+      throw new AppError('Invalid access token.', 401);
     }
 
-    const user = await UserRepository.findById(decoded.sub);
+    const user = await UserRepository.findById(payload.sub);
 
     if (!user) {
-      throw new AppError('Invalid authentication token', 401);
+      throw new AppError('Invalid access token.', 401);
     }
 
     if (!user.is_active) {
-      throw new AppError('User account disabled', 403);
+      throw new AppError('User account is deactivated.', 403);
     }
 
     request.user = {
@@ -43,14 +49,6 @@ async function authMiddleware(request, response, next) {
 
     return next();
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return next(new AppError('Authentication token expired', 401));
-    }
-
-    if (error.name === 'JsonWebTokenError' || error.name === 'NotBeforeError') {
-      return next(new AppError('Invalid authentication token', 401));
-    }
-
     return next(error);
   }
 }

@@ -1,4 +1,4 @@
-const { createHash, randomUUID } = require('crypto');
+const { createHash, randomUUID, timingSafeEqual } = require('crypto');
 
 const jwt = require('jsonwebtoken');
 
@@ -8,6 +8,7 @@ function generateAccessToken(userId) {
   return jwt.sign(
     {
       sub: userId,
+      type: 'access',
     },
     authConfig.jwt.accessToken.secret,
     {
@@ -20,13 +21,34 @@ function generateRefreshToken(userId, jti) {
   return jwt.sign(
     {
       sub: userId,
+      jti,
+      type: 'refresh',
     },
     authConfig.jwt.refreshToken.secret,
     {
       expiresIn: authConfig.jwt.refreshToken.expiresIn,
-      jwtid: jti,
     }
   );
+}
+
+function verifyAccessToken(token) {
+  const payload = jwt.verify(token, authConfig.jwt.accessToken.secret);
+
+  if (!payload.sub || payload.type !== 'access') {
+    throw new jwt.JsonWebTokenError('Invalid access token payload');
+  }
+
+  return payload;
+}
+
+function verifyRefreshToken(token) {
+  const payload = jwt.verify(token, authConfig.jwt.refreshToken.secret);
+
+  if (!payload.sub || !payload.jti || payload.type !== 'refresh') {
+    throw new jwt.JsonWebTokenError('Invalid refresh token payload');
+  }
+
+  return payload;
 }
 
 function generateJti() {
@@ -34,22 +56,37 @@ function generateJti() {
 }
 
 function hashRefreshToken(token) {
+  if (typeof token !== 'string' || !token) {
+    throw new TypeError('Refresh token must be a non-empty string.');
+  }
+
   return createHash('sha256').update(token).digest('hex');
 }
 
-function verifyAccessToken(token) {
-  return jwt.verify(token, authConfig.jwt.accessToken.secret);
-}
+function compareRefreshTokenHash(token, storedHash) {
+  if (typeof token !== 'string' || typeof storedHash !== 'string') {
+    return false;
+  }
 
-function verifyRefreshToken(token) {
-  return jwt.verify(token, authConfig.jwt.refreshToken.secret);
+  const calculatedHash = hashRefreshToken(token);
+
+  const calculatedBuffer = Buffer.from(calculatedHash, 'hex');
+
+  const storedBuffer = Buffer.from(storedHash, 'hex');
+
+  if (calculatedBuffer.length !== storedBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(calculatedBuffer, storedBuffer);
 }
 
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
-  generateJti,
-  hashRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
+  generateJti,
+  hashRefreshToken,
+  compareRefreshTokenHash,
 };
