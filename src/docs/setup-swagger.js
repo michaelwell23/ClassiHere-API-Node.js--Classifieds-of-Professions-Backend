@@ -5,10 +5,20 @@ const swaggerDocument = require('./swagger');
 function setupSwagger(app) {
   app.use(
     '/docs/api',
+
     swaggerUi.serve,
+
     swaggerUi.setup(swaggerDocument, {
       explorer: true,
+
       customSiteTitle: 'ClassiHere API Documentation',
+
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: true,
+      },
     })
   );
 }

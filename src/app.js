@@ -1,19 +1,20 @@
 const express = require('express');
-const path = require('path');
 
-const routes = require('./router');
+const setupSwagger = require('./docs/setup-swagger');
+
+const router = require('./router');
 
 const notFound = require('./shared/middlewares/notFound');
 const errorHandler = require('./shared/middlewares/errorHandler');
-const setupSwagger = require('./docs/setup-swagger');
 
 const app = express();
-setupSwagger(app);
 
 app.use(express.json());
-app.use('/storage', express.static(path.resolve(__dirname, '..', 'storage')));
 
-app.use(routes);
+setupSwagger(app);
+
+app.use(router);
+
 app.use(notFound);
 app.use(errorHandler);
 

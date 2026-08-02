@@ -1,32 +1,37 @@
-const environment = require('../config/environment');
-
 const authPaths = require('../modules/auth/auth.swagger');
+
 const usersPaths = require('../modules/users/users.swagger');
 
 module.exports = {
-  openapi: '3.0.0',
+  openapi: '3.0.3',
 
   info: {
     title: 'ClassiHere API',
+
     version: '1.0.0',
-    description: 'Official API for the ClassiHere platform.',
+
+    description: 'API oficial da plataforma ClassiHere.',
   },
 
   servers: [
     {
-      url: environment.appUrl,
-      description: environment.nodeEnv === 'production' ? 'Production' : 'Current environment',
+      url: 'http://localhost:3333',
+
+      description: 'Local development environment',
     },
   ],
 
   tags: [
     {
       name: 'Authentication',
-      description: 'Authentication and account security endpoints',
+
+      description: 'Authentication, session, password and identity verification endpoints.',
     },
+
     {
       name: 'Users',
-      description: 'User profile and account management endpoints',
+
+      description: 'User account and profile management endpoints.',
     },
   ],
 
@@ -36,91 +41,15 @@ module.exports = {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        description: 'JWT access token returned by the login endpoint.',
+
+        description: 'JWT access token returned by the login or refresh-token endpoint.',
       },
     },
 
     schemas: {
-      CreateUserRequest: {
-        type: 'object',
-        required: ['first_name', 'last_name', 'email', 'password', 'cpf'],
-        additionalProperties: false,
-
-        properties: {
-          first_name: {
-            type: 'string',
-            minLength: 2,
-            maxLength: 100,
-            example: 'Michael',
-          },
-
-          last_name: {
-            type: 'string',
-            minLength: 2,
-            maxLength: 100,
-            example: 'Walker',
-          },
-
-          email: {
-            type: 'string',
-            format: 'email',
-            example: 'michael.walker@example.com',
-          },
-
-          password: {
-            type: 'string',
-            format: 'password',
-            minLength: 8,
-            maxLength: 100,
-            example: 'SecurePassword123',
-          },
-
-          cpf: {
-            type: 'string',
-            example: '39053344705',
-            description:
-              'Valid Brazilian CPF. Formatting characters are accepted and removed before persistence.',
-          },
-
-          phone: {
-            type: 'string',
-            example: '11987654321',
-            description:
-              'Optional phone number. Formatting characters are removed before persistence.',
-          },
-        },
-      },
-
-      UpdateUserRequest: {
-        type: 'object',
-        minProperties: 1,
-        additionalProperties: false,
-
-        properties: {
-          first_name: {
-            type: 'string',
-            minLength: 2,
-            maxLength: 100,
-            example: 'Michael',
-          },
-
-          last_name: {
-            type: 'string',
-            minLength: 2,
-            maxLength: 100,
-            example: 'Walker',
-          },
-
-          phone: {
-            type: 'string',
-            example: '11987654321',
-            description: 'Formatting characters are removed before persistence.',
-          },
-        },
-      },
-
       User: {
         type: 'object',
+
         required: [
           'id',
           'first_name',
@@ -137,41 +66,49 @@ module.exports = {
           id: {
             type: 'string',
             format: 'uuid',
+
             example: 'd6f2f9b5-f6a5-4f0f-97b0-1c68f36a8e54',
           },
 
           first_name: {
             type: 'string',
+            minLength: 2,
+            maxLength: 100,
             example: 'Michael',
           },
 
           last_name: {
             type: 'string',
+            minLength: 2,
+            maxLength: 100,
             example: 'Walker',
           },
 
           email: {
             type: 'string',
             format: 'email',
+
             example: 'michael.walker@example.com',
           },
 
           phone: {
             type: 'string',
             nullable: true,
-            example: '11987654321',
+            example: '+5511999999999',
           },
 
           avatar_url: {
             type: 'string',
             format: 'uri',
             nullable: true,
-            example: 'http://localhost:3333/avatars/users/avatar.webp',
+
+            example:
+              'http://localhost:3333/avatars/users/a39a917d-11ad-42b7-b028-f3ecb539fd1c.webp',
           },
 
           is_email_verified: {
             type: 'boolean',
-            example: false,
+            example: true,
           },
 
           is_phone_verified: {
@@ -187,53 +124,15 @@ module.exports = {
           created_at: {
             type: 'string',
             format: 'date-time',
-            example: '2026-06-27T15:30:00.000Z',
+
+            example: '2026-08-02T15:00:00.000Z',
           },
 
           updated_at: {
             type: 'string',
             format: 'date-time',
-            example: '2026-06-27T15:30:00.000Z',
-          },
-        },
-      },
 
-      UserResponse: {
-        type: 'object',
-        required: ['success', 'data'],
-
-        properties: {
-          success: {
-            type: 'boolean',
-            example: true,
-          },
-
-          data: {
-            $ref: '#/components/schemas/User',
-          },
-        },
-      },
-
-      SuccessDataMessageResponse: {
-        type: 'object',
-        required: ['success', 'data'],
-
-        properties: {
-          success: {
-            type: 'boolean',
-            example: true,
-          },
-
-          data: {
-            type: 'object',
-            required: ['message'],
-
-            properties: {
-              message: {
-                type: 'string',
-                example: 'Operation completed successfully',
-              },
-            },
+            example: '2026-08-02T15:00:00.000Z',
           },
         },
       },
@@ -241,21 +140,31 @@ module.exports = {
       AuthTokens: {
         type: 'object',
 
+        required: ['access_token', 'refresh_token'],
+
         properties: {
           access_token: {
             type: 'string',
+
+            description: 'Short-lived JWT access token.',
+
             example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
           },
 
           refresh_token: {
             type: 'string',
+
+            description: 'Long-lived JWT refresh token used for session rotation.',
+
             example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
           },
         },
       },
 
-      LoginResponse: {
+      LoginData: {
         type: 'object',
+
+        required: ['user', 'tokens'],
 
         properties: {
           user: {
@@ -268,48 +177,169 @@ module.exports = {
         },
       },
 
-      RefreshTokenResponse: {
+      LoginRequest: {
         type: 'object',
 
+        additionalProperties: false,
+
+        required: ['email', 'password'],
+
         properties: {
-          tokens: {
-            $ref: '#/components/schemas/AuthTokens',
+          email: {
+            type: 'string',
+            format: 'email',
+
+            example: 'michael.walker@example.com',
+          },
+
+          password: {
+            type: 'string',
+            minLength: 1,
+            writeOnly: true,
+            example: '12345678',
           },
         },
       },
 
-      MeResponse: {
+      RefreshTokenRequest: {
         type: 'object',
 
+        additionalProperties: false,
+
+        required: ['refresh_token'],
+
         properties: {
-          user: {
-            $ref: '#/components/schemas/User',
+          refresh_token: {
+            type: 'string',
+            minLength: 1,
+            writeOnly: true,
+
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
           },
         },
       },
 
-      MessageResponse: {
+      ChangePasswordRequest: {
         type: 'object',
+
+        additionalProperties: false,
+
+        required: ['currentPassword', 'newPassword'],
+
+        properties: {
+          currentPassword: {
+            type: 'string',
+            minLength: 1,
+            writeOnly: true,
+            example: '12345678',
+          },
+
+          newPassword: {
+            type: 'string',
+            minLength: 8,
+            maxLength: 255,
+            writeOnly: true,
+            example: 'NewPassword123',
+          },
+        },
+      },
+
+      ForgotPasswordRequest: {
+        type: 'object',
+
+        additionalProperties: false,
+
+        required: ['email'],
+
+        properties: {
+          email: {
+            type: 'string',
+            format: 'email',
+
+            example: 'michael.walker@example.com',
+          },
+        },
+      },
+
+      ResetPasswordRequest: {
+        type: 'object',
+
+        additionalProperties: false,
+
+        required: ['resetId', 'token', 'password'],
+
+        properties: {
+          resetId: {
+            type: 'string',
+            format: 'uuid',
+
+            example: '61b32df4-dbd4-4bb0-9254-7cc7fd49d3e0',
+          },
+
+          token: {
+            type: 'string',
+            minLength: 1,
+            writeOnly: true,
+
+            example: '13cce1325d09fd2696d0348c728b608032e3f06caf0a14b8482465d5932cf048',
+          },
+
+          password: {
+            type: 'string',
+            minLength: 8,
+            maxLength: 255,
+            writeOnly: true,
+            example: 'NewPassword123',
+          },
+        },
+      },
+
+      ResendVerificationRequest: {
+        type: 'object',
+
+        additionalProperties: false,
+
+        required: ['email'],
+
+        properties: {
+          email: {
+            type: 'string',
+            format: 'email',
+
+            example: 'michael.walker@example.com',
+          },
+        },
+      },
+
+      VerifyPhoneRequest: {
+        type: 'object',
+
+        additionalProperties: false,
+
+        required: ['code'],
+
+        properties: {
+          code: {
+            type: 'string',
+
+            pattern: '^\\d{6}$',
+            minLength: 6,
+            maxLength: 6,
+
+            example: '042781',
+          },
+        },
+      },
+
+      MessageData: {
+        type: 'object',
+
+        required: ['message'],
 
         properties: {
           message: {
             type: 'string',
-            example: 'Operation completed successfully.',
-          },
-        },
-      },
 
-      SuccessMessageResponse: {
-        type: 'object',
-
-        properties: {
-          success: {
-            type: 'boolean',
-            example: true,
-          },
-
-          message: {
-            type: 'string',
             example: 'Operation completed successfully.',
           },
         },
@@ -318,20 +348,33 @@ module.exports = {
       ApiError: {
         type: 'object',
 
+        required: ['success', 'message'],
+
         properties: {
-          statusCode: {
-            type: 'integer',
-            example: 500,
+          success: {
+            type: 'boolean',
+            example: false,
           },
 
           message: {
             type: 'string',
-            example: 'Internal server error.',
+            example: 'Invalid access token.',
           },
 
-          timestamp: {
-            type: 'string',
-            format: 'date-time',
+          details: {
+            nullable: true,
+
+            description: 'Optional structured error details.',
+
+            oneOf: [
+              {
+                type: 'object',
+              },
+              {
+                type: 'array',
+                items: {},
+              },
+            ],
           },
         },
       },
@@ -339,110 +382,106 @@ module.exports = {
       ValidationError: {
         type: 'object',
 
+        required: ['success', 'message', 'details'],
+
         properties: {
-          statusCode: {
-            type: 'integer',
-            example: 400,
+          success: {
+            type: 'boolean',
+            example: false,
           },
 
           message: {
             type: 'string',
-            example: 'Validation failed.',
+            example: 'Validation failed',
           },
 
           details: {
             type: 'object',
-            nullable: true,
-            additionalProperties: true,
-          },
 
-          timestamp: {
-            type: 'string',
-            format: 'date-time',
+            required: ['formErrors', 'fieldErrors'],
+
+            properties: {
+              formErrors: {
+                type: 'array',
+
+                items: {
+                  type: 'string',
+                },
+
+                example: [],
+              },
+
+              fieldErrors: {
+                type: 'object',
+
+                additionalProperties: {
+                  type: 'array',
+
+                  items: {
+                    type: 'string',
+                  },
+                },
+
+                example: {
+                  body: ['Invalid email format.'],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    responses: {
+      Unauthorized: {
+        description: 'Authentication is required or the access token is invalid.',
+
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ApiError',
+            },
+
+            example: {
+              success: false,
+              message: 'Invalid access token.',
+            },
           },
         },
       },
 
-      UnauthorizedError: {
-        type: 'object',
+      Forbidden: {
+        description: 'Authenticated user is not allowed to perform the operation.',
 
-        properties: {
-          statusCode: {
-            type: 'integer',
-            example: 401,
-          },
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ApiError',
+            },
 
-          message: {
-            type: 'string',
-            example: 'Invalid authentication token.',
-          },
+            example: {
+              success: false,
 
-          timestamp: {
-            type: 'string',
-            format: 'date-time',
+              message: 'User account is deactivated.',
+            },
           },
         },
       },
 
-      ForbiddenError: {
-        type: 'object',
+      InternalServerError: {
+        description: 'Unexpected internal server error.',
 
-        properties: {
-          statusCode: {
-            type: 'integer',
-            example: 403,
-          },
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ApiError',
+            },
 
-          message: {
-            type: 'string',
-            example: 'Access denied.',
-          },
+            example: {
+              success: false,
 
-          timestamp: {
-            type: 'string',
-            format: 'date-time',
-          },
-        },
-      },
-
-      NotFoundError: {
-        type: 'object',
-
-        properties: {
-          statusCode: {
-            type: 'integer',
-            example: 404,
-          },
-
-          message: {
-            type: 'string',
-            example: 'Resource not found.',
-          },
-
-          timestamp: {
-            type: 'string',
-            format: 'date-time',
-          },
-        },
-      },
-
-      ConflictError: {
-        type: 'object',
-
-        properties: {
-          statusCode: {
-            type: 'integer',
-            example: 409,
-          },
-
-          message: {
-            type: 'string',
-            example: 'Resource already exists.',
-          },
-
-          timestamp: {
-            type: 'string',
-            format: 'date-time',
+              message: 'Internal server error',
+            },
           },
         },
       },
