@@ -3,35 +3,41 @@ const { Op } = require('sequelize');
 const User = require('../../../database/models/User');
 
 class UserRepository {
-  async create(data) {
-    return User.create(data);
+  async create(data, options = {}) {
+    return User.create(data, options);
   }
 
-  async findById(id) {
-    return User.findByPk(id);
+  async findById(id, options = {}) {
+    return User.findByPk(id, options);
   }
 
-  async findByEmail(email) {
+  async findByEmail(email, options = {}) {
     return User.findOne({
       where: {
         email,
       },
+
+      ...options,
     });
   }
 
-  async findByCpf(cpf) {
+  async findByCpf(cpf, options = {}) {
     return User.findOne({
       where: {
         cpf,
       },
+
+      ...options,
     });
   }
 
-  async findByPhone(phone) {
+  async findByPhone(phone, options = {}) {
     return User.findOne({
       where: {
         phone,
       },
+
+      ...options,
     });
   }
 
@@ -39,43 +45,22 @@ class UserRepository {
     return user.update(data, options);
   }
 
-  async softDelete(user) {
-    return user.destroy();
+  async softDelete(user, options = {}) {
+    return user.destroy(options);
   }
 
-  async findUsersPendingDeletion(limitDate) {
+  async findUsersPendingDeletion(limitDate, options = {}) {
     return User.findAll({
       where: {
         is_active: false,
+
         deactivated_at: {
           [Op.lte]: limitDate,
         },
       },
+
+      ...options,
     });
-  }
-
-  async softDeleteUsersPendingDeletion(limitDate, options = {}) {
-    const [affectedRows] = await User.update(
-      {
-        deleted_at: new Date(),
-      },
-      {
-        where: {
-          deletion_requested_at: {
-            [Op.lte]: limitDate,
-          },
-
-          deleted_at: null,
-
-          // Ajustar conforme os campos reais:
-          deletion_cancelled_at: null,
-        },
-
-        transaction: options.transaction,
-      }
-    );
-
-    return affectedRows;
   }
 }
 

@@ -3,8 +3,7 @@ const AppError = require('../../../shared/errors/AppError');
 const authConfig = require('../../../config/auth');
 
 const UserRepository = require('../../users/repositories/UserRepository');
-
-const UserResponseDTO = require('../../users/user-response.dto');
+const userResponseDTO = require('../../users/dtos/user-response.dto');
 
 const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
 
@@ -99,7 +98,7 @@ class SessionService {
     });
 
     return {
-      user: UserResponseDTO(updatedUser),
+      user: userResponseDTO(updatedUser),
 
       tokens: {
         access_token: accessToken,
@@ -138,7 +137,7 @@ class SessionService {
     }
 
     return {
-      user: UserResponseDTO(user),
+      user: userResponseDTO(user),
     };
   }
 
@@ -151,17 +150,11 @@ class SessionService {
       throw new AppError('Invalid or expired refresh token.', 401);
     }
 
-    if (!payload.sub || !payload.jti) {
-      throw new AppError('Invalid refresh token.', 401);
-    }
-
     const session = await UserRefreshTokenRepository.findByJti(payload.jti);
 
     if (!session) {
       throw new AppError('Invalid or revoked refresh token.', 401);
     }
-
-    const presentedTokenHash = hashRefreshToken(refresh_token);
 
     const tokenMatches = compareRefreshTokenHash(refresh_token, session.token_hash);
 
@@ -173,7 +166,7 @@ class SessionService {
       throw new AppError('Invalid refresh token.', 401);
     }
 
-    if (session.expires_at && session.expires_at <= new Date()) {
+    if (session.expires_at && session.expires_at.getTime() <= Date.now()) {
       await UserRefreshTokenRepository.deleteById(session.id);
 
       throw new AppError('Refresh token expired.', 401);
@@ -204,9 +197,7 @@ class SessionService {
     const rotatedSession = await UserRefreshTokenRepository.rotate(session.id, {
       user_id: user.id,
       jti: newJti,
-
       token_hash: hashRefreshToken(newRefreshToken),
-
       expires_at: new Date(newRefreshTokenPayload.exp * 1000),
     });
 

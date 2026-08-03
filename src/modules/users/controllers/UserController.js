@@ -1,15 +1,13 @@
-const CreateUserService = require('../CreateUser/CreateUserService');
-const GetUserService = require('../GetUser/GetUserService');
-const UpdateUserService = require('../UpdateUser/UpdateUserService');
-const DeleteUserService = require('../DeleteUser/DeleteUserService');
+const UserService = require('../services/UserService');
 
 const ChangeAccountStatusService = require('../ChangeAccountStatus/ChangeAccountStatusService');
+
 const userResponseDTO = require('../dtos/user-response.dto');
 
 class UserController {
   async create(request, response, next) {
     try {
-      const user = await CreateUserService.execute({
+      const user = await UserService.create({
         data: request.validated.body,
 
         file: request.validated.file,
@@ -27,9 +25,15 @@ class UserController {
 
   async getById(request, response, next) {
     try {
-      const user = await GetUserService.execute(request.validated.params.id);
+      const user = await UserService.getById({
+        authenticatedUserId: request.user.id,
+
+        userId: request.validated.params.id,
+      });
+
       return response.status(200).json({
         success: true,
+
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -39,14 +43,19 @@ class UserController {
 
   async update(request, response, next) {
     try {
-      const user = await UpdateUserService.execute({
-        id: request.validated.params.id,
+      const user = await UserService.update({
+        authenticatedUserId: request.user.id,
+
+        userId: request.validated.params.id,
+
         data: request.validated.body,
+
         file: request.validated.file,
       });
 
       return response.status(200).json({
         success: true,
+
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -56,7 +65,12 @@ class UserController {
 
   async remove(request, response, next) {
     try {
-      const result = await DeleteUserService.execute(request.validated.params.id);
+      const result = await UserService.remove({
+        authenticatedUserId: request.user.id,
+
+        userId: request.validated.params.id,
+      });
+
       return response.status(200).json({
         success: true,
         data: result,
@@ -70,7 +84,10 @@ class UserController {
     try {
       const result = await ChangeAccountStatusService.execute({
         id: request.validated.params.id,
+
         action: 'deactivate',
+
+        authenticatedUserId: request.user.id,
       });
 
       return response.status(200).json({
@@ -86,7 +103,10 @@ class UserController {
     try {
       const result = await ChangeAccountStatusService.execute({
         id: request.validated.params.id,
+
         action: 'reactivate',
+
+        authenticatedUserId: request.user.id,
       });
 
       return response.status(200).json({
