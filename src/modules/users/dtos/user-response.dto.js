@@ -1,15 +1,13 @@
-const environment = require('../../config/environment');
+const environment = require('../../../config/environment');
 
 function buildAvatarUrl(avatarPath) {
   if (!avatarPath) {
     return null;
   }
 
-  const normalizedBaseUrl = environment.appUrl.replace(/\/+$/, '');
-
+  const baseUrl = environment.appUrl.replace(/\/+$/, '');
   const normalizedPath = avatarPath.replace(/^\/+/, '');
-
-  return `${normalizedBaseUrl}/${normalizedPath}`;
+  return `${baseUrl}/${normalizedPath}`;
 }
 
 function userResponseDTO(user) {
