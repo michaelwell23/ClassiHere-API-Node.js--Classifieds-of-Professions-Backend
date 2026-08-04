@@ -103,6 +103,11 @@ module.exports = {
             type: Sequelize.DATE,
             allowNull: true,
           },
+
+          deletion_requested_at: {
+            type: Sequelize.DATE,
+            allowNull: true,
+          },
         },
         {
           transaction,
@@ -149,6 +154,18 @@ module.exports = {
         `
           CREATE UNIQUE INDEX users_email_lower_unique
           ON users (LOWER(email));
+        `,
+        {
+          transaction,
+        }
+      );
+
+      await queryInterface.sequelize.query(
+        `
+          CREATE INDEX users_pending_deletion_idx
+          ON users (deletion_requested_at)
+          WHERE deletion_requested_at IS NOT NULL
+          AND deleted_at IS NULL;
         `,
         {
           transaction,

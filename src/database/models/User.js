@@ -73,6 +73,11 @@ class User extends Model {
           allowNull: true,
         },
 
+        deletion_requested_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
+
         last_login_at: {
           type: DataTypes.DATE,
           allowNull: true,

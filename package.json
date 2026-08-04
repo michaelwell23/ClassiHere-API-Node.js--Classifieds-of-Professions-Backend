@@ -8,7 +8,7 @@
     "lint": "eslint . --fix",
     "format": "prettier --write .",
     "prepare": "husky",
-    "delete-inactive-users": "node src/shared/jobs/DeleteInactiveUsers/run.js"
+    "delete-inactive-users": "node src/modules/users/jobs/run-delete-inactive-users.js"
   },
   "lint-staged": {
     "**/*.js": [

@@ -26,11 +26,5 @@ usersRoutes.patch(
   validate(userIdDTO),
   UserController.deactivate
 );
-usersRoutes.patch(
-  '/:id/reactivate',
-  authMiddleware,
-  validate(userIdDTO),
-  UserController.reactivate
-);
 
 module.exports = usersRoutes;

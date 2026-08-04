@@ -1,6 +1,6 @@
 const UserService = require('../services/UserService');
 
-const ChangeAccountStatusService = require('../ChangeAccountStatus/ChangeAccountStatusService');
+const AccountLifecycleService = require('../services/AccountLifecycleService');
 
 const userResponseDTO = require('../dtos/user-response.dto');
 
@@ -9,13 +9,11 @@ class UserController {
     try {
       const user = await UserService.create({
         data: request.validated.body,
-
         file: request.validated.file,
       });
 
       return response.status(201).json({
         success: true,
-
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -27,13 +25,11 @@ class UserController {
     try {
       const user = await UserService.getById({
         authenticatedUserId: request.user.id,
-
         userId: request.validated.params.id,
       });
 
       return response.status(200).json({
         success: true,
-
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -45,17 +41,13 @@ class UserController {
     try {
       const user = await UserService.update({
         authenticatedUserId: request.user.id,
-
         userId: request.validated.params.id,
-
         data: request.validated.body,
-
         file: request.validated.file,
       });
 
       return response.status(200).json({
         success: true,
-
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -67,7 +59,6 @@ class UserController {
     try {
       const result = await UserService.remove({
         authenticatedUserId: request.user.id,
-
         userId: request.validated.params.id,
       });
 
@@ -82,11 +73,9 @@ class UserController {
 
   async deactivate(request, response, next) {
     try {
-      const result = await ChangeAccountStatusService.execute({
+      const result = await AccountLifecycleService.deactivate({
         id: request.validated.params.id,
-
         action: 'deactivate',
-
         authenticatedUserId: request.user.id,
       });
 
@@ -101,11 +90,9 @@ class UserController {
 
   async reactivate(request, response, next) {
     try {
-      const result = await ChangeAccountStatusService.execute({
+      const result = await AccountLifecycleService.reactivate({
         id: request.validated.params.id,
-
         action: 'reactivate',
-
         authenticatedUserId: request.user.id,
       });
 

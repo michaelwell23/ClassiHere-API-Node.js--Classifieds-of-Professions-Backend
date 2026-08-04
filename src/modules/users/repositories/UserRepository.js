@@ -49,18 +49,27 @@ class UserRepository {
     return user.destroy(options);
   }
 
-  async findUsersPendingDeletion(limitDate, options = {}) {
-    return User.findAll({
-      where: {
-        is_active: false,
-
-        deactivated_at: {
-          [Op.lte]: limitDate,
-        },
+  async softDeleteUsersPendingDeletion(limitDate, options = {}) {
+    const [affectedRows] = await User.update(
+      {
+        deleted_at: new Date(),
       },
+      {
+        where: {
+          deletion_requested_at: {
+            [Op.lte]: limitDate,
+          },
 
-      ...options,
-    });
+          deleted_at: null,
+        },
+
+        paranoid: false,
+
+        ...options,
+      }
+    );
+
+    return affectedRows;
   }
 }
 

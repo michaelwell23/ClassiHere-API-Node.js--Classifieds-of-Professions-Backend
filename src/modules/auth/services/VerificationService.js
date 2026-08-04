@@ -11,7 +11,6 @@ const UserVerificationRepository = require('../repositories/UserVerificationRepo
 const UserPhoneVerificationRepository = require('../repositories/UserPhoneVerificationRepository');
 
 const SendVerificationEmailService = require('../mail/SendVerificationEmailService');
-
 const LocalPhoneProvider = require('../../../shared/providers/phone/local.provider');
 
 const { generateOpaqueToken, hashOpaqueToken } = require('../providers/opaque-token.provider');
