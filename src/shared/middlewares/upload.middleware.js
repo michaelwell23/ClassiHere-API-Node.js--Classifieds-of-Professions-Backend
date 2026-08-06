@@ -1,30 +1,30 @@
 const fs = require('fs');
 const path = require('path');
-const { randomUUID } = require('crypto');
+const crypto = require('crypto');
 
 const multer = require('multer');
 
 const uploadConfig = require('../../config/upload');
+
 const AppError = require('../errors/AppError');
 
-fs.mkdirSync(uploadConfig.temporaryDirectory, {
+fs.mkdirSync(uploadConfig.avatars.temporaryDirectory, {
   recursive: true,
 });
 
 const storage = multer.diskStorage({
   destination(request, file, callback) {
-    callback(null, uploadConfig.temporaryDirectory);
+    return callback(null, uploadConfig.avatars.temporaryDirectory);
   },
 
   filename(request, file, callback) {
     const extension = path.extname(file.originalname).toLowerCase();
-
-    callback(null, `${randomUUID()}${extension}`);
+    return callback(null, `${crypto.randomUUID()}${extension}`);
   },
 });
 
 function fileFilter(request, file, callback) {
-  const { allowedMimeTypes } = uploadConfig.avatar;
+  const allowedMimeTypes = uploadConfig.avatars.allowedMimeTypes;
 
   if (!allowedMimeTypes.includes(file.mimetype)) {
     return callback(new AppError('Only JPEG, PNG and WebP images are allowed.', 400));
@@ -35,9 +35,8 @@ function fileFilter(request, file, callback) {
 
 module.exports = multer({
   storage,
-
   limits: {
-    fileSize: uploadConfig.avatar.maxFileSize,
+    fileSize: uploadConfig.avatars.maximumFileSize,
     files: 1,
   },
 
