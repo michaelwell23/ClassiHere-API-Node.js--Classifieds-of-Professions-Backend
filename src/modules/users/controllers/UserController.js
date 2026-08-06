@@ -9,11 +9,13 @@ class UserController {
     try {
       const user = await UserService.create({
         data: request.validated.body,
+
         file: request.validated.file,
       });
 
       return response.status(201).json({
         success: true,
+
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -25,11 +27,13 @@ class UserController {
     try {
       const user = await UserService.getById({
         authenticatedUserId: request.user.id,
+
         userId: request.validated.params.id,
       });
 
       return response.status(200).json({
         success: true,
+
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -41,13 +45,17 @@ class UserController {
     try {
       const user = await UserService.update({
         authenticatedUserId: request.user.id,
+
         userId: request.validated.params.id,
+
         data: request.validated.body,
+
         file: request.validated.file,
       });
 
       return response.status(200).json({
         success: true,
+
         data: userResponseDTO(user),
       });
     } catch (error) {
@@ -57,12 +65,13 @@ class UserController {
 
   async remove(request, response, next) {
     try {
-      const result = await UserService.remove({
+      const result = await AccountLifecycleService.requestDeletion({
         authenticatedUserId: request.user.id,
+
         userId: request.validated.params.id,
       });
 
-      return response.status(200).json({
+      return response.status(202).json({
         success: true,
         data: result,
       });
@@ -74,26 +83,9 @@ class UserController {
   async deactivate(request, response, next) {
     try {
       const result = await AccountLifecycleService.deactivate({
-        id: request.validated.params.id,
-        action: 'deactivate',
         authenticatedUserId: request.user.id,
-      });
 
-      return response.status(200).json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-  async reactivate(request, response, next) {
-    try {
-      const result = await AccountLifecycleService.reactivate({
-        id: request.validated.params.id,
-        action: 'reactivate',
-        authenticatedUserId: request.user.id,
+        userId: request.validated.params.id,
       });
 
       return response.status(200).json({
