@@ -68,11 +68,12 @@ const createUserDTO = z
           .max(255, 'Password must contain at most 255 characters.'),
 
         phone: z
-          .string()
+          .string({
+            required_error: 'Phone is required.',
+          })
           .trim()
           .min(10, 'Phone must contain at least 10 digits.')
-          .max(20, 'Phone must contain at most 20 characters.')
-          .optional(),
+          .max(20, 'Phone must contain at most 20 characters.'),
 
         cpf: z
           .string({

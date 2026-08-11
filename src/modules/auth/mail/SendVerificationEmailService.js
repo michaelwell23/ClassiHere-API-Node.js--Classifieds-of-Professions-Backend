@@ -1,9 +1,10 @@
 const environment = require('../../../config/environment');
+
 const authConfig = require('../../../config/auth');
 
 const { sendMail } = require('../../../shared/providers/mail/smtp.provider');
 
-const verifyEmailTemplate = require('../mail/templates/verify-email.template');
+const verifyEmailTemplate = require('./templates/verify-email.template');
 
 class SendVerificationEmailService {
   async execute({ user, token }) {
@@ -12,7 +13,7 @@ class SendVerificationEmailService {
     verificationUrl.searchParams.set('token', token);
 
     const message = verifyEmailTemplate({
-      userName: user.first_name || user.name || 'usuário',
+      userName: user.first_name,
       verificationLink: verificationUrl.toString(),
       expiresInHours: authConfig.emailVerification.expiresInHours,
     });

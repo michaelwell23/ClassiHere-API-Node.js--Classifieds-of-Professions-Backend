@@ -1,7 +1,9 @@
 const path = require('path');
 
 const storageDirectory = path.resolve(process.cwd(), 'storage');
+
 const temporaryAvatarDirectory = path.resolve(storageDirectory, 'tmp', 'avatars');
+
 const userAvatarDirectory = path.resolve(storageDirectory, 'avatars', 'users');
 
 module.exports = {

@@ -1,11 +1,14 @@
+const database = require('../../../database');
+
 const AppError = require('../../../shared/errors/AppError');
 
 const UserRepository = require('../repositories/UserRepository');
 
+const AccountVerificationService = require('./AccountVerificationService');
+
 const avatarProcessor = require('../providers/avatar.processor');
 
 const storageProvider = require('../../../shared/providers/storage/local.provider');
-
 const { hashPassword } = require('../../../shared/providers/hash/bcrypt.provider');
 
 class UserService {
@@ -14,11 +17,8 @@ class UserService {
 
     try {
       const email = data.email.trim().toLowerCase();
-
       const cpf = data.cpf.replace(/\D/g, '');
-
       const phone = data.phone ? data.phone.replace(/\D/g, '') : null;
-
       const existingEmail = await UserRepository.findByEmail(email);
 
       if (existingEmail) {
@@ -26,14 +26,12 @@ class UserService {
       }
 
       const existingCpf = await UserRepository.findByCpf(cpf);
-
       if (existingCpf) {
         throw new AppError('CPF is already registered.', 409);
       }
 
       if (phone) {
         const existingPhone = await UserRepository.findByPhone(phone);
-
         if (existingPhone) {
           throw new AppError('Phone is already registered.', 409);
         }
@@ -45,28 +43,52 @@ class UserService {
         processedAvatarPath = await avatarProcessor.process(file.path);
       }
 
-      return await UserRepository.create({
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email,
-        password_hash: passwordHash,
-        phone,
-        cpf,
+      let user;
+      let verification;
 
-        avatar_path: processedAvatarPath,
+      await database.transaction(async (transaction) => {
+        user = await UserRepository.create(
+          {
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email,
+            password_hash: passwordHash,
+            phone,
+            cpf,
+            avatar_path: processedAvatarPath,
+            is_email_verified: false,
+            is_phone_verified: false,
+            is_active: true,
+            failed_login_attempts: 0,
+            locked_until: null,
+          },
+          {
+            transaction,
+          }
+        );
 
-        is_email_verified: false,
-        is_phone_verified: false,
-        is_active: true,
-        failed_login_attempts: 0,
-        locked_until: null,
+        verification = await AccountVerificationService.prepare({
+          user,
+          transaction,
+        });
       });
-    } catch (error) {
-      const filePathToDelete = processedAvatarPath || file?.path;
 
-      if (filePathToDelete) {
+      await AccountVerificationService.dispatch({
+        user,
+        verification,
+      });
+
+      return user;
+    } catch (error) {
+      if (processedAvatarPath) {
         try {
-          await storageProvider.delete(filePathToDelete);
+          await storageProvider.delete(processedAvatarPath);
+        } catch (cleanupError) {
+          error.cleanupError = cleanupError;
+        }
+      } else if (file?.path) {
+        try {
+          await storageProvider.delete(file.path);
         } catch (cleanupError) {
           error.cleanupError = cleanupError;
         }
@@ -137,33 +159,37 @@ class UserService {
       }
 
       const previousAvatarPath = user.avatar_path;
-
       const updatedUser = await UserRepository.update(user, updateData);
 
       if (processedAvatarPath && previousAvatarPath) {
         try {
           await storageProvider.delete(previousAvatarPath);
         } catch (cleanupError) {
-          cleanupError.userId = user.id;
-
-          cleanupError.filePath = previousAvatarPath;
-
           console.error({
-            name: cleanupError.name,
-            message: cleanupError.message,
-            userId: cleanupError.userId,
-            filePath: cleanupError.filePath,
+            event: 'previous_avatar_cleanup_failed',
+
+            userId: user.id,
+
+            error: {
+              name: cleanupError.name,
+
+              message: cleanupError.message,
+            },
           });
         }
       }
 
       return updatedUser;
     } catch (error) {
-      const filePathToDelete = processedAvatarPath || file?.path;
-
-      if (filePathToDelete) {
+      if (processedAvatarPath) {
         try {
-          await storageProvider.delete(filePathToDelete);
+          await storageProvider.delete(processedAvatarPath);
+        } catch (cleanupError) {
+          error.cleanupError = cleanupError;
+        }
+      } else if (file?.path) {
+        try {
+          await storageProvider.delete(file.path);
         } catch (cleanupError) {
           error.cleanupError = cleanupError;
         }
@@ -171,24 +197,6 @@ class UserService {
 
       throw error;
     }
-  }
-
-  async remove({ authenticatedUserId, userId }) {
-    if (authenticatedUserId !== userId) {
-      throw new AppError('You are not allowed to delete this user.', 403);
-    }
-
-    const user = await UserRepository.findById(userId);
-
-    if (!user) {
-      throw new AppError('User not found.', 404);
-    }
-
-    await UserRepository.softDelete(user);
-
-    return {
-      message: 'User deleted successfully.',
-    };
   }
 }
 

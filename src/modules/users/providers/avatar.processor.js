@@ -7,34 +7,59 @@ const uploadConfig = require('../../../config/upload');
 
 class AvatarProcessor {
   async process(filePath) {
-    if (!filePath) {
-      return null;
+    if (typeof filePath !== 'string' || !filePath) {
+      throw new TypeError('Avatar file path is required.');
     }
 
-    await fs.mkdir(uploadConfig.avatarsDirectory, {
+    const { destinationDirectory, relativeDirectory, width, height, quality } =
+      uploadConfig.avatars;
+
+    if (!destinationDirectory) {
+      throw new Error('Avatar destination directory is not configured.');
+    }
+
+    await fs.mkdir(destinationDirectory, {
       recursive: true,
     });
 
     const filename = `${path.parse(filePath).name}.webp`;
-    const destination = path.resolve(uploadConfig.avatarsDirectory, filename);
+    const destinationPath = path.resolve(destinationDirectory, filename);
 
     try {
       await sharp(filePath)
         .rotate()
-        .resize(uploadConfig.avatar.width, uploadConfig.avatar.height, {
+        .resize(width, height, {
           fit: 'cover',
           position: 'centre',
         })
         .webp({
-          quality: uploadConfig.avatar.quality,
+          quality,
         })
-        .toFile(destination);
+        .toFile(destinationPath);
 
       await fs.unlink(filePath);
 
-      return `avatars/users/${filename}`;
+      return path.posix.join(relativeDirectory, filename);
     } catch (error) {
-      await Promise.allSettled([fs.unlink(filePath), fs.unlink(destination)]);
+      try {
+        await fs.unlink(destinationPath);
+      } catch (cleanupError) {
+        if (cleanupError.code !== 'ENOENT') {
+          error.cleanupError = cleanupError;
+        }
+      }
+
+      try {
+        await fs.unlink(filePath);
+      } catch (cleanupError) {
+        if (cleanupError.code !== 'ENOENT') {
+          if (!error.cleanupErrors) {
+            error.cleanupErrors = [];
+          }
+
+          error.cleanupErrors.push(cleanupError);
+        }
+      }
 
       throw error;
     }

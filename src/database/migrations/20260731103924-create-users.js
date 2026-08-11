@@ -2,182 +2,132 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const transaction = await queryInterface.sequelize.transaction();
+    await queryInterface.createTable('users', {
+      id: {
+        type: Sequelize.UUID,
+        primaryKey: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
+      },
 
-    try {
-      await queryInterface.createTable(
-        'users',
-        {
-          id: {
-            type: Sequelize.UUID,
-            allowNull: false,
-            defaultValue: Sequelize.UUIDV4,
-            primaryKey: true,
-          },
+      first_name: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
 
-          first_name: {
-            type: Sequelize.STRING(100),
-            allowNull: false,
-          },
+      last_name: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
 
-          last_name: {
-            type: Sequelize.STRING(100),
-            allowNull: false,
-          },
-
-          email: {
-            type: Sequelize.STRING(254),
-            allowNull: false,
-          },
-
-          password_hash: {
-            type: Sequelize.STRING(255),
-            allowNull: false,
-          },
-
-          phone: {
-            type: Sequelize.STRING(20),
-            allowNull: true,
-          },
-
-          avatar_path: {
-            type: Sequelize.STRING(500),
-            allowNull: true,
-          },
-
-          cpf: {
-            type: Sequelize.STRING(11),
-            allowNull: false,
-          },
-
-          is_email_verified: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-          },
-
-          is_phone_verified: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-          },
-
-          is_active: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: true,
-          },
-
-          deactivated_at: {
-            type: Sequelize.DATE,
-            allowNull: true,
-          },
-
-          last_login_at: {
-            type: Sequelize.DATE,
-            allowNull: true,
-          },
-
-          failed_login_attempts: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-          },
-
-          locked_until: {
-            type: Sequelize.DATE,
-            allowNull: true,
-          },
-
-          created_at: {
-            type: Sequelize.DATE,
-            allowNull: false,
-          },
-
-          updated_at: {
-            type: Sequelize.DATE,
-            allowNull: false,
-          },
-
-          deleted_at: {
-            type: Sequelize.DATE,
-            allowNull: true,
-          },
-
-          deletion_requested_at: {
-            type: Sequelize.DATE,
-            allowNull: true,
-          },
-        },
-        {
-          transaction,
-        }
-      );
-
-      await queryInterface.addIndex('users', ['cpf'], {
-        name: 'users_cpf_unique',
+      email: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
         unique: true,
-        transaction,
-      });
+      },
 
-      await queryInterface.addIndex('users', ['phone'], {
-        name: 'users_phone_idx',
-        transaction,
-      });
+      password_hash: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+      },
 
-      await queryInterface.addConstraint('users', {
-        fields: ['failed_login_attempts'],
-        type: 'check',
-        name: 'users_failed_login_attempts_non_negative_check',
+      phone: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+        unique: true,
+      },
 
-        where: {
-          failed_login_attempts: {
-            [Sequelize.Op.gte]: 0,
-          },
-        },
+      cpf: {
+        type: Sequelize.STRING(11),
+        allowNull: false,
+        unique: true,
+      },
 
-        transaction,
-      });
+      avatar_path: {
+        type: Sequelize.STRING(500),
+        allowNull: true,
+      },
 
-      await queryInterface.sequelize.query(
-        `
-          ALTER TABLE users
-          ADD CONSTRAINT users_cpf_format_check
-          CHECK (cpf ~ '^[0-9]{11}$');
-        `,
-        {
-          transaction,
-        }
-      );
+      is_email_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
 
-      await queryInterface.sequelize.query(
-        `
-          CREATE UNIQUE INDEX users_email_lower_unique
-          ON users (LOWER(email));
-        `,
-        {
-          transaction,
-        }
-      );
+      is_phone_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
 
-      await queryInterface.sequelize.query(
-        `
-          CREATE INDEX users_pending_deletion_idx
-          ON users (deletion_requested_at)
-          WHERE deletion_requested_at IS NOT NULL
-          AND deleted_at IS NULL;
-        `,
-        {
-          transaction,
-        }
-      );
+      is_active: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
 
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
+      deactivated_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
 
-      throw error;
-    }
+      deletion_requested_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+
+      last_login_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+
+      failed_login_attempts: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      locked_until: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+
+      deleted_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+    });
+
+    await queryInterface.addIndex('users', ['email'], {
+      unique: true,
+      name: 'users_email_unique',
+    });
+
+    await queryInterface.addIndex('users', ['cpf'], {
+      unique: true,
+      name: 'users_cpf_unique',
+    });
+
+    await queryInterface.addIndex('users', ['phone'], {
+      unique: true,
+      name: 'users_phone_unique',
+    });
+
+    await queryInterface.addIndex('users', ['deletion_requested_at'], {
+      name: 'users_deletion_requested_at_idx',
+    });
   },
 
   async down(queryInterface) {

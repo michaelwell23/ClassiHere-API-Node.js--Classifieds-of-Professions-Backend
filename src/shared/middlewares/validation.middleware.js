@@ -4,12 +4,23 @@ const storageProvider = require('../providers/storage/local.provider');
 
 function validate(schema) {
   return async (request, response, next) => {
-    const result = schema.safeParse({
+    const payload = {
       body: request.body,
-      params: request.params,
-      query: request.query,
-      file: request.file,
-    });
+    };
+
+    if (request.params && Object.keys(request.params).length > 0) {
+      payload.params = request.params;
+    }
+
+    if (request.query && Object.keys(request.query).length > 0) {
+      payload.query = request.query;
+    }
+
+    if (request.file) {
+      payload.file = request.file;
+    }
+
+    const result = schema.safeParse(payload);
 
     if (!result.success) {
       const validationError = new AppError('Validation failed', 400, result.error.flatten());

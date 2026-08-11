@@ -24,9 +24,7 @@ const storage = multer.diskStorage({
 });
 
 function fileFilter(request, file, callback) {
-  const allowedMimeTypes = uploadConfig.avatars.allowedMimeTypes;
-
-  if (!allowedMimeTypes.includes(file.mimetype)) {
+  if (!uploadConfig.avatars.allowedMimeTypes.includes(file.mimetype)) {
     return callback(new AppError('Only JPEG, PNG and WebP images are allowed.', 400));
   }
 
@@ -35,8 +33,10 @@ function fileFilter(request, file, callback) {
 
 module.exports = multer({
   storage,
+
   limits: {
     fileSize: uploadConfig.avatars.maximumFileSize,
+
     files: 1,
   },
 
