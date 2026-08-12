@@ -42,9 +42,15 @@ async function authMiddleware(request, response, next) {
       throw new AppError('User account is deactivated.', 403);
     }
 
+    if (!user.is_email_verified) {
+      throw new AppError('Email verification is required.', 403);
+    }
+
     request.user = {
       id: user.id,
       email: user.email,
+      is_email_verified: user.is_email_verified,
+      is_phone_verified: user.is_phone_verified,
     };
 
     return next();

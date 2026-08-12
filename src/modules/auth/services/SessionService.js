@@ -3,6 +3,7 @@ const AppError = require('../../../shared/errors/AppError');
 const authConfig = require('../../../config/auth');
 
 const UserRepository = require('../../users/repositories/UserRepository');
+
 const userResponseDTO = require('../../users/dtos/user-response.dto');
 
 const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepository');
@@ -14,8 +15,8 @@ const {
   generateRefreshToken,
   generateJti,
   hashRefreshToken,
-  verifyRefreshToken,
   compareRefreshTokenHash,
+  verifyRefreshToken,
 } = require('../providers/jwt.provider');
 
 class SessionService {
@@ -59,6 +60,7 @@ class SessionService {
 
         await UserRepository.update(user, {
           failed_login_attempts: attempts,
+
           locked_until: lockedUntil,
         });
 
@@ -70,20 +72,30 @@ class SessionService {
 
       await UserRepository.update(user, {
         failed_login_attempts: attempts,
+
         locked_until: null,
       });
 
       throw new AppError('Invalid email or password.', 401);
     }
 
+    if (user.failed_login_attempts > 0 || user.locked_until) {
+      await UserRepository.update(user, {
+        failed_login_attempts: 0,
+        locked_until: null,
+      });
+    }
+
+    if (!user.is_email_verified) {
+      throw new AppError('Email verification is required.', 403);
+    }
+
     const jti = generateJti();
 
     const accessToken = generateAccessToken(user.id);
-
     const refreshToken = generateRefreshToken(user.id, jti);
 
     const refreshTokenPayload = verifyRefreshToken(refreshToken);
-
     await UserRefreshTokenRepository.create({
       user_id: user.id,
       jti,
@@ -92,14 +104,11 @@ class SessionService {
     });
 
     const updatedUser = await UserRepository.update(user, {
-      failed_login_attempts: 0,
-      locked_until: null,
       last_login_at: now,
     });
 
     return {
       user: userResponseDTO(updatedUser),
-
       tokens: {
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -109,7 +118,6 @@ class SessionService {
 
   async logout({ refresh_token }) {
     const tokenHash = hashRefreshToken(refresh_token);
-
     const session = await UserRefreshTokenRepository.findByTokenHash(tokenHash);
 
     if (session) {
@@ -123,7 +131,6 @@ class SessionService {
 
   async logoutAll({ authenticatedUserId }) {
     await UserRefreshTokenRepository.deleteAllByUserId(authenticatedUserId);
-
     return {
       message: 'All sessions have been revoked successfully.',
     };
@@ -166,7 +173,7 @@ class SessionService {
       throw new AppError('Invalid refresh token.', 401);
     }
 
-    if (session.expires_at && session.expires_at.getTime() <= Date.now()) {
+    if (session.expires_at <= new Date()) {
       await UserRefreshTokenRepository.deleteById(session.id);
 
       throw new AppError('Refresh token expired.', 401);
@@ -186,19 +193,21 @@ class SessionService {
       throw new AppError('User account is deactivated.', 403);
     }
 
+    if (!user.is_email_verified) {
+      await UserRefreshTokenRepository.deleteAllByUserId(user.id);
+
+      throw new AppError('Email verification is required.', 403);
+    }
+
     const newJti = generateJti();
-
-    const accessToken = generateAccessToken(user.id);
-
+    const newAccessToken = generateAccessToken(user.id);
     const newRefreshToken = generateRefreshToken(user.id, newJti);
-
-    const newRefreshTokenPayload = verifyRefreshToken(newRefreshToken);
-
+    const newRefreshPayload = verifyRefreshToken(newRefreshToken);
     const rotatedSession = await UserRefreshTokenRepository.rotate(session.id, {
       user_id: user.id,
       jti: newJti,
       token_hash: hashRefreshToken(newRefreshToken),
-      expires_at: new Date(newRefreshTokenPayload.exp * 1000),
+      expires_at: new Date(newRefreshPayload.exp * 1000),
     });
 
     if (!rotatedSession) {
@@ -207,7 +216,7 @@ class SessionService {
 
     return {
       tokens: {
-        access_token: accessToken,
+        access_token: newAccessToken,
         refresh_token: newRefreshToken,
       },
     };
