@@ -23,13 +23,9 @@ const {
 const authRoutes = Router();
 
 authRoutes.post('/login', validate(loginDTO), SessionController.login);
-
 authRoutes.post('/logout', validate(logoutDTO), SessionController.logout);
-
 authRoutes.post('/logout-all', authMiddleware, SessionController.logoutAll);
-
 authRoutes.get('/me', authMiddleware, SessionController.me);
-
 authRoutes.post('/refresh-token', validate(refreshTokenDTO), SessionController.refresh);
 
 authRoutes.patch(
@@ -40,7 +36,6 @@ authRoutes.patch(
 );
 
 authRoutes.post('/forgot-password', validate(forgotPasswordDTO), PasswordController.forgot);
-
 authRoutes.post('/reset-password', validate(resetPasswordDTO), PasswordController.reset);
 
 authRoutes.get(

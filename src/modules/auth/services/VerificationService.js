@@ -23,9 +23,7 @@ class VerificationService {
 
     const verification = await UserVerificationRepository.create({
       user_id: user.id,
-
       token_hash: hashOpaqueToken(token),
-
       expires_at: new Date(
         Date.now() + authConfig.emailVerification.expiresInHours * 60 * 60 * 1000
       ),
@@ -62,11 +60,8 @@ class VerificationService {
 
     const verification = await UserPhoneVerificationRepository.create({
       user_id: user.id,
-
       code_hash: hashPhoneVerificationCode(code),
-
       expires_at: new Date(Date.now() + authConfig.phoneVerification.expiresInMinutes * 60 * 1000),
-
       attempts: 0,
     });
 
@@ -74,7 +69,6 @@ class VerificationService {
       await LocalPhoneProvider.send({
         phone: user.phone,
         code,
-
         expiresAt: verification.expires_at,
       });
     } catch (error) {
@@ -96,7 +90,6 @@ class VerificationService {
 
   async verifyEmail({ token }) {
     const tokenHash = hashOpaqueToken(token);
-
     const verification = await UserVerificationRepository.findActiveByTokenHash(tokenHash);
 
     if (!verification) {
@@ -105,7 +98,7 @@ class VerificationService {
 
     const user = await UserRepository.findById(verification.user_id);
 
-    if (!user || !user.is_active) {
+    if (!user) {
       throw new AppError('Invalid or expired verification token.', 400);
     }
 
