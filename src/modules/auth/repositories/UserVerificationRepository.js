@@ -1,36 +1,69 @@
 const { Op } = require('sequelize');
 
-const UserVerification = require('../../../database/models/UserVerification');
+const UserPhoneVerification = require('../../../database/models/UserPhoneVerification');
 
-class UserVerificationRepository {
+class UserPhoneVerificationRepository {
   async create(data, options = {}) {
-    return UserVerification.create(data, options);
+    return UserPhoneVerification.create(data, options);
   }
 
-  async findActiveByTokenHash(tokenHash, options = {}) {
-    return UserVerification.findOne({
+  async findLatestPendingByUserId(userId, options = {}) {
+    return UserPhoneVerification.findOne({
       where: {
-        token_hash: tokenHash,
-        used_at: null,
-
-        expires_at: {
-          [Op.gt]: new Date(),
-        },
+        user_id: userId,
+        verified_at: null,
       },
+
+      order: [['created_at', 'DESC']],
 
       ...options,
     });
   }
 
-  async markAsUsed(id, options = {}) {
-    const [updatedRows] = await UserVerification.update(
+  async findRecentPendingByUserId(userId, createdAfter, options = {}) {
+    return UserPhoneVerification.findOne({
+      where: {
+        user_id: userId,
+        verified_at: null,
+
+        created_at: {
+          [Op.gte]: createdAfter,
+        },
+      },
+
+      order: [['created_at', 'DESC']],
+
+      ...options,
+    });
+  }
+
+  async incrementAttempts(id, options = {}) {
+    const [affectedRows] = await UserPhoneVerification.increment(
       {
-        used_at: new Date(),
+        attempts: 1,
       },
       {
         where: {
           id,
-          used_at: null,
+          verified_at: null,
+        },
+
+        ...options,
+      }
+    );
+
+    return affectedRows;
+  }
+
+  async markAsVerified(id, options = {}) {
+    const [updatedRows] = await UserPhoneVerification.update(
+      {
+        verified_at: new Date(),
+      },
+      {
+        where: {
+          id,
+          verified_at: null,
         },
 
         ...options,
@@ -40,31 +73,15 @@ class UserVerificationRepository {
     return updatedRows > 0;
   }
 
-  async invalidateAllByUserId(userId, options = {}) {
-    return UserVerification.update(
+  async invalidatePendingByUserIdExcept(userId, excludedVerificationId, options = {}) {
+    return UserPhoneVerification.update(
       {
-        used_at: new Date(),
+        verified_at: new Date(),
       },
       {
         where: {
           user_id: userId,
-          used_at: null,
-        },
-
-        ...options,
-      }
-    );
-  }
-
-  async invalidateOthersByUserId(userId, excludedVerificationId, options = {}) {
-    return UserVerification.update(
-      {
-        used_at: new Date(),
-      },
-      {
-        where: {
-          user_id: userId,
-          used_at: null,
+          verified_at: null,
 
           id: {
             [Op.ne]: excludedVerificationId,
@@ -77,7 +94,7 @@ class UserVerificationRepository {
   }
 
   async deleteById(id, options = {}) {
-    return UserVerification.destroy({
+    return UserPhoneVerification.destroy({
       where: {
         id,
       },
@@ -87,4 +104,4 @@ class UserVerificationRepository {
   }
 }
 
-module.exports = new UserVerificationRepository();
+module.exports = new UserPhoneVerificationRepository();
