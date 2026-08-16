@@ -294,23 +294,6 @@ module.exports = {
         },
       },
 
-      ResendVerificationRequest: {
-        type: 'object',
-
-        additionalProperties: false,
-
-        required: ['email'],
-
-        properties: {
-          email: {
-            type: 'string',
-            format: 'email',
-
-            example: 'michael.walker@example.com',
-          },
-        },
-      },
-
       VerifyPhoneRequest: {
         type: 'object',
 

@@ -19,8 +19,13 @@ const {
 } = require('../../auth/providers/phone-verification-code.provider');
 
 class AccountVerificationService {
-  async prepare({ user, transaction }) {
+  async prepareInitialVerification({ user, transaction }) {
     const emailToken = generateOpaqueToken();
+
+    await UserVerificationRepository.invalidateAllByUserId(user.id, {
+      transaction,
+    });
+
     const emailVerification = await UserVerificationRepository.create(
       {
         user_id: user.id,
@@ -28,7 +33,6 @@ class AccountVerificationService {
         expires_at: new Date(
           Date.now() + authConfig.emailVerification.expiresInHours * 60 * 60 * 1000
         ),
-
         used_at: null,
       },
       {
@@ -41,6 +45,7 @@ class AccountVerificationService {
 
     if (user.phone) {
       phoneCode = generatePhoneVerificationCode();
+
       phoneVerification = await UserPhoneVerificationRepository.create(
         {
           user_id: user.id,
@@ -71,24 +76,67 @@ class AccountVerificationService {
     };
   }
 
-  async dispatch({ user, verification }) {
-    const results = await Promise.allSettled([
+  async preparePhoneVerification({ user, transaction }) {
+    if (!user.phone) {
+      return null;
+    }
+
+    const code = generatePhoneVerificationCode();
+
+    const verification = await UserPhoneVerificationRepository.create(
+      {
+        user_id: user.id,
+        code_hash: hashPhoneVerificationCode(code),
+
+        expires_at: new Date(
+          Date.now() + authConfig.phoneVerification.expiresInMinutes * 60 * 1000
+        ),
+
+        attempts: 0,
+        verified_at: null,
+      },
+      {
+        transaction,
+      }
+    );
+
+    await UserPhoneVerificationRepository.invalidatePendingByUserIdExcept(
+      user.id,
+      verification.id,
+      {
+        transaction,
+      }
+    );
+
+    return {
+      code,
+      verification,
+    };
+  }
+
+  async dispatchInitialVerification({ user, verification }) {
+    const tasks = [
       SendVerificationEmailService.execute({
         user,
         token: verification.email.token,
       }),
+    ];
 
-      verification.phone
-        ? phoneProvider.send({
-            phone: user.phone,
-            code: verification.phone.code,
-            expiresAt: verification.phone.verification.expires_at,
-          })
-        : Promise.resolve(),
-    ]);
+    if (verification.phone) {
+      tasks.push(
+        phoneProvider.send({
+          phone: user.phone,
+          code: verification.phone.code,
+          expiresAt: verification.phone.verification.expires_at,
+        })
+      );
+    }
+
+    const results = await Promise.allSettled(tasks);
 
     const emailResult = results[0];
-    const phoneResult = results[1];
+
+    const phoneResult = verification.phone ? results[1] : null;
 
     if (emailResult.status === 'rejected') {
       console.error({
@@ -101,7 +149,7 @@ class AccountVerificationService {
       });
     }
 
-    if (verification.phone && phoneResult.status === 'rejected') {
+    if (phoneResult && phoneResult.status === 'rejected') {
       console.error({
         event: 'phone_verification_delivery_failed',
         userId: user.id,
@@ -114,8 +162,41 @@ class AccountVerificationService {
 
     return {
       emailSent: emailResult.status === 'fulfilled',
-      phoneSent: !verification.phone || phoneResult.status === 'fulfilled',
+      phoneSent: !phoneResult || phoneResult.status === 'fulfilled',
     };
+  }
+
+  async dispatchPhoneVerification({ user, verification }) {
+    if (!verification) {
+      return {
+        phoneSent: false,
+      };
+    }
+
+    try {
+      await phoneProvider.send({
+        phone: user.phone,
+        code: verification.code,
+        expiresAt: verification.verification.expires_at,
+      });
+
+      return {
+        phoneSent: true,
+      };
+    } catch (error) {
+      console.error({
+        event: 'phone_verification_delivery_failed',
+        userId: user.id,
+        error: {
+          name: error.name,
+          message: error.message,
+        },
+      });
+
+      return {
+        phoneSent: false,
+      };
+    }
   }
 }
 

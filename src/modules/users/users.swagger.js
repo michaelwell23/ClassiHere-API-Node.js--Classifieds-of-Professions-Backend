@@ -56,7 +56,7 @@ module.exports = {
       tags: ['Users'],
       summary: 'Create user account',
       description:
-        'Create a user account with an optional avatar. The uploaded image is resized to 400 × 400 pixels, converted to WebP and the original file is discarded.',
+        'Create a user account. Email verification is sent automatically. If a phone number is provided, a six-digit phone verification code valid for one hour is also sent automatically. An optional avatar may be uploaded.',
       requestBody: {
         required: true,
         content: {
@@ -189,7 +189,7 @@ module.exports = {
       tags: ['Users'],
       summary: 'Update user profile',
       description:
-        'Partially update the authenticated user profile. A new avatar may be uploaded. Changing the phone number resets phone verification.',
+        'Partially update the authenticated user profile. Changing the phone number resets phone verification and automatically sends a new six-digit verification code valid for one hour.',
       security: [
         {
           bearerAuth: [],

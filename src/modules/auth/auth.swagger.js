@@ -86,7 +86,35 @@ module.exports = {
 
         401: errorResponse('Invalid credentials', 'Invalid email or password.'),
 
-        403: errorResponse('User account is deactivated', 'User account is deactivated.'),
+        403: {
+          description: 'User account cannot authenticate',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+
+              examples: {
+                emailVerificationRequired: {
+                  value: {
+                    success: false,
+
+                    message: 'Email verification is required.',
+                  },
+                },
+
+                accountDeactivated: {
+                  value: {
+                    success: false,
+
+                    message: 'User account is deactivated.',
+                  },
+                },
+              },
+            },
+          },
+        },
 
         423: errorResponse(
           'User account is temporarily locked',
@@ -538,7 +566,8 @@ module.exports = {
 
       summary: 'Verify email address',
 
-      description: 'Verify a user email address using a one-time opaque token.',
+      description:
+        'Verify the user email address using the one-time token sent automatically when the account is created.',
 
       parameters: [
         {
@@ -546,48 +575,41 @@ module.exports = {
           in: 'path',
           required: true,
 
-          description: '64-character hexadecimal email verification token.',
-
           schema: {
             type: 'string',
             pattern: '^[a-fA-F0-9]{64}$',
             minLength: 64,
             maxLength: 64,
           },
-
-          example: '13cce1325d09fd2696d0348c728b608032e3f06caf0a14b8482465d5932cf048',
         },
       ],
 
       responses: {
         200: {
-          description: 'Email verified or already verified',
+          description: 'Email verified successfully',
 
           content: {
             'application/json': {
-              schema: successDataResponse({
-                $ref: '#/components/schemas/MessageData',
-              }),
+              schema: {
+                type: 'object',
 
-              examples: {
-                verified: {
-                  value: {
-                    success: true,
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
 
-                    data: {
-                      message: 'Email verified successfully.',
-                    },
+                  data: {
+                    $ref: '#/components/schemas/MessageData',
                   },
                 },
+              },
 
-                alreadyVerified: {
-                  value: {
-                    success: true,
+              example: {
+                success: true,
 
-                    data: {
-                      message: 'Email is already verified.',
-                    },
-                  },
+                data: {
+                  message: 'Email verified successfully.',
                 },
               },
             },
@@ -595,155 +617,12 @@ module.exports = {
         },
 
         400: {
-          description: 'Token format is invalid, token expired or token was already used',
-
-          content: {
-            'application/json': {
-              schema: {
-                oneOf: [
-                  {
-                    $ref: '#/components/schemas/ValidationError',
-                  },
-                  {
-                    $ref: '#/components/schemas/ApiError',
-                  },
-                ],
-              },
-            },
-          },
-        },
-
-        500: {
-          $ref: '#/components/responses/InternalServerError',
-        },
-      },
-    },
-  },
-
-  '/auth/resend-verification': {
-    post: {
-      tags: ['Authentication'],
-
-      summary: 'Resend email verification',
-
-      description:
-        'Request another email verification link. The response does not reveal whether the account exists or is already verified.',
-
-      requestBody: {
-        required: true,
-
-        content: {
-          'application/json': {
-            schema: {
-              $ref: '#/components/schemas/ResendVerificationRequest',
-            },
-
-            example: {
-              email: 'michael.walker@example.com',
-            },
-          },
-        },
-      },
-
-      responses: {
-        200: {
-          description: 'Email verification request processed',
-
-          content: {
-            'application/json': {
-              schema: successDataResponse({
-                $ref: '#/components/schemas/MessageData',
-              }),
-
-              example: {
-                success: true,
-
-                data: {
-                  message: 'If the account still requires verification, a new email has been sent.',
-                },
-              },
-            },
-          },
-        },
-
-        400: validationErrorResponse,
-
-        500: {
-          $ref: '#/components/responses/InternalServerError',
-        },
-      },
-    },
-  },
-
-  '/auth/phone/send-verification': {
-    post: {
-      tags: ['Authentication'],
-
-      summary: 'Send phone verification code',
-
-      description:
-        'Generate and send a six-digit verification code to the authenticated user phone number.',
-
-      security: [
-        {
-          bearerAuth: [],
-        },
-      ],
-
-      responses: {
-        200: {
-          description: 'Phone verification code sent or phone already verified',
-
-          content: {
-            'application/json': {
-              schema: successDataResponse({
-                $ref: '#/components/schemas/MessageData',
-              }),
-
-              examples: {
-                sent: {
-                  value: {
-                    success: true,
-
-                    data: {
-                      message: 'Verification code sent successfully.',
-                    },
-                  },
-                },
-
-                alreadyVerified: {
-                  value: {
-                    success: true,
-
-                    data: {
-                      message: 'Phone number is already verified.',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-
-        400: errorResponse(
-          'User does not have a phone number',
-          'User does not have a phone number.'
-        ),
-
-        401: {
-          $ref: '#/components/responses/Unauthorized',
+          description: 'Verification token is invalid, expired or already used',
         },
 
         403: {
-          $ref: '#/components/responses/Forbidden',
+          description: 'User account is deactivated',
         },
-
-        404: errorResponse('User not found', 'User not found.'),
-
-        429: errorResponse(
-          'Verification code requested too frequently',
-          'Please wait before requesting another verification code.'
-        ),
 
         500: {
           $ref: '#/components/responses/InternalServerError',
@@ -759,7 +638,7 @@ module.exports = {
       summary: 'Verify phone number',
 
       description:
-        'Verify the authenticated user phone number using a six-digit verification code.',
+        'Verify the authenticated user phone number using the six-digit code sent automatically during account creation or after the phone number is changed. The code is valid for one hour.',
 
       security: [
         {
@@ -785,32 +664,21 @@ module.exports = {
 
       responses: {
         200: {
-          description: 'Phone verified or already verified',
+          description: 'Phone verified successfully',
 
           content: {
             'application/json': {
-              schema: successDataResponse({
-                $ref: '#/components/schemas/MessageData',
-              }),
+              schema: {
+                type: 'object',
 
-              examples: {
-                verified: {
-                  value: {
-                    success: true,
-
-                    data: {
-                      message: 'Phone verified successfully.',
-                    },
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
                   },
-                },
 
-                alreadyVerified: {
-                  value: {
-                    success: true,
-
-                    data: {
-                      message: 'Phone number is already verified.',
-                    },
+                  data: {
+                    $ref: '#/components/schemas/MessageData',
                   },
                 },
               },
@@ -819,22 +687,7 @@ module.exports = {
         },
 
         400: {
-          description: 'Validation failed or verification code is invalid, expired or already used',
-
-          content: {
-            'application/json': {
-              schema: {
-                oneOf: [
-                  {
-                    $ref: '#/components/schemas/ValidationError',
-                  },
-                  {
-                    $ref: '#/components/schemas/ApiError',
-                  },
-                ],
-              },
-            },
-          },
+          description: 'Verification code is invalid or expired',
         },
 
         401: {
@@ -845,12 +698,9 @@ module.exports = {
           $ref: '#/components/responses/Forbidden',
         },
 
-        404: errorResponse('User not found', 'User not found.'),
-
-        429: errorResponse(
-          'Verification attempt limit exceeded',
-          'Verification code attempt limit exceeded. Request a new code.'
-        ),
+        429: {
+          description: 'Verification attempt limit exceeded',
+        },
 
         500: {
           $ref: '#/components/responses/InternalServerError',

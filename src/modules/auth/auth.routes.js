@@ -5,25 +5,18 @@ const authMiddleware = require('../../shared/middlewares/auth.middleware');
 const validate = require('../../shared/middlewares/validation.middleware');
 
 const SessionController = require('./controllers/SessionController');
-
 const PasswordController = require('./controllers/PasswordController');
-
 const VerificationController = require('./controllers/VerificationController');
 
 const { loginDTO, logoutDTO, refreshTokenDTO } = require('./dtos/session.dto');
-
 const { changePasswordDTO, forgotPasswordDTO, resetPasswordDTO } = require('./dtos/password.dto');
-
-const {
-  verifyEmailDTO,
-  resendVerificationDTO,
-  verifyPhoneDTO,
-} = require('./dtos/verification.dto');
+const { verifyEmailDTO, verifyPhoneDTO } = require('./dtos/verification.dto');
 
 const authRoutes = Router();
 
 authRoutes.post('/login', validate(loginDTO), SessionController.login);
 authRoutes.post('/logout', validate(logoutDTO), SessionController.logout);
+
 authRoutes.post('/logout-all', authMiddleware, SessionController.logoutAll);
 authRoutes.get('/me', authMiddleware, SessionController.me);
 authRoutes.post('/refresh-token', validate(refreshTokenDTO), SessionController.refresh);
@@ -43,15 +36,6 @@ authRoutes.get(
   validate(verifyEmailDTO),
   VerificationController.verifyEmail
 );
-
-authRoutes.post(
-  '/resend-verification',
-  validate(resendVerificationDTO),
-  VerificationController.resendEmail
-);
-
-authRoutes.post('/phone/send-verification', authMiddleware, VerificationController.sendPhoneCode);
-
 authRoutes.post(
   '/phone/verify',
   authMiddleware,

@@ -15,22 +15,6 @@ const verifyEmailDTO = z
   })
   .strict();
 
-const resendVerificationDTO = z
-  .object({
-    body: z
-      .object({
-        email: z
-          .string({
-            required_error: 'Email is required.',
-          })
-          .trim()
-          .email('Invalid email format.')
-          .transform((value) => value.toLowerCase()),
-      })
-      .strict(),
-  })
-  .strict();
-
 const verifyPhoneDTO = z
   .object({
     body: z
@@ -48,6 +32,5 @@ const verifyPhoneDTO = z
 
 module.exports = {
   verifyEmailDTO,
-  resendVerificationDTO,
   verifyPhoneDTO,
 };

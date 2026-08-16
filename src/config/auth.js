@@ -48,11 +48,6 @@ module.exports = {
   phoneVerification: {
     expiresInMinutes: parsePositiveInteger(process.env.PHONE_VERIFICATION_EXPIRES_IN_MINUTES, 60),
     maxAttempts: parsePositiveInteger(process.env.PHONE_VERIFICATION_MAX_ATTEMPTS, 5),
-    resendIntervalSeconds: parsePositiveInteger(
-      process.env.PHONE_VERIFICATION_RESEND_INTERVAL_SECONDS,
-      60
-    ),
-
     codeSecret: phoneVerificationCodeSecret,
   },
 

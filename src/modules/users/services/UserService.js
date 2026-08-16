@@ -67,13 +67,13 @@ class UserService {
           }
         );
 
-        verification = await AccountVerificationService.prepare({
+        verification = await AccountVerificationService.prepareInitialVerification({
           user,
           transaction,
         });
       });
 
-      await AccountVerificationService.dispatch({
+      await AccountVerificationService.dispatchInitialVerification({
         user,
         verification,
       });
@@ -124,6 +124,7 @@ class UserService {
     }
 
     let processedAvatarPath = null;
+    let phoneVerification = null;
 
     try {
       const updateData = {};
@@ -136,6 +137,8 @@ class UserService {
         updateData.last_name = data.last_name;
       }
 
+      let phoneChanged = false;
+
       if (data.phone !== undefined) {
         const phone = data.phone.replace(/\D/g, '');
 
@@ -146,6 +149,8 @@ class UserService {
         }
 
         if (phone !== user.phone) {
+          phoneChanged = true;
+
           updateData.phone = phone;
 
           updateData.is_phone_verified = false;
@@ -159,7 +164,30 @@ class UserService {
       }
 
       const previousAvatarPath = user.avatar_path;
-      const updatedUser = await UserRepository.update(user, updateData);
+
+      let updatedUser;
+
+      await database.transaction(async (transaction) => {
+        updatedUser = await UserRepository.update(user, updateData, {
+          transaction,
+        });
+
+        if (phoneChanged) {
+          phoneVerification = await AccountVerificationService.preparePhoneVerification({
+            user: updatedUser,
+
+            transaction,
+          });
+        }
+      });
+
+      if (phoneVerification) {
+        await AccountVerificationService.dispatchPhoneVerification({
+          user: updatedUser,
+
+          verification: phoneVerification,
+        });
+      }
 
       if (processedAvatarPath && previousAvatarPath) {
         try {
@@ -167,12 +195,9 @@ class UserService {
         } catch (cleanupError) {
           console.error({
             event: 'previous_avatar_cleanup_failed',
-
             userId: user.id,
-
             error: {
               name: cleanupError.name,
-
               message: cleanupError.message,
             },
           });
