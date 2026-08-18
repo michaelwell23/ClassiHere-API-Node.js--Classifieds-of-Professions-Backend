@@ -1,34 +1,30 @@
 const { z } = require('zod');
 
-const verifyEmailDTO = z
-  .object({
-    params: z
-      .object({
-        token: z
-          .string({
-            required_error: 'Verification token is required.',
-          })
-          .trim()
-          .regex(/^[a-f0-9]{64}$/i, 'Invalid verification token.'),
-      })
-      .strict(),
-  })
-  .strict();
+const verifyEmailDTO = z.object({
+  params: z
+    .object({
+      token: z
+        .string({
+          required_error: 'Verification token is required.',
+        })
+        .trim()
+        .regex(/^[a-f0-9]{64}$/i, 'Invalid verification token.'),
+    })
+    .strict(),
+});
 
-const verifyPhoneDTO = z
-  .object({
-    body: z
-      .object({
-        code: z
-          .string({
-            required_error: 'Verification code is required.',
-          })
-          .trim()
-          .regex(/^\d{6}$/, 'Verification code must contain exactly 6 digits.'),
-      })
-      .strict(),
-  })
-  .strict();
+const verifyPhoneDTO = z.object({
+  body: z
+    .object({
+      code: z
+        .string({
+          required_error: 'Verification code is required.',
+        })
+        .trim()
+        .regex(/^\d{6}$/, 'Verification code must contain exactly 6 digits.'),
+    })
+    .strict(),
+});
 
 module.exports = {
   verifyEmailDTO,

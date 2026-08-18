@@ -8,13 +8,15 @@ const verifyEmailTemplate = require('./templates/verify-email.template');
 
 class SendVerificationEmailService {
   async execute({ user, token }) {
-    const verificationUrl = new URL('/verify-email', environment.frontendUrl);
+    const baseUrl = environment.appUrl.replace(/\/+$/, '');
 
-    verificationUrl.searchParams.set('token', token);
+    const verificationUrl = `${baseUrl}/auth/verify-email/${token}`;
 
     const message = verifyEmailTemplate({
       userName: user.first_name,
-      verificationLink: verificationUrl.toString(),
+
+      verificationLink: verificationUrl,
+
       expiresInHours: authConfig.emailVerification.expiresInHours,
     });
 

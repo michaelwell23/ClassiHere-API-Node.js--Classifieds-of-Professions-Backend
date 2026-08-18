@@ -1,69 +1,36 @@
 const { Op } = require('sequelize');
 
-const UserPhoneVerification = require('../../../database/models/UserPhoneVerification');
+const UserVerification = require('../../../database/models/UserVerification');
 
-class UserPhoneVerificationRepository {
+class UserVerificationRepository {
   async create(data, options = {}) {
-    return UserPhoneVerification.create(data, options);
+    return UserVerification.create(data, options);
   }
 
-  async findLatestPendingByUserId(userId, options = {}) {
-    return UserPhoneVerification.findOne({
+  async findActiveByTokenHash(tokenHash, options = {}) {
+    return UserVerification.findOne({
       where: {
-        user_id: userId,
-        verified_at: null,
-      },
+        token_hash: tokenHash,
+        used_at: null,
 
-      order: [['created_at', 'DESC']],
+        expires_at: {
+          [Op.gt]: new Date(),
+        },
+      },
 
       ...options,
     });
   }
 
-  async findRecentPendingByUserId(userId, createdAfter, options = {}) {
-    return UserPhoneVerification.findOne({
-      where: {
-        user_id: userId,
-        verified_at: null,
-
-        created_at: {
-          [Op.gte]: createdAfter,
-        },
-      },
-
-      order: [['created_at', 'DESC']],
-
-      ...options,
-    });
-  }
-
-  async incrementAttempts(id, options = {}) {
-    const [affectedRows] = await UserPhoneVerification.increment(
+  async markAsUsed(id, options = {}) {
+    const [updatedRows] = await UserVerification.update(
       {
-        attempts: 1,
+        used_at: new Date(),
       },
       {
         where: {
           id,
-          verified_at: null,
-        },
-
-        ...options,
-      }
-    );
-
-    return affectedRows;
-  }
-
-  async markAsVerified(id, options = {}) {
-    const [updatedRows] = await UserPhoneVerification.update(
-      {
-        verified_at: new Date(),
-      },
-      {
-        where: {
-          id,
-          verified_at: null,
+          used_at: null,
         },
 
         ...options,
@@ -73,15 +40,31 @@ class UserPhoneVerificationRepository {
     return updatedRows > 0;
   }
 
-  async invalidatePendingByUserIdExcept(userId, excludedVerificationId, options = {}) {
-    return UserPhoneVerification.update(
+  async invalidateAllByUserId(userId, options = {}) {
+    return UserVerification.update(
       {
-        verified_at: new Date(),
+        used_at: new Date(),
       },
       {
         where: {
           user_id: userId,
-          verified_at: null,
+          used_at: null,
+        },
+
+        ...options,
+      }
+    );
+  }
+
+  async invalidateOthersByUserId(userId, excludedVerificationId, options = {}) {
+    return UserVerification.update(
+      {
+        used_at: new Date(),
+      },
+      {
+        where: {
+          user_id: userId,
+          used_at: null,
 
           id: {
             [Op.ne]: excludedVerificationId,
@@ -94,7 +77,7 @@ class UserPhoneVerificationRepository {
   }
 
   async deleteById(id, options = {}) {
-    return UserPhoneVerification.destroy({
+    return UserVerification.destroy({
       where: {
         id,
       },
@@ -104,4 +87,4 @@ class UserPhoneVerificationRepository {
   }
 }
 
-module.exports = new UserPhoneVerificationRepository();
+module.exports = new UserVerificationRepository();
