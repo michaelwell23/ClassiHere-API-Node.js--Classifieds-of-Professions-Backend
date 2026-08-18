@@ -15,19 +15,12 @@ const userIdParamsSchema = z
 const avatarFileSchema = z
   .object({
     fieldname: z.literal('avatar'),
-
     originalname: z.string().min(1),
-
     encoding: z.string().min(1),
-
     mimetype: z.enum(['image/jpeg', 'image/png', 'image/webp']),
-
     size: z.number().int().positive(),
-
     destination: z.string().min(1),
-
     filename: z.string().min(1),
-
     path: z.string().min(1),
   })
   .passthrough();
@@ -85,7 +78,6 @@ const createUserDTO = z
           }),
       })
       .strict(),
-
     file: avatarFileSchema.optional(),
   })
   .strict();

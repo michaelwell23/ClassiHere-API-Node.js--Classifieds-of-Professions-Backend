@@ -4,9 +4,11 @@ const storageProvider = require('../providers/storage/local.provider');
 
 function validate(schema) {
   return async (request, response, next) => {
-    const payload = {
-      body: request.body,
-    };
+    const payload = {};
+
+    if (request.body && Object.keys(request.body).length > 0) {
+      payload.body = request.body;
+    }
 
     if (request.params && Object.keys(request.params).length > 0) {
       payload.params = request.params;
@@ -36,22 +38,20 @@ function validate(schema) {
       return next(validationError);
     }
 
-    const { body, params, query, file } = result.data;
-
-    if (body !== undefined) {
-      request.body = body;
+    if (result.data.body !== undefined) {
+      request.body = result.data.body;
     }
 
-    if (params !== undefined) {
-      request.params = params;
+    if (result.data.params !== undefined) {
+      request.params = result.data.params;
     }
 
-    if (query !== undefined) {
-      request.query = query;
+    if (result.data.query !== undefined) {
+      request.query = result.data.query;
     }
 
-    if (file !== undefined) {
-      request.file = file;
+    if (result.data.file !== undefined) {
+      request.file = result.data.file;
     }
 
     request.validated = result.data;
