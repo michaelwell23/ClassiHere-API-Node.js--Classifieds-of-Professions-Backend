@@ -10,6 +10,10 @@ const UserRefreshTokenRepository = require('../repositories/UserRefreshTokenRepo
 
 const { comparePassword } = require('../../../shared/providers/hash/bcrypt.provider');
 
+const database = require('../../../database');
+
+const AccountLifecycleService = require('../../users/services/AccountLifecycleService');
+
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -218,6 +222,124 @@ class SessionService {
       tokens: {
         access_token: newAccessToken,
         refresh_token: newRefreshToken,
+      },
+    };
+  }
+
+  async reactivateAccount({ email, password }) {
+    const user = await UserRepository.findByEmail(email);
+
+    if (!user) {
+      throw new AppError('Invalid email or password.', 401);
+    }
+
+    const now = new Date();
+
+    if (user.locked_until && user.locked_until > now) {
+      throw new AppError('Account temporarily locked due to multiple failed login attempts.', 423);
+    }
+
+    let failedLoginAttempts = user.failed_login_attempts || 0;
+
+    if (user.locked_until && user.locked_until <= now) {
+      failedLoginAttempts = 0;
+
+      await UserRepository.update(user, {
+        failed_login_attempts: 0,
+        locked_until: null,
+      });
+    }
+
+    const passwordMatches = await comparePassword(password, user.password_hash);
+
+    if (!passwordMatches) {
+      const attempts = failedLoginAttempts + 1;
+
+      if (attempts >= authConfig.loginSecurity.maxAttempts) {
+        const lockedUntil = new Date(
+          now.getTime() + authConfig.loginSecurity.lockDurationMinutes * 60 * 1000
+        );
+
+        await UserRepository.update(user, {
+          failed_login_attempts: attempts,
+
+          locked_until: lockedUntil,
+        });
+
+        throw new AppError(
+          'Account temporarily locked due to multiple failed login attempts.',
+          423
+        );
+      }
+
+      await UserRepository.update(user, {
+        failed_login_attempts: attempts,
+
+        locked_until: null,
+      });
+
+      throw new AppError('Invalid email or password.', 401);
+    }
+
+    if (user.is_active) {
+      throw new AppError('User account is already active.', 409);
+    }
+
+    if (!user.is_email_verified) {
+      throw new AppError('Email verification is required.', 403);
+    }
+
+    let reactivatedUser;
+    let accessToken;
+    let refreshToken;
+
+    await database.transaction(async (transaction) => {
+      reactivatedUser = await AccountLifecycleService.reactivate({
+        user,
+        transaction,
+      });
+
+      const jti = generateJti();
+
+      accessToken = generateAccessToken(reactivatedUser.id);
+
+      refreshToken = generateRefreshToken(reactivatedUser.id, jti);
+
+      const refreshPayload = verifyRefreshToken(refreshToken);
+
+      await UserRefreshTokenRepository.create(
+        {
+          user_id: reactivatedUser.id,
+
+          jti,
+
+          token_hash: hashRefreshToken(refreshToken),
+
+          expires_at: new Date(refreshPayload.exp * 1000),
+        },
+        {
+          transaction,
+        }
+      );
+
+      reactivatedUser = await UserRepository.update(
+        reactivatedUser,
+        {
+          last_login_at: new Date(),
+        },
+        {
+          transaction,
+        }
+      );
+    });
+
+    return {
+      user: userResponseDTO(reactivatedUser),
+
+      tokens: {
+        access_token: accessToken,
+
+        refresh_token: refreshToken,
       },
     };
   }

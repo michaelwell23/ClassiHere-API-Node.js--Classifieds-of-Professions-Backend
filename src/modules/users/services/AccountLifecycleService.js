@@ -6,6 +6,7 @@ const UserRepository = require('../repositories/UserRepository');
 
 const UserRefreshTokenRepository = require('../../auth/repositories/UserRefreshTokenRepository');
 
+const environment = require('../../../config/environment');
 class AccountLifecycleService {
   async deactivate({ authenticatedUserId, userId }) {
     if (authenticatedUserId !== userId) {
@@ -44,34 +45,42 @@ class AccountLifecycleService {
     };
   }
 
-  async reactivate({ authenticatedUserId, userId }) {
-    if (authenticatedUserId !== userId) {
-      throw new AppError('You are not allowed to reactivate this account.', 403);
-    }
-
-    const user = await UserRepository.findById(userId);
-
+  async reactivate({ user, transaction }) {
     if (!user) {
-      throw new AppError('User not found.', 404);
+      throw new TypeError('User is required for account reactivation.');
     }
 
     if (user.is_active) {
       throw new AppError('User account is already active.', 409);
     }
 
-    await UserRepository.update(user, {
-      is_active: true,
-      deactivated_at: null,
-      deletion_requested_at: null,
-      failed_login_attempts: 0,
-      locked_until: null,
-    });
+    if (user.deletion_requested_at) {
+      const gracePeriodMilliseconds =
+        environment.accountDeletionGracePeriodDays * 24 * 60 * 60 * 1000;
 
-    return {
-      message: 'User account reactivated successfully.',
-    };
+      const deletionDeadline = new Date(
+        user.deletion_requested_at.getTime() + gracePeriodMilliseconds
+      );
+
+      if (deletionDeadline <= new Date()) {
+        throw new AppError('Account reactivation period has expired.', 410);
+      }
+    }
+
+    return UserRepository.update(
+      user,
+      {
+        is_active: true,
+        deactivated_at: null,
+        deletion_requested_at: null,
+        failed_login_attempts: 0,
+        locked_until: null,
+      },
+      {
+        transaction,
+      }
+    );
   }
-
   async requestDeletion({ authenticatedUserId, userId }) {
     if (authenticatedUserId !== userId) {
       throw new AppError('You are not allowed to request deletion of this account.', 403);

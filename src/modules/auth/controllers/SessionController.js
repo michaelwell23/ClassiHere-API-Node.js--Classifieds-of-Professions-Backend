@@ -69,6 +69,19 @@ class SessionController {
       return next(error);
     }
   }
+
+  async reactivateAccount(request, response, next) {
+    try {
+      const result = await SessionService.reactivateAccount(request.validated.body);
+
+      return response.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
 }
 
 module.exports = new SessionController();

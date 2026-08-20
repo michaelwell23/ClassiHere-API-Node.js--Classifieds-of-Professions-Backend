@@ -8,7 +8,12 @@ const SessionController = require('./controllers/SessionController');
 const PasswordController = require('./controllers/PasswordController');
 const VerificationController = require('./controllers/VerificationController');
 
-const { loginDTO, logoutDTO, refreshTokenDTO } = require('./dtos/session.dto');
+const {
+  loginDTO,
+  logoutDTO,
+  refreshTokenDTO,
+  reactivateAccountDTO,
+} = require('./dtos/session.dto');
 const { changePasswordDTO, forgotPasswordDTO, resetPasswordDTO } = require('./dtos/password.dto');
 const { verifyEmailDTO, verifyPhoneDTO } = require('./dtos/verification.dto');
 
@@ -41,6 +46,12 @@ authRoutes.post(
   authMiddleware,
   validate(verifyPhoneDTO),
   VerificationController.verifyPhone
+);
+
+authRoutes.post(
+  '/reactivate-account',
+  validate(reactivateAccountDTO),
+  SessionController.reactivateAccount
 );
 
 module.exports = authRoutes;
