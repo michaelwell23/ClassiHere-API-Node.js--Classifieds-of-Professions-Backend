@@ -248,7 +248,7 @@ module.exports = {
       tags: ['Users'],
       summary: 'Request account deletion',
       description:
-        'Request deletion of the authenticated user account. The account is immediately deactivated and all sessions are revoked. The account is soft deleted after the configured grace period, currently 90 days.',
+        'Request account deletion. The account is immediately deactivated, all sessions are revoked and deletion is scheduled after the configured grace period. Before the recovery period expires, the account may be restored through POST /auth/reactivate-account using valid credentials.',
       security: [
         {
           bearerAuth: [],
@@ -298,7 +298,7 @@ module.exports = {
       tags: ['Users'],
       summary: 'Deactivate user account',
       description:
-        'Temporarily deactivate the authenticated user account and revoke all refresh-token sessions. Deactivation does not schedule automatic deletion.',
+        'Temporarily deactivate the authenticated user account and revoke all refresh-token sessions. The account may later be reactivated through POST /auth/reactivate-account using valid account credentials.',
       security: [
         {
           bearerAuth: [],

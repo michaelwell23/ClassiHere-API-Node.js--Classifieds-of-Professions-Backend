@@ -631,6 +631,161 @@ module.exports = {
     },
   },
 
+  '/auth/reactivate-account': {
+    post: {
+      tags: ['Authentication'],
+
+      summary: 'Reactivate user account',
+
+      description:
+        'Reactivate a previously deactivated user account using email and password. If an account deletion request is still within the configured recovery period, the deletion request is cancelled. A new authenticated session is created after successful reactivation.',
+
+      requestBody: {
+        required: true,
+
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ReactivateAccountRequest',
+            },
+
+            example: {
+              email: 'michael.walker@example.com',
+
+              password: '12345678',
+            },
+          },
+        },
+      },
+
+      responses: {
+        200: {
+          description: 'Account reactivated successfully',
+
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+
+                required: ['success', 'data'],
+
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+
+                  data: {
+                    $ref: '#/components/schemas/LoginData',
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        400: {
+          $ref: '#/components/responses/ValidationError',
+        },
+
+        401: {
+          description: 'Invalid email or password',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+
+              example: {
+                success: false,
+
+                message: 'Invalid email or password.',
+              },
+            },
+          },
+        },
+
+        403: {
+          description: 'Email verification is required',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+
+              example: {
+                success: false,
+
+                message: 'Email verification is required.',
+              },
+            },
+          },
+        },
+
+        409: {
+          description: 'Account is already active',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+
+              example: {
+                success: false,
+
+                message: 'User account is already active.',
+              },
+            },
+          },
+        },
+
+        410: {
+          description: 'Account recovery period has expired',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+
+              example: {
+                success: false,
+
+                message: 'Account reactivation period has expired.',
+              },
+            },
+          },
+        },
+
+        423: {
+          description:
+            'Account temporarily locked because of repeated failed authentication attempts',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+
+              example: {
+                success: false,
+
+                message: 'Account temporarily locked due to multiple failed login attempts.',
+              },
+            },
+          },
+        },
+
+        500: {
+          $ref: '#/components/responses/InternalServerError',
+        },
+      },
+    },
+  },
+
   '/auth/phone/verify': {
     post: {
       tags: ['Authentication'],

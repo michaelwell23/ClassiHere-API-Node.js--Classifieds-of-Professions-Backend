@@ -314,6 +314,31 @@ module.exports = {
         },
       },
 
+      ReactivateAccountRequest: {
+        type: 'object',
+
+        additionalProperties: false,
+
+        required: ['email', 'password'],
+
+        properties: {
+          email: {
+            type: 'string',
+            format: 'email',
+
+            example: 'michael.walker@example.com',
+          },
+
+          password: {
+            type: 'string',
+            minLength: 1,
+            writeOnly: true,
+
+            example: '12345678',
+          },
+        },
+      },
+
       MessageData: {
         type: 'object',
 
@@ -418,13 +443,11 @@ module.exports = {
     responses: {
       Unauthorized: {
         description: 'Authentication is required or the access token is invalid.',
-
         content: {
           'application/json': {
             schema: {
               $ref: '#/components/schemas/ApiError',
             },
-
             example: {
               success: false,
               message: 'Invalid access token.',
@@ -435,16 +458,13 @@ module.exports = {
 
       Forbidden: {
         description: 'Authenticated user is not allowed to perform the operation.',
-
         content: {
           'application/json': {
             schema: {
               $ref: '#/components/schemas/ApiError',
             },
-
             example: {
               success: false,
-
               message: 'User account is deactivated.',
             },
           },
@@ -464,6 +484,17 @@ module.exports = {
               success: false,
 
               message: 'Internal server error',
+            },
+          },
+        },
+      },
+
+      ValidationError: {
+        description: 'Request validation failed',
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ValidationError',
             },
           },
         },
