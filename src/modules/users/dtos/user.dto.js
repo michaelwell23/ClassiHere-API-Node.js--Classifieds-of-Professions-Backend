@@ -61,12 +61,11 @@ const createUserDTO = z
           .max(255, 'Password must contain at most 255 characters.'),
 
         phone: z
-          .string({
-            required_error: 'Phone is required.',
-          })
+          .string()
           .trim()
           .min(10, 'Phone must contain at least 10 digits.')
-          .max(20, 'Phone must contain at most 20 characters.'),
+          .max(20, 'Phone must contain at most 20 characters.')
+          .optional(),
 
         cpf: z
           .string({
@@ -78,6 +77,7 @@ const createUserDTO = z
           }),
       })
       .strict(),
+
     file: avatarFileSchema.optional(),
   })
   .strict();
@@ -88,18 +88,11 @@ const updateUserDTO = z
 
     body: z
       .object({
-        first_name: z
+        email: z
           .string()
           .trim()
-          .min(2, 'First name must contain at least 2 characters.')
-          .max(100, 'First name must contain at most 100 characters.')
-          .optional(),
-
-        last_name: z
-          .string()
-          .trim()
-          .min(2, 'Last name must contain at least 2 characters.')
-          .max(100, 'Last name must contain at most 100 characters.')
+          .email('Invalid email format.')
+          .transform((value) => value.toLowerCase())
           .optional(),
 
         phone: z
@@ -115,7 +108,7 @@ const updateUserDTO = z
   })
   .strict()
   .refine(({ body, file }) => Object.keys(body).length > 0 || Boolean(file), {
-    message: 'At least one field or avatar must be provided.',
+    message: 'At least one editable field or avatar must be provided.',
     path: ['body'],
   });
 

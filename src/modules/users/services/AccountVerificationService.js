@@ -20,19 +20,39 @@ const {
 
 class AccountVerificationService {
   async prepareInitialVerification({ user, transaction }) {
-    const emailToken = generateOpaqueToken();
+    const email = await this.prepareEmailVerification({
+      user,
+      transaction,
+    });
+
+    const phone = user.phone
+      ? await this.preparePhoneVerification({
+          user,
+          transaction,
+        })
+      : null;
+
+    return {
+      email,
+      phone,
+    };
+  }
+
+  async prepareEmailVerification({ user, transaction }) {
+    const token = generateOpaqueToken();
 
     await UserVerificationRepository.invalidateAllByUserId(user.id, {
       transaction,
     });
 
-    const emailVerification = await UserVerificationRepository.create(
+    const verification = await UserVerificationRepository.create(
       {
         user_id: user.id,
-        token_hash: hashOpaqueToken(emailToken),
+        token_hash: hashOpaqueToken(token),
         expires_at: new Date(
           Date.now() + authConfig.emailVerification.expiresInHours * 60 * 60 * 1000
         ),
+
         used_at: null,
       },
       {
@@ -40,39 +60,9 @@ class AccountVerificationService {
       }
     );
 
-    let phoneVerification = null;
-    let phoneCode = null;
-
-    if (user.phone) {
-      phoneCode = generatePhoneVerificationCode();
-
-      phoneVerification = await UserPhoneVerificationRepository.create(
-        {
-          user_id: user.id,
-          code_hash: hashPhoneVerificationCode(phoneCode),
-          expires_at: new Date(
-            Date.now() + authConfig.phoneVerification.expiresInMinutes * 60 * 1000
-          ),
-          attempts: 0,
-          verified_at: null,
-        },
-        {
-          transaction,
-        }
-      );
-    }
-
     return {
-      email: {
-        token: emailToken,
-        verification: emailVerification,
-      },
-      phone: phoneVerification
-        ? {
-            code: phoneCode,
-            verification: phoneVerification,
-          }
-        : null,
+      token,
+      verification,
     };
   }
 
@@ -87,7 +77,6 @@ class AccountVerificationService {
       {
         user_id: user.id,
         code_hash: hashPhoneVerificationCode(code),
-
         expires_at: new Date(
           Date.now() + authConfig.phoneVerification.expiresInMinutes * 60 * 1000
         ),
@@ -116,54 +105,48 @@ class AccountVerificationService {
 
   async dispatchInitialVerification({ user, verification }) {
     const tasks = [
-      SendVerificationEmailService.execute({
+      this.dispatchEmailVerification({
         user,
-        token: verification.email.token,
+        verification: verification.email,
       }),
     ];
 
     if (verification.phone) {
       tasks.push(
-        phoneProvider.send({
-          phone: user.phone,
-          code: verification.phone.code,
-          expiresAt: verification.phone.verification.expires_at,
+        this.dispatchPhoneVerification({
+          user,
+          verification: verification.phone,
         })
       );
     }
 
-    const results = await Promise.allSettled(tasks);
+    await Promise.allSettled(tasks);
+  }
 
-    const emailResult = results[0];
+  async dispatchEmailVerification({ user, verification }) {
+    try {
+      await SendVerificationEmailService.execute({
+        user,
+        token: verification.token,
+      });
 
-    const phoneResult = verification.phone ? results[1] : null;
-
-    if (emailResult.status === 'rejected') {
+      return {
+        emailSent: true,
+      };
+    } catch (error) {
       console.error({
         event: 'email_verification_delivery_failed',
         userId: user.id,
         error: {
-          name: emailResult.reason?.name,
-          message: emailResult.reason?.message,
+          name: error.name,
+          message: error.message,
         },
       });
-    }
 
-    if (phoneResult && phoneResult.status === 'rejected') {
-      console.error({
-        event: 'phone_verification_delivery_failed',
-        userId: user.id,
-        error: {
-          name: phoneResult.reason?.name,
-          message: phoneResult.reason?.message,
-        },
-      });
+      return {
+        emailSent: false,
+      };
     }
-
-    return {
-      emailSent: emailResult.status === 'fulfilled',
-      phoneSent: !phoneResult || phoneResult.status === 'fulfilled',
-    };
   }
 
   async dispatchPhoneVerification({ user, verification }) {

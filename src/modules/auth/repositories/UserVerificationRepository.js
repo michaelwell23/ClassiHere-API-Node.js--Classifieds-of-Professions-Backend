@@ -11,6 +11,7 @@ class UserVerificationRepository {
     return UserVerification.findOne({
       where: {
         token_hash: tokenHash,
+
         used_at: null,
 
         expires_at: {
@@ -30,6 +31,7 @@ class UserVerificationRepository {
       {
         where: {
           id,
+
           used_at: null,
         },
 
@@ -48,6 +50,7 @@ class UserVerificationRepository {
       {
         where: {
           user_id: userId,
+
           used_at: null,
         },
 
@@ -64,6 +67,7 @@ class UserVerificationRepository {
       {
         where: {
           user_id: userId,
+
           used_at: null,
 
           id: {
@@ -74,16 +78,6 @@ class UserVerificationRepository {
         ...options,
       }
     );
-  }
-
-  async deleteById(id, options = {}) {
-    return UserVerification.destroy({
-      where: {
-        id,
-      },
-
-      ...options,
-    });
   }
 }
 

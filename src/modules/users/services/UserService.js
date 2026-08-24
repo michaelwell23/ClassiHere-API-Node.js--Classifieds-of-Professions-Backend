@@ -11,6 +11,7 @@ const avatarProcessor = require('../providers/avatar.processor');
 const storageProvider = require('../../../shared/providers/storage/local.provider');
 const { hashPassword } = require('../../../shared/providers/hash/bcrypt.provider');
 
+const UserRefreshTokenRepository = require('../../auth/repositories/UserRefreshTokenRepository');
 class UserService {
   async create({ data, file }) {
     let processedAvatarPath = null;
@@ -124,31 +125,41 @@ class UserService {
     }
 
     let processedAvatarPath = null;
+
+    let emailVerification = null;
+
     let phoneVerification = null;
 
     try {
       const updateData = {};
 
-      if (data.first_name !== undefined) {
-        updateData.first_name = data.first_name;
-      }
-
-      if (data.last_name !== undefined) {
-        updateData.last_name = data.last_name;
-      }
-
+      let emailChanged = false;
       let phoneChanged = false;
+
+      if (data.email !== undefined && data.email !== user.email) {
+        const existingEmail = await UserRepository.findByEmail(data.email);
+
+        if (existingEmail && existingEmail.id !== user.id) {
+          throw new AppError('Email is already registered.', 409);
+        }
+
+        emailChanged = true;
+
+        updateData.email = data.email;
+
+        updateData.is_email_verified = false;
+      }
 
       if (data.phone !== undefined) {
         const phone = data.phone.replace(/\D/g, '');
 
-        const existingPhone = await UserRepository.findByPhone(phone);
-
-        if (existingPhone && existingPhone.id !== user.id) {
-          throw new AppError('Phone is already registered.', 409);
-        }
-
         if (phone !== user.phone) {
+          const existingPhone = await UserRepository.findByPhone(phone);
+
+          if (existingPhone && existingPhone.id !== user.id) {
+            throw new AppError('Phone is already registered.', 409);
+          }
+
           phoneChanged = true;
 
           updateData.phone = phone;
@@ -172,6 +183,18 @@ class UserService {
           transaction,
         });
 
+        if (emailChanged) {
+          emailVerification = await AccountVerificationService.prepareEmailVerification({
+            user: updatedUser,
+
+            transaction,
+          });
+
+          await UserRefreshTokenRepository.deleteAllByUserId(updatedUser.id, {
+            transaction,
+          });
+        }
+
         if (phoneChanged) {
           phoneVerification = await AccountVerificationService.preparePhoneVerification({
             user: updatedUser,
@@ -180,6 +203,14 @@ class UserService {
           });
         }
       });
+
+      if (emailVerification) {
+        await AccountVerificationService.dispatchEmailVerification({
+          user: updatedUser,
+
+          verification: emailVerification,
+        });
+      }
 
       if (phoneVerification) {
         await AccountVerificationService.dispatchPhoneVerification({
@@ -195,9 +226,12 @@ class UserService {
         } catch (cleanupError) {
           console.error({
             event: 'previous_avatar_cleanup_failed',
+
             userId: user.id,
+
             error: {
               name: cleanupError.name,
+
               message: cleanupError.message,
             },
           });
