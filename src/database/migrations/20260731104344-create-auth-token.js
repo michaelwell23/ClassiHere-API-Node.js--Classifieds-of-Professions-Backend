@@ -18,12 +18,10 @@ module.exports = {
           user_id: {
             type: Sequelize.UUID,
             allowNull: false,
-
             references: {
               model: 'users',
               key: 'id',
             },
-
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
           },
@@ -37,6 +35,12 @@ module.exports = {
           expires_at: {
             type: Sequelize.DATE,
             allowNull: false,
+          },
+
+          attempts: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
           },
 
           used_at: {
@@ -72,12 +76,10 @@ module.exports = {
           user_id: {
             type: Sequelize.UUID,
             allowNull: false,
-
             references: {
               model: 'users',
               key: 'id',
             },
-
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
           },
@@ -99,6 +101,11 @@ module.exports = {
           },
 
           verified_at: {
+            type: Sequelize.DATE,
+            allowNull: true,
+          },
+
+          invalidated_at: {
             type: Sequelize.DATE,
             allowNull: true,
           },
@@ -249,6 +256,11 @@ module.exports = {
 
       await queryInterface.addIndex('password_reset_tokens', ['expires_at'], {
         name: 'password_reset_tokens_expires_at_idx',
+        transaction,
+      });
+
+      await queryInterface.addIndex('user_phone_verifications', ['user_id', 'created_at'], {
+        name: 'user_phone_verifications_user_created_idx',
         transaction,
       });
 

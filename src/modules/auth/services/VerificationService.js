@@ -12,6 +12,8 @@ const { hashOpaqueToken } = require('../providers/opaque-token.provider');
 
 const { comparePhoneVerificationCode } = require('../providers/phone-verification-code.provider');
 
+const authConfig = require('../../../config/auth');
+
 class VerificationService {
   async verifyEmail({ token }) {
     const tokenHash = hashOpaqueToken(token);
@@ -76,10 +78,6 @@ class VerificationService {
       throw new AppError('User not found.', 404);
     }
 
-    if (!user.is_active) {
-      throw new AppError('User account is deactivated.', 403);
-    }
-
     if (!user.phone) {
       throw new AppError('User does not have a phone number.', 400);
     }
@@ -100,7 +98,7 @@ class VerificationService {
       throw new AppError('Invalid or expired verification code.', 400);
     }
 
-    const maxAttempts = 5;
+    const maxAttempts = authConfig.phoneVerification.maxAttempts;
 
     if (verification.attempts >= maxAttempts) {
       throw new AppError('Verification code attempt limit exceeded.', 429);
@@ -121,12 +119,12 @@ class VerificationService {
     }
 
     await database.transaction(async (transaction) => {
-      const consumed = await UserPhoneVerificationRepository.markAsVerified(verification.id, {
+      const verified = await UserPhoneVerificationRepository.markAsVerified(verification.id, {
         transaction,
       });
 
-      if (!consumed) {
-        throw new AppError('Verification code has already been used.', 400);
+      if (!verified) {
+        throw new AppError('Invalid or expired verification code.', 400);
       }
 
       await UserRepository.update(
@@ -134,14 +132,6 @@ class VerificationService {
         {
           is_phone_verified: true,
         },
-        {
-          transaction,
-        }
-      );
-
-      await UserPhoneVerificationRepository.invalidatePendingByUserIdExcept(
-        user.id,
-        verification.id,
         {
           transaction,
         }

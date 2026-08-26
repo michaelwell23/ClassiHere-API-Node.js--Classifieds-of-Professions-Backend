@@ -12,27 +12,9 @@ class UserPhoneVerificationRepository {
       where: {
         user_id: userId,
         verified_at: null,
+        invalidated_at: null,
       },
-
       order: [['created_at', 'DESC']],
-
-      ...options,
-    });
-  }
-
-  async findRecentPendingByUserId(userId, createdAfter, options = {}) {
-    return UserPhoneVerification.findOne({
-      where: {
-        user_id: userId,
-        verified_at: null,
-
-        created_at: {
-          [Op.gte]: createdAfter,
-        },
-      },
-
-      order: [['created_at', 'DESC']],
-
       ...options,
     });
   }
@@ -46,6 +28,7 @@ class UserPhoneVerificationRepository {
         where: {
           id,
           verified_at: null,
+          invalidated_at: null,
         },
 
         ...options,
@@ -62,6 +45,10 @@ class UserPhoneVerificationRepository {
         where: {
           id,
           verified_at: null,
+          invalidated_at: null,
+          expires_at: {
+            [Op.gt]: new Date(),
+          },
         },
 
         ...options,
@@ -74,13 +61,13 @@ class UserPhoneVerificationRepository {
   async invalidatePendingByUserIdExcept(userId, excludedVerificationId, options = {}) {
     return UserPhoneVerification.update(
       {
-        verified_at: new Date(),
+        invalidated_at: new Date(),
       },
       {
         where: {
           user_id: userId,
           verified_at: null,
-
+          invalidated_at: null,
           id: {
             [Op.ne]: excludedVerificationId,
           },
@@ -89,16 +76,6 @@ class UserPhoneVerificationRepository {
         ...options,
       }
     );
-  }
-
-  async deleteById(id, options = {}) {
-    return UserPhoneVerification.destroy({
-      where: {
-        id,
-      },
-
-      ...options,
-    });
   }
 }
 
