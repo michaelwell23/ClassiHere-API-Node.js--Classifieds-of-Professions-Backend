@@ -7,16 +7,13 @@ module.exports = {
 
   info: {
     title: 'ClassiHere API',
-
     version: '1.0.0',
-
     description: 'API oficial da plataforma ClassiHere.',
   },
 
   servers: [
     {
       url: 'http://localhost:3333',
-
       description: 'Local development environment',
     },
   ],
@@ -24,13 +21,11 @@ module.exports = {
   tags: [
     {
       name: 'Authentication',
-
       description: 'Authentication, session, password and identity verification endpoints.',
     },
 
     {
       name: 'Users',
-
       description: 'User account and profile management endpoints.',
     },
   ],
@@ -41,7 +36,6 @@ module.exports = {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-
         description: 'JWT access token returned by the login or refresh-token endpoint.',
       },
     },
@@ -49,7 +43,6 @@ module.exports = {
     schemas: {
       User: {
         type: 'object',
-
         required: [
           'id',
           'first_name',
@@ -66,7 +59,6 @@ module.exports = {
           id: {
             type: 'string',
             format: 'uuid',
-
             example: 'd6f2f9b5-f6a5-4f0f-97b0-1c68f36a8e54',
           },
 
@@ -139,23 +131,16 @@ module.exports = {
 
       AuthTokens: {
         type: 'object',
-
         required: ['access_token', 'refresh_token'],
-
         properties: {
           access_token: {
             type: 'string',
-
             description: 'Short-lived JWT access token.',
-
             example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
           },
-
           refresh_token: {
             type: 'string',
-
             description: 'Long-lived JWT refresh token used for session rotation.',
-
             example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
           },
         },
@@ -163,35 +148,66 @@ module.exports = {
 
       LoginData: {
         type: 'object',
-
         required: ['user', 'tokens'],
-
         properties: {
           user: {
             $ref: '#/components/schemas/User',
           },
-
           tokens: {
             $ref: '#/components/schemas/AuthTokens',
           },
         },
       },
 
-      LoginRequest: {
+      UpdateUserRequest: {
         type: 'object',
 
         additionalProperties: false,
 
-        required: ['email', 'password'],
+        minProperties: 1,
 
         properties: {
           email: {
             type: 'string',
             format: 'email',
 
-            example: 'michael.walker@example.com',
+            description:
+              'Changing the email address invalidates the current email verification state, revokes existing refresh-token sessions and automatically sends a new verification email.',
+
+            example: 'new.email@example.com',
           },
 
+          phone: {
+            type: 'string',
+            minLength: 10,
+            maxLength: 20,
+
+            description:
+              'Changing the phone number invalidates the current phone verification state and automatically sends a new six-digit verification code valid for one hour.',
+
+            example: '5511988887777',
+          },
+
+          avatar: {
+            type: 'string',
+            format: 'binary',
+
+            description:
+              'Optional replacement avatar in JPEG, PNG or WebP format. Maximum size: 5 MB.',
+          },
+        },
+      },
+
+      LoginRequest: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['email', 'password'],
+        properties: {
+          email: {
+            type: 'string',
+            format: 'email',
+            example: 'michael.walker@example.com',
+          },
           password: {
             type: 'string',
             minLength: 1,

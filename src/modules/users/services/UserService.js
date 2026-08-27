@@ -3,6 +3,7 @@ const database = require('../../../database');
 const AppError = require('../../../shared/errors/AppError');
 
 const UserRepository = require('../repositories/UserRepository');
+const UserRefreshTokenRepository = require('../../auth/repositories/UserRefreshTokenRepository');
 
 const AccountVerificationService = require('./AccountVerificationService');
 
@@ -11,7 +12,6 @@ const avatarProcessor = require('../providers/avatar.processor');
 const storageProvider = require('../../../shared/providers/storage/local.provider');
 const { hashPassword } = require('../../../shared/providers/hash/bcrypt.provider');
 
-const UserRefreshTokenRepository = require('../../auth/repositories/UserRefreshTokenRepository');
 class UserService {
   async create({ data, file }) {
     let processedAvatarPath = null;
@@ -125,9 +125,7 @@ class UserService {
     }
 
     let processedAvatarPath = null;
-
     let emailVerification = null;
-
     let phoneVerification = null;
 
     try {
@@ -144,9 +142,7 @@ class UserService {
         }
 
         emailChanged = true;
-
         updateData.email = data.email;
-
         updateData.is_email_verified = false;
       }
 
@@ -161,16 +157,13 @@ class UserService {
           }
 
           phoneChanged = true;
-
           updateData.phone = phone;
-
           updateData.is_phone_verified = false;
         }
       }
 
       if (file) {
         processedAvatarPath = await avatarProcessor.process(file.path);
-
         updateData.avatar_path = processedAvatarPath;
       }
 
@@ -186,7 +179,6 @@ class UserService {
         if (emailChanged) {
           emailVerification = await AccountVerificationService.prepareEmailVerification({
             user: updatedUser,
-
             transaction,
           });
 
@@ -198,7 +190,6 @@ class UserService {
         if (phoneChanged) {
           phoneVerification = await AccountVerificationService.preparePhoneVerification({
             user: updatedUser,
-
             transaction,
           });
         }
@@ -207,7 +198,6 @@ class UserService {
       if (emailVerification) {
         await AccountVerificationService.dispatchEmailVerification({
           user: updatedUser,
-
           verification: emailVerification,
         });
       }
@@ -215,7 +205,6 @@ class UserService {
       if (phoneVerification) {
         await AccountVerificationService.dispatchPhoneVerification({
           user: updatedUser,
-
           verification: phoneVerification,
         });
       }
@@ -226,12 +215,9 @@ class UserService {
         } catch (cleanupError) {
           console.error({
             event: 'previous_avatar_cleanup_failed',
-
             userId: user.id,
-
             error: {
               name: cleanupError.name,
-
               message: cleanupError.message,
             },
           });

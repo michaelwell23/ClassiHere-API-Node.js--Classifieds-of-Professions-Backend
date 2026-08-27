@@ -187,15 +187,31 @@ module.exports = {
 
     patch: {
       tags: ['Users'],
-      summary: 'Update user profile',
+      summary: 'Update user account',
       description:
-        'Partially update the authenticated user profile. Changing the phone number resets phone verification and automatically sends a new six-digit verification code valid for one hour.',
+        'Update editable account data. Only email, phone and avatar may be changed. First name, last name and CPF are immutable after account creation. Changing the email address requires email revalidation and revokes existing refresh-token sessions. Changing the phone number requires phone revalidation and automatically sends a new six-digit verification code valid for one hour.',
+
       security: [
         {
           bearerAuth: [],
         },
       ],
-      parameters: [userIdParameter],
+
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+
+          schema: {
+            type: 'string',
+            format: 'uuid',
+          },
+
+          example: 'd6f2f9b5-f6a5-4f0f-97b0-1c68f36a8e54',
+        },
+      ],
+
       requestBody: {
         required: true,
         content: {
@@ -211,33 +227,112 @@ module.exports = {
           },
         },
       },
+
       responses: {
         200: {
-          description: 'User profile updated successfully',
+          description: 'User account updated successfully',
 
           content: {
             'application/json': {
-              schema: successDataResponse({
-                $ref: '#/components/schemas/User',
-              }),
+              schema: {
+                type: 'object',
+
+                required: ['success', 'data'],
+
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+
+                  data: {
+                    $ref: '#/components/schemas/User',
+                  },
+                },
+              },
             },
           },
         },
 
-        400: validationErrorResponse,
+        400: {
+          $ref: '#/components/responses/ValidationError',
+        },
+
         401: {
           $ref: '#/components/responses/Unauthorized',
         },
-        403: errorResponse(
-          'Authenticated user cannot update another account',
-          'You are not allowed to update this user.'
-        ),
-        404: errorResponse('User account was not found', 'User not found.'),
-        409: errorResponse('Phone number is already registered', 'Phone is already registered.'),
-        413: errorResponse(
-          'Uploaded avatar exceeds the configured size limit',
-          'Uploaded file exceeds the maximum allowed size.'
-        ),
+        403: {
+          description: 'Authenticated user cannot update another account',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+              example: {
+                success: false,
+                message: 'You are not allowed to update this user.',
+              },
+            },
+          },
+        },
+
+        404: {
+          description: 'User account was not found',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+              example: {
+                success: false,
+                message: 'User not found.',
+              },
+            },
+          },
+        },
+        409: {
+          description: 'Email or phone is already registered',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+              examples: {
+                emailAlreadyRegistered: {
+                  value: {
+                    success: false,
+                    message: 'Email is already registered.',
+                  },
+                },
+                phoneAlreadyRegistered: {
+                  value: {
+                    success: false,
+                    message: 'Phone is already registered.',
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        413: {
+          description: 'Uploaded avatar exceeds the configured size limit',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiError',
+              },
+
+              example: {
+                success: false,
+
+                message: 'Uploaded file exceeds the maximum allowed size.',
+              },
+            },
+          },
+        },
+
         500: {
           $ref: '#/components/responses/InternalServerError',
         },
