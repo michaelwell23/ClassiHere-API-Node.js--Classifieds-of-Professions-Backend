@@ -36,3 +36,6 @@ storage/temp/*
 
 storage/phone-verification/*
 !storage/phone-verification/.gitkeep
+
+# Load test generated data
+scripts/load/data/
