@@ -9,7 +9,8 @@
     "format": "prettier --write .",
     "prepare": "husky",
     "delete-inactive-users": "node src/modules/users/jobs/run-delete-inactive-users.js",
-    "load:generate-users": "node scripts/load/generate-users.js"
+    "load:generate-users": "node scripts/load/generate-users.js",
+    "load:create-users": "node scripts/load/create-users.js"
   },
   "lint-staged": {
     "**/*.js": [
