@@ -3,15 +3,10 @@ const path = require('node:path');
 const { performance } = require('node:perf_hooks');
 
 const DEFAULT_API_URL = 'http://localhost:3333';
-
 const API_URL = process.env.LOAD_TEST_API_URL || DEFAULT_API_URL;
-
 const USERS_FILE = path.resolve(__dirname, 'data', 'users.json');
-
 const REPORTS_DIRECTORY = path.resolve(__dirname, 'reports');
-
 const REQUEST_DELAY_MS = Number(process.env.LOAD_TEST_DELAY_MS || 0);
-
 const REQUEST_TIMEOUT_MS = Number(process.env.LOAD_TEST_TIMEOUT_MS || 15000);
 
 function sleep(milliseconds) {
@@ -44,19 +39,12 @@ function loadUsers() {
 
 function createFormData(user) {
   const formData = new FormData();
-
   formData.append('first_name', user.first_name);
-
   formData.append('last_name', user.last_name);
-
   formData.append('email', user.email);
-
   formData.append('password', user.password);
-
   formData.append('phone', user.phone);
-
   formData.append('cpf', user.cpf);
-
   return formData;
 }
 

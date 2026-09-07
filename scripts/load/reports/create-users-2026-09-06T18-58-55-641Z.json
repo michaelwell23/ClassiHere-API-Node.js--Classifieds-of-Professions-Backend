@@ -1,0 +1,139 @@
+{
+  "generated_at": "2026-09-06T18:58:55.639Z",
+  "configuration": {
+    "api_url": "http://localhost:3333",
+    "endpoint": "/users",
+    "mode": "sequential",
+    "request_timeout_ms": 15000,
+    "delay_between_requests_ms": 0
+  },
+  "summary": {
+    "total_requests": 5,
+    "successful_requests": 5,
+    "failed_requests": 0,
+    "success_rate_percent": 100,
+    "status_codes": {
+      "201": 5
+    },
+    "execution": {
+      "total_duration_ms": 15408.33,
+      "total_duration_seconds": 15.41,
+      "requests_per_second": 0.32
+    },
+    "latency_ms": {
+      "min": 2760.78,
+      "max": 3767.96,
+      "average": 3076.73,
+      "p50": 2863.62,
+      "p95": 3767.96,
+      "p99": 3767.96
+    }
+  },
+  "results": [
+    {
+      "index": 1,
+      "email": "loadtest.mtq6d5vm.001@example.com",
+      "success": true,
+      "status": 201,
+      "duration_ms": 3767.96,
+      "response": {
+        "success": true,
+        "data": {
+          "id": "af9d0f0a-a1f8-495a-b523-7134f1ae0332",
+          "first_name": "Carolina",
+          "last_name": "Freitas",
+          "email": "loadtest.mtq6d5vm.001@example.com",
+          "phone": "11900000001",
+          "avatar_url": null,
+          "is_email_verified": false,
+          "is_phone_verified": false,
+          "is_active": true
+        }
+      }
+    },
+    {
+      "index": 2,
+      "email": "loadtest.mtq6d5vm.002@example.com",
+      "success": true,
+      "status": 201,
+      "duration_ms": 2821.7,
+      "response": {
+        "success": true,
+        "data": {
+          "id": "7c2c170e-1558-4aaa-8032-d2f3c59e65db",
+          "first_name": "Juliana",
+          "last_name": "Alves",
+          "email": "loadtest.mtq6d5vm.002@example.com",
+          "phone": "11900000002",
+          "avatar_url": null,
+          "is_email_verified": false,
+          "is_phone_verified": false,
+          "is_active": true
+        }
+      }
+    },
+    {
+      "index": 3,
+      "email": "loadtest.mtq6d5vm.003@example.com",
+      "success": true,
+      "status": 201,
+      "duration_ms": 2760.78,
+      "response": {
+        "success": true,
+        "data": {
+          "id": "48cd1230-4142-45b4-afea-ce6c377704cd",
+          "first_name": "Aline",
+          "last_name": "Araújo",
+          "email": "loadtest.mtq6d5vm.003@example.com",
+          "phone": "11900000003",
+          "avatar_url": null,
+          "is_email_verified": false,
+          "is_phone_verified": false,
+          "is_active": true
+        }
+      }
+    },
+    {
+      "index": 4,
+      "email": "loadtest.mtq6d5vm.004@example.com",
+      "success": true,
+      "status": 201,
+      "duration_ms": 2863.62,
+      "response": {
+        "success": true,
+        "data": {
+          "id": "8c4013b5-5865-4afe-af76-f4ae0607f1ee",
+          "first_name": "Patricia",
+          "last_name": "Duarte",
+          "email": "loadtest.mtq6d5vm.004@example.com",
+          "phone": "11900000004",
+          "avatar_url": null,
+          "is_email_verified": false,
+          "is_phone_verified": false,
+          "is_active": true
+        }
+      }
+    },
+    {
+      "index": 5,
+      "email": "loadtest.mtq6d5vm.005@example.com",
+      "success": true,
+      "status": 201,
+      "duration_ms": 3169.57,
+      "response": {
+        "success": true,
+        "data": {
+          "id": "29387313-f043-4531-a954-4a2460eb6bc0",
+          "first_name": "Rafael",
+          "last_name": "Monteiro",
+          "email": "loadtest.mtq6d5vm.005@example.com",
+          "phone": "11900000005",
+          "avatar_url": null,
+          "is_email_verified": false,
+          "is_phone_verified": false,
+          "is_active": true
+        }
+      }
+    }
+  ]
+}

@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const USERS_COUNT = Number(process.env.USERS_COUNT || 100);
+const USERS_COUNT = Number(process.env.USERS_COUNT || 10);
 
 const OUTPUT_DIRECTORY = path.resolve(__dirname, 'data');
 

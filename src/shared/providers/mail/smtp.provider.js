@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-
 const mailConfig = require('../../../config/mail');
 
 let transporter;
@@ -10,7 +9,6 @@ function getTransporter() {
       host: mailConfig.host,
       port: mailConfig.port,
       secure: mailConfig.secure,
-
       auth:
         mailConfig.user && mailConfig.password
           ? {
@@ -18,11 +16,8 @@ function getTransporter() {
               pass: mailConfig.password,
             }
           : undefined,
-
       connectionTimeout: mailConfig.connectionTimeout,
-
       greetingTimeout: mailConfig.greetingTimeout,
-
       socketTimeout: mailConfig.socketTimeout,
     });
   }
